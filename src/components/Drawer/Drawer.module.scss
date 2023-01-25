@@ -1,0 +1,27 @@
+.outerContainer {
+  position: fixed;
+  width: 40%;
+  top:0;
+  height: 100vh;
+  background-color: rgba(114, 85, 42, 0.4);
+  right: -100%;
+  transition: 0.5s;
+  z-index: 999;
+
+  &.active {
+
+    right: 0;
+  }
+
+}
+
+.innerContainer {
+  position: relative;
+}
+
+.closeIcon {
+  position: absolute;
+  cursor: pointer;
+  right: 10px;
+  top: 10px;
+}

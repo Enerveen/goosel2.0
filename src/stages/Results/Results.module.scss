@@ -1,0 +1,16 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.chartsSection {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.chartContainer {
+  margin: 20px;
+}

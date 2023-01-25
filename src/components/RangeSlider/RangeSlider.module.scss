@@ -1,0 +1,81 @@
+.sliderContainer {
+  position: relative;
+  width: 100%;
+  height: 40px;
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: calc(100% - 5px);
+    outline: none;
+    position: absolute;
+    margin: auto;
+    top: 0;
+    bottom: 0;
+    background-color: transparent;
+    pointer-events: none;
+
+    &::-webkit-slider-runnable-track {
+      -webkit-appearance: none;
+      height: 10px;
+    }
+
+    &::-moz-range-track {
+      -moz-appearance: none;
+      height: 10px;
+    }
+
+    &::-moz-range-thumb {
+      width: 28.8px;
+      height: 38px;
+      background: url('src/img/egg2.png');
+      background-size: cover;
+      cursor: pointer;
+      pointer-events: auto;
+      border: 0;
+    }
+
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 28.8px;
+      height: 38px;
+      background: url('src/img/egg2.png');
+      background-size: cover;
+      cursor: pointer;
+      border: 0;
+      pointer-events: auto;
+      margin-top: -15px;
+    }
+
+    &:active::-webkit-slider-thumb {
+      filter: invert(20%);
+    }
+  }
+}
+
+.sliderTrack {
+  width: calc(100% - 5px);
+  height: 10px;
+  position: absolute;
+  margin: auto;
+  top: 0;
+  bottom: 0;
+  border-radius: 5px;
+}
+
+
+.minMaxLabels {
+  display: flex;
+  justify-content: space-between;
+
+  color: #fafafa;
+}
+
+.labelContainer {
+  display: flex;
+  justify-content: space-between;
+  color: #fafafa;
+  margin-bottom: 8px;
+}
