@@ -1,4 +1,4 @@
-import bgSrc from '../img/background.jpeg'
+import bgSrc from '../img/background.jpg'
 import plantSrc from '../img/plant.png'
 import animalTextureAtlasSrc from '../img/animalTextureAtlas.png'
 import eggSrc from '../img/egg.png'
@@ -24,7 +24,7 @@ class View {
         this.plantTexture = {
             image: plantImage,
             width: 50,
-            height: 50
+            height: 45
         }
         const animalTextureAtlas = new Image()
         animalTextureAtlas.src = animalTextureAtlasSrc

@@ -27,9 +27,11 @@ const Main = ({ setAppPhase }: IMainProps) => {
     )
 
     const onSimStart = useCallback(() => {
-        simulationStore.setSimulationConstants(constantsValues)
+        if (!isDefaultSettings) {
+            simulationStore.setSimulationConstants(constantsValues)
+        }
         setAppPhase('STARTED')
-    }, [constantsValues, setAppPhase])
+    }, [constantsValues, setAppPhase, isDefaultSettings])
 
     return <div className={classes.container}>
         <h1>
