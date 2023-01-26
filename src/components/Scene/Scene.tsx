@@ -33,7 +33,9 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             store.addPlant(generateFood(store.getSimulationConstants.initialFoodCount,
                 {width: fieldSize.edgeX, height: fieldSize.edgeY}))
         }
-        if(store.getAnimals.length) {
+        if(!store.getAnimals.length) {
+            setAppPhase('FINISHED')
+        } else {
             store.clearAnimalCorpses()
             store.gatherStatistics()
             if (context) {
@@ -87,8 +89,6 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                     }
                 })
             }
-        } else {
-            setAppPhase('FINISHED')
         }
     }, [context, canvasWidth, canvasHeight]);
 

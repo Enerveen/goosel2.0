@@ -101,10 +101,23 @@ class View {
             } else {
                 this.context.drawImage(image, x, y, width, height )
             }
-            this.context.fillStyle = `rgba(${gender === 'male' ? '0,0,255' : '255,0,255'},0.5)`;
-            this.context.fillText(name, x + width / 2, y - 26)
-            this.context?.fillText(isAlive ? age >= 0 ? `${age} y.o.` : 'Egg' : 'Corpse',
-                x + width / 2, y - 6)
+
+            const styles = [
+                `rgba(${gender === 'male' ? '0,180,255' : '255,100,255'},1.0)`,
+                'rgba(0, 0, 0, 1.0)'
+            ]
+
+            for (let i = styles.length - 1; i >= 0; i--) {
+                const textPos = {
+                    x: x + 2 * i,
+                    y: y + 2 * i
+                }
+
+                this.context.fillStyle = styles[i];
+                this.context.fillText(name, textPos.x + width / 2, textPos.y - 26)
+                this.context?.fillText(isAlive ? age >= 0 ? `${age} y.o.` : 'Egg' : 'Corpse',
+                    textPos.x + width / 2, textPos.y - 6)
+            }
         }
 
 
