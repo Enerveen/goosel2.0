@@ -80,7 +80,8 @@ class View {
     public drawPlant(position: Position) {
         const [{image, width, height}, {x, y}] = [this.plantTexture, position]
         if (this.context) {
-            this.context.drawImage(image, x, y, width, height)
+            const originOffset = { x: 0.5 * width, y: 1.0 * height };
+            this.context.drawImage(image, x - originOffset.x, y - originOffset.y, width, height)
         }
     }
 
@@ -95,11 +96,13 @@ class View {
                 isAlive,
                 age
             }] = [this.calculateAnimalTexture(entity), position, entity]
-            const currentFrame = Math.floor((animationFrameId % appConstants.fps) / appConstants.fps * 15)
+
+            const currentFrame = Math.floor((animationFrameId % appConstants.fps) / appConstants.fps * 15);
+            const originOffset = { x: 0.5 * width, y: 1.0 * height };
             if (frameWidth) {
-                this.context.drawImage(image, frameWidth * currentFrame, 0, frameWidth, frameHeight, x, y, width, height)
+                this.context.drawImage(image, frameWidth * currentFrame, 0, frameWidth, frameHeight, x - originOffset.x, y - originOffset.y, width, height)
             } else {
-                this.context.drawImage(image, x, y, width, height )
+                this.context.drawImage(image, x - originOffset.x, y - originOffset.y, width, height)
             }
 
             const styles = [
@@ -114,9 +117,9 @@ class View {
                 }
 
                 this.context.fillStyle = styles[i];
-                this.context.fillText(name, textPos.x + width / 2, textPos.y - 26)
+                this.context.fillText(name, textPos.x - originOffset.x + width / 2, textPos.y - originOffset.y - 26)
                 this.context?.fillText(isAlive ? age >= 0 ? `${age} y.o.` : 'Egg' : 'Corpse',
-                    textPos.x + width / 2, textPos.y - 6)
+                    textPos.x - originOffset.x + width / 2, textPos.y - originOffset.y - 6)
             }
         }
 
