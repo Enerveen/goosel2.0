@@ -80,7 +80,7 @@ class View {
     public drawPlant(position: Position) {
         const [{image, width, height}, {x, y}] = [this.plantTexture, position]
         if (this.context) {
-            const originOffset = { x: 0.5 * width, y: 1.0 * height };
+            const originOffset = { x: 0.5 * width, y: 0.6 * height };
             this.context.drawImage(image, x - originOffset.x, y - originOffset.y, width, height)
         }
     }
@@ -98,7 +98,7 @@ class View {
             }] = [this.calculateAnimalTexture(entity), position, entity]
 
             const currentFrame = Math.floor((animationFrameId % appConstants.fps) / appConstants.fps * 15);
-            const originOffset = { x: 0.5 * width, y: 1.0 * height };
+            const originOffset = { x: 0.5 * width, y: 0.8 * height };
             if (frameWidth) {
                 this.context.drawImage(image, frameWidth * currentFrame, 0, frameWidth, frameHeight, x - originOffset.x, y - originOffset.y, width, height)
             } else {
@@ -106,21 +106,23 @@ class View {
             }
 
             const styles = [
-                `rgba(${gender === 'male' ? '0,180,255' : '255,100,255'},1.0)`,
-                'rgba(0, 0, 0, 1.0)'
+                'rgba(0, 0, 0, 1.0)',
+                `rgba(${gender === 'male' ? '0,180,255' : '255,100,255'},1.0)`
             ]
 
-            for (let i = styles.length - 1; i >= 0; i--) {
+            styles.forEach((style, index) => {
                 const textPos = {
-                    x: x + 2 * i,
-                    y: y + 2 * i
+                    x: x + 2 * (styles.length - index - 1),
+                    y: y + 2 * (styles.length - index - 1)
                 }
 
-                this.context.fillStyle = styles[i];
-                this.context.fillText(name, textPos.x - originOffset.x + width / 2, textPos.y - originOffset.y - 26)
-                this.context?.fillText(isAlive ? age >= 0 ? `${age} y.o.` : 'Egg' : 'Corpse',
-                    textPos.x - originOffset.x + width / 2, textPos.y - originOffset.y - 6)
-            }
+                if (this.context) {
+                    this.context.fillStyle = style;
+                    this.context.fillText(name, textPos.x - originOffset.x + width / 2, textPos.y - originOffset.y - 26)
+                    this.context?.fillText(isAlive ? age >= 0 ? `${age} y.o.` : 'Egg' : 'Corpse',
+                        textPos.x - originOffset.x + width / 2, textPos.y - originOffset.y - 6)
+                }
+            })
         }
 
 
