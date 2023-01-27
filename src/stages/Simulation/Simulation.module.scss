@@ -1,5 +1,6 @@
 .container {
   position: relative;
+  overflow-y: hidden;
 }
 
 .aside {
@@ -17,6 +18,6 @@
   z-index: 999;
 
   &.active {
-    right: -100%;
+    right: -48px;
   }
 }

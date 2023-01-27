@@ -13,6 +13,6 @@ export const timeConstants = {
 
 export const appConstants = {
     fps: 60,
-    fieldXPadding: 100,
-    fieldYPadding: 100
+    fieldXPadding: 20,
+    fieldYPadding: 20
 }

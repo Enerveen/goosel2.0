@@ -27,13 +27,13 @@ const ComposedChart = ({data, xAxisDataKey, lineDataKey, barDataKey}:IComposedCh
         left: 20,
     }}
 >
-    <CartesianGrid stroke="#f5f5f5" />
-    <XAxis dataKey={xAxisDataKey} />
+    <CartesianGrid strokeDasharray="3 3"/>
+    <XAxis dataKey={xAxisDataKey} stroke={'#fafafa'}/>
     <YAxis orientation={'left'} yAxisId={`${barDataKey}Y`} stroke={'#413ea0'}/>
     <YAxis orientation={'right'} yAxisId={`${lineDataKey}Y`} stroke={'#ff7300'}/>
     <Tooltip content={renderTooltipContent}/>
     <Bar dataKey={barDataKey} fill="#413ea0" yAxisId={`${barDataKey}Y`}/>
-    <Line type="monotone" dataKey={lineDataKey} stroke="#ff7300" yAxisId={`${lineDataKey}Y`}/>
+    <Line type="monotone" dataKey={lineDataKey} stroke="#ff7300" yAxisId={`${lineDataKey}Y`} dot={null}/>
 </RechartsComposedChart>
 
 export default ComposedChart

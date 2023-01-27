@@ -45,8 +45,8 @@ const DynamicsChart = ({data}:IDynamicsChartProps) => {
         }}
     >
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="year" />
-        <YAxis />
+        <XAxis dataKey="year" stroke={'#fafafa'}/>
+        <YAxis stroke={'#fafafa'}/>
         <Tooltip content={renderTooltipContent}/>
         <defs>
             <linearGradient id="splitColor" x1="0" y1="0" x2="0" y2="1">
