@@ -6,6 +6,7 @@ import React from "react";
 import View from "./View";
 import {simulationValuesMultipliers} from "../constants/simulation";
 import Plant from "../entities/Plant";
+import {Camera, mouseCameraController} from "../core/Camera";
 
 export const findDistance = (pos1: Position, pos2: Position) =>
     Math.sqrt((pos2.x - pos1.x) ** 2 + (pos2.y - pos1.y) ** 2)
@@ -88,6 +89,35 @@ export const handleCanvasClick = (
         removeActiveEntity()
     }
 }
+
+
+export const handleCanvasMousePress = (
+    event: React.MouseEvent<HTMLCanvasElement>,
+    camera: Camera) => {
+    mouseCameraController.moveStart(camera, {x: event.clientX, y: event.clientY});
+}
+
+
+export const handleCanvasMouseRelease = (
+    event: React.MouseEvent<HTMLCanvasElement>,
+    camera: Camera) => {
+    mouseCameraController.moveStop();
+}
+
+
+export const handleCanvasMouseMove = (
+    event: React.MouseEvent<HTMLCanvasElement>,
+    camera: Camera) => {
+    mouseCameraController.moveUpdate(camera, {x: event.clientX, y: event.clientY});
+}
+
+export const handleCanvasMouseWheel = (
+    event: React.WheelEvent<HTMLCanvasElement>,
+    camera: Camera) => {
+    camera.scale.x *= 1 + 0.001 * event.deltaY;
+    camera.scale.y *= 1 + 0.001 * event.deltaY;
+}
+
 
 export const checkBreedingPossibility = (animal: Animal, breedingMinAge: number, breedingMaxAge: number) => animal.energy.current > animal.energy.max / 2 &&
     animal.energy.breedingCD <= 0 &&
