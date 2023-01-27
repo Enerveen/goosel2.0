@@ -1,7 +1,7 @@
 import React from 'react';
 import {AreaChart as RechartsAreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip} from 'recharts';
-import {areaChartColors} from "../../../constants/colors";
-import renderTooltipContent from "../renderTooltipContent";
+import {areaChartColors} from "../../constants/colors";
+import {renderTooltipContent} from "./customChartComponents";
 
 interface IAreaChartProps {
     data: any[],

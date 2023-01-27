@@ -1,9 +1,10 @@
 import React from "react";
 import classes from './Results.module.scss'
-import AreaChart from "../../components/Charts/AreaChart/AreaChart";
-import BarChart from "../../components/Charts/BarChart/BarChart";
-import DynamicsChart from "../../components/Charts/DynamicsChart/DynamicsChart";
-import ComposedChart from "../../components/Charts/ComposedChart/ComposedChart";
+import AreaChart from "../../components/Charts/AreaChart";
+import BarChart from "../../components/Charts/BarChart";
+import DynamicsChart from "../../components/Charts/DynamicsChart";
+import ComposedChart from "../../components/Charts/ComposedChart";
+import LineChart from "../../components/Charts/LineChart";
 
 const Results = ({statistics}: any) => {
     return <div className={classes.container}>
@@ -29,7 +30,7 @@ const Results = ({statistics}: any) => {
                 <BarChart data={statistics.age} dataKeys={['child', 'teen', 'mature', 'elder']} xAxisDataKey={'year'}/>
             </div>
             <div className={classes.chartContainer}>
-                <BarChart
+                <LineChart
                     data={statistics.averageStats}
                     dataKeys={['speed', 'breedingSensitivity', 'foodSensitivity', 'breedingCD', 'hatchingTime']}
                     xAxisDataKey={'year'}/>

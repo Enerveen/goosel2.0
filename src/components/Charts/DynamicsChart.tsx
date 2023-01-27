@@ -1,5 +1,5 @@
 import {Area, AreaChart, CartesianGrid, Tooltip, XAxis, YAxis} from "recharts";
-import {TooltipContent} from "../renderTooltipContent";
+import {TooltipContent} from "./customChartComponents";
 
 
 interface IDynamicsChartProps {

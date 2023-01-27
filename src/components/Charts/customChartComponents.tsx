@@ -16,7 +16,7 @@ enum keyNames {
     totalNutrition = 'Plants Total Nutrition'
 }
 
-const renderTooltipContent = (o: any) => <TooltipContent o={o}/>
+export const renderTooltipContent = (o: any) => <TooltipContent o={o}/>
 
 interface ITooltipContentProps {
     o: any
@@ -39,5 +39,3 @@ export const TooltipContent = ({o, calculateLabel}: ITooltipContentProps) => {
             </div>
         </div>
 };
-
-export default renderTooltipContent

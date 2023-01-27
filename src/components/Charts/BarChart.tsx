@@ -6,10 +6,11 @@ import {
     YAxis,
     CartesianGrid,
     Tooltip,
-    Legend
+    Legend,
+    Brush
 } from 'recharts';
-import {barChartColors} from "../../../constants/colors";
-import renderTooltipContent from "../renderTooltipContent";
+import {barChartColors} from "../../constants/colors";
+import {renderTooltipContent} from "./customChartComponents";
 
 interface IBarChartProps {
     data: any[],
@@ -33,6 +34,7 @@ const BarChart = ({data, dataKeys, xAxisDataKey}: IBarChartProps) => <RechartsBa
     <YAxis/>
     <Tooltip content={renderTooltipContent}/>
     <Legend/>
+    <Brush height={20}/>
     {dataKeys.map((dataKey, index) =>
         <Bar
             dataKey={dataKey}

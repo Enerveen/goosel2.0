@@ -7,7 +7,7 @@ import {
     XAxis,
     YAxis
 } from "recharts";
-import renderTooltipContent from "../renderTooltipContent";
+import {renderTooltipContent} from "./customChartComponents";
 
 interface IComposedChartProps {
     data: any[],
