@@ -34,7 +34,7 @@ const LineChart = ({data, dataKeys, xAxisDataKey}: ILineChartProps) => <Recharts
             key={`dataKey${index}`}
             stroke={barChartColors[index]}
             strokeWidth={4}
-            dot={null}
+            dot={false}
         />
     )}
 </RechartsLineChart>

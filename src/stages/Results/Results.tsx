@@ -13,12 +13,15 @@ const Results = ({statistics}: any) => {
         </h1>
         <div className={classes.chartsSection}>
             <div className={classes.chartContainer}>
+                <h2>Male/Female ratio</h2>
                 <AreaChart data={statistics.gender} xAxisDataKey={'year'} dataKeys={['male', 'female']}/>
             </div>
             <div className={classes.chartContainer}>
+                <h2>Population Change</h2>
                 <DynamicsChart data={statistics.populationChange}/>
             </div>
             <div className={classes.chartContainer}>
+                <h2>Plants count</h2>
                 <ComposedChart
                     data={statistics.plantStats}
                     barDataKey={'count'}
@@ -27,9 +30,11 @@ const Results = ({statistics}: any) => {
                 />
             </div>
             <div className={classes.chartContainer}>
+                <h2>Animals age groups</h2>
                 <BarChart data={statistics.age} dataKeys={['child', 'teen', 'mature', 'elder']} xAxisDataKey={'year'}/>
             </div>
             <div className={classes.chartContainer}>
+                <h2>Average population stats</h2>
                 <LineChart
                     data={statistics.averageStats}
                     dataKeys={['speed', 'breedingSensitivity', 'foodSensitivity', 'breedingCD', 'hatchingTime']}
