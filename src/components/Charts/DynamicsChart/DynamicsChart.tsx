@@ -1,4 +1,5 @@
 import {Area, AreaChart, CartesianGrid, Tooltip, XAxis, YAxis} from "recharts";
+import {TooltipContent} from "../renderTooltipContent";
 
 
 interface IDynamicsChartProps {
@@ -19,6 +20,16 @@ const gradientOffset = (data: {value: number, year: number}[]) => {
     return dataMax / (dataMax - dataMin);
 };
 
+const calculateTooltipItemLabel = (name: string, value: number) => {
+    const commonStyles = {fontSize: '18px'}
+    return value > 0  ? <span style={{color: 'green', ...commonStyles}}>{`Growth: ${value} animals`}</span>
+        : value < 0 ? <span style={{color: 'red', ...commonStyles}}>{`Decrease: ${Math.abs(value)} animals`}</span>
+            : <span style={commonStyles}>No changes in population</span>
+
+}
+
+const renderTooltipContent = (o: any) => <TooltipContent o={o} calculateLabel={calculateTooltipItemLabel}/>
+
 const DynamicsChart = ({data}:IDynamicsChartProps) => {
     const off = gradientOffset(data);
 
@@ -36,7 +47,7 @@ const DynamicsChart = ({data}:IDynamicsChartProps) => {
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="year" />
         <YAxis />
-        <Tooltip />
+        <Tooltip content={renderTooltipContent}/>
         <defs>
             <linearGradient id="splitColor" x1="0" y1="0" x2="0" y2="1">
                 <stop offset={off} stopColor="green" stopOpacity={1} />

@@ -63,7 +63,7 @@ const RangeSlider = ({initialValues, minGap = 0, max, min, label, className, onV
                 max={max}
                 step={step}
                 value={values[0]}
-                onChange={(e) => slideOne(Number(e.target.value))}
+                onChange={(e) => slideOne(+e.target.value)}
             />
             <input
                 type="range"
@@ -71,7 +71,7 @@ const RangeSlider = ({initialValues, minGap = 0, max, min, label, className, onV
                 max={max}
                 value={values[1]}
                 step={step}
-                onChange={(e) => slideTwo(Number(e.target.value))}
+                onChange={(e) => slideTwo(+e.target.value)}
             />
         </div>
         <div className={classes.minMaxLabels}>

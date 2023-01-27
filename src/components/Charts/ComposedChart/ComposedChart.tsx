@@ -7,6 +7,7 @@ import {
     XAxis,
     YAxis
 } from "recharts";
+import renderTooltipContent from "../renderTooltipContent";
 
 interface IComposedChartProps {
     data: any[],
@@ -30,7 +31,7 @@ const ComposedChart = ({data, xAxisDataKey, lineDataKey, barDataKey}:IComposedCh
     <XAxis dataKey={xAxisDataKey} />
     <YAxis orientation={'left'} yAxisId={`${barDataKey}Y`} stroke={'#413ea0'}/>
     <YAxis orientation={'right'} yAxisId={`${lineDataKey}Y`} stroke={'#ff7300'}/>
-    <Tooltip />
+    <Tooltip content={renderTooltipContent}/>
     <Bar dataKey={barDataKey} fill="#413ea0" yAxisId={`${barDataKey}Y`}/>
     <Line type="monotone" dataKey={lineDataKey} stroke="#ff7300" yAxisId={`${lineDataKey}Y`}/>
 </RechartsComposedChart>

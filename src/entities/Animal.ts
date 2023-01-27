@@ -254,7 +254,7 @@ class Animal extends Entity {
         breedingMaxProgress: number
     ) {
         const {progress, maxProgress} = this.currentActivity
-        this.energy.current -= simulationSpeed * calculateEnergyLoss(this.stats);
+        this.energy.current -= +((simulationSpeed * calculateEnergyLoss(this.stats)).toFixed(3));
         if (progress >= maxProgress) {
             const father = this.gender === 'male' ? this : partner
             const mother = this.gender === 'female' ? this : partner

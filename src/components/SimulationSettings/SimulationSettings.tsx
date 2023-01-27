@@ -52,7 +52,7 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
             step={2}
             value={constantsValues.breedingMaxProgress / 10}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                updateSettingsValues('breedingMaxProgress', Number(e.target.value) * 10)}
+                updateSettingsValues('breedingMaxProgress', +e.target.value * 10)}
         />
         <Slider
             label={'Maximum Energy of Animals'}
@@ -63,7 +63,7 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
             step={100}
             value={constantsValues.animalMaxEnergy}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                updateSettingsValues('animalMaxEnergy', Number(e.target.value))}
+                updateSettingsValues('animalMaxEnergy', +e.target.value)}
         />
         <Slider
             label={'Initial food pieces count'}
@@ -74,7 +74,7 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
             step={2}
             value={constantsValues.initialFoodCount}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                updateSettingsValues('initialFoodCount', Number(e.target.value))}
+                updateSettingsValues('initialFoodCount', +e.target.value)}
         />
         <Slider
             label={'Initial animals count'}
@@ -84,7 +84,7 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
             max={100}
             value={constantsValues.initialAnimalCount}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                updateSettingsValues('initialAnimalCount', Number(e.target.value))}
+                updateSettingsValues('initialAnimalCount', +e.target.value)}
         />
         <Slider
             label={'Food spawn Coef'}
@@ -95,7 +95,7 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
             step={2}
             value={constantsValues.foodSpawnChanceK}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                updateSettingsValues('foodSpawnChanceK', Number(e.target.value))}
+                updateSettingsValues('foodSpawnChanceK', +e.target.value)}
         />
     </div>
 }

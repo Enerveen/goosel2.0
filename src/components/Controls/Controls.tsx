@@ -45,7 +45,7 @@ const Controls = observer(({simulationSpeed, setSimulationSpeed, timestamp, setA
             value={value}
             min={0}
             max={10}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(Number(e.target.value))}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(+e.target.value)}
             className={classes.sliderContainer}
         />
         <button onClick={createNewAnimal}>

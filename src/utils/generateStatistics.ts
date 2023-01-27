@@ -22,11 +22,12 @@ const generateStatistics = (animals: Animal[], plants: Plant[]) => {
         }
     }
 
+    const stats = Object.keys(animalStats.averageStats) as
+        ('breedingCD' | 'breedingSensitivity' | 'hatchingTime' | 'foodSensitivity' | 'speed')[]
+
     animals.forEach(animal => {
-        const stats = Object.keys(animalStats.averageStats) as
-            ('breedingCD' | 'breedingSensitivity' | 'hatchingTime' | 'foodSensitivity' | 'speed')[]
         stats.forEach((stat) => {
-            animalStats.averageStats[stat] += animal.stats[stat] / animals.length
+            animalStats.averageStats[stat] += animal.stats[stat]
         })
         animal.gender === "male" ? animalStats.gender.male += 1 : animalStats.gender.female += 1
         if (animal.age.current >= 0 && animal.age.current < 5) {
@@ -47,7 +48,8 @@ const generateStatistics = (animals: Animal[], plants: Plant[]) => {
     })
 
     const totalNutrition = plants.reduce((acc, elem) => acc + elem.nutritionValue, 0)
-
+    stats.forEach(stat =>
+        animalStats.averageStats[stat] = +(animalStats.averageStats[stat] / animals.length).toFixed(3))
     return {...animalStats, plantsStats: {totalNutrition, count: plants.length}, animalsCount: animals.length}
 
 }

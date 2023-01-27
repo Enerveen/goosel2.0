@@ -34,11 +34,11 @@ export const getChild = (
     const gender: gender = coinFlip() ? 'male' : 'female'
 
     const stats = {
-        speed: Math.max(0.1, Number((rollFivePercentChance() ? baseStats.speed : coinFlip() ? baseStats.speed + statsDelta : baseStats.speed - statsDelta).toFixed(3))),
-        foodSensitivity: Math.max(0.1, Number((rollFivePercentChance() ? baseStats.foodSensitivity : coinFlip() ? baseStats.foodSensitivity + statsDelta : baseStats.foodSensitivity - statsDelta).toFixed(3))),
-        breedingSensitivity: Math.max(0.1, Number((rollFivePercentChance() ? baseStats.breedingSensitivity : coinFlip() ? baseStats.breedingSensitivity + statsDelta : baseStats.breedingSensitivity - statsDelta).toFixed(3))),
-        breedingCD: Math.max(0.1, Number((rollFivePercentChance() ? baseStats.breedingCD : coinFlip() ? baseStats.breedingCD + statsDelta : baseStats.breedingCD - statsDelta).toFixed(3))),
-        hatchingTime: Math.max(0.1, Number((rollFivePercentChance() ? baseStats.hatchingTime : coinFlip() ? baseStats.hatchingTime + statsDelta : baseStats.hatchingTime - statsDelta).toFixed(3)))
+        speed: Math.max(0.1, +((rollFivePercentChance() ? baseStats.speed : coinFlip() ? baseStats.speed + statsDelta : baseStats.speed - statsDelta).toFixed(3))),
+        foodSensitivity: Math.max(0.1, +((rollFivePercentChance() ? baseStats.foodSensitivity : coinFlip() ? baseStats.foodSensitivity + statsDelta : baseStats.foodSensitivity - statsDelta).toFixed(3))),
+        breedingSensitivity: Math.max(0.1, +((rollFivePercentChance() ? baseStats.breedingSensitivity : coinFlip() ? baseStats.breedingSensitivity + statsDelta : baseStats.breedingSensitivity - statsDelta).toFixed(3))),
+        breedingCD: Math.max(0.1, +((rollFivePercentChance() ? baseStats.breedingCD : coinFlip() ? baseStats.breedingCD + statsDelta : baseStats.breedingCD - statsDelta).toFixed(3))),
+        hatchingTime: Math.max(0.1, +((rollFivePercentChance() ? baseStats.hatchingTime : coinFlip() ? baseStats.hatchingTime + statsDelta : baseStats.hatchingTime - statsDelta).toFixed(3)))
     }
     return new Animal({
         id,
@@ -62,7 +62,7 @@ export const getChild = (
 
 export const calculateEnergyLoss = (stats: Stats) => {
     const {speed, foodSensitivity, breedingSensitivity, breedingCD, hatchingTime} = stats
-    return Number((speed * foodSensitivity * breedingSensitivity / breedingCD / hatchingTime).toFixed(3))
+    return speed * foodSensitivity * breedingSensitivity / breedingCD / hatchingTime
 }
 
 export const handleCanvasClick = (

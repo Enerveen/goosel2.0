@@ -8,7 +8,8 @@ import {
     Tooltip,
     Legend
 } from 'recharts';
-import {barChartColors} from "../../constants/colors";
+import {barChartColors} from "../../../constants/colors";
+import renderTooltipContent from "../renderTooltipContent";
 
 interface IBarChartProps {
     data: any[],
@@ -30,7 +31,7 @@ const BarChart = ({data, dataKeys, xAxisDataKey}: IBarChartProps) => <RechartsBa
     <CartesianGrid strokeDasharray="3 3"/>
     <XAxis dataKey={xAxisDataKey}/>
     <YAxis/>
-    <Tooltip/>
+    <Tooltip content={renderTooltipContent}/>
     <Legend/>
     {dataKeys.map((dataKey, index) =>
         <Bar

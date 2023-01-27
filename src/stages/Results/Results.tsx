@@ -1,9 +1,9 @@
 import React from "react";
 import classes from './Results.module.scss'
-import AreaChart from "../../components/AreaChart/AreaChart";
-import BarChart from "../../components/BarChart/BarChart";
-import DynamicsChart from "../../components/DynamicsChart/DynamicsChart";
-import ComposedChart from "../../components/ComposedChart/ComposedChart";
+import AreaChart from "../../components/Charts/AreaChart/AreaChart";
+import BarChart from "../../components/Charts/BarChart/BarChart";
+import DynamicsChart from "../../components/Charts/DynamicsChart/DynamicsChart";
+import ComposedChart from "../../components/Charts/ComposedChart/ComposedChart";
 
 const Results = ({statistics}: any) => {
     return <div className={classes.container}>
