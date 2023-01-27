@@ -1,7 +1,8 @@
 import {CartesianGrid, Legend, Line, Tooltip, XAxis, YAxis, LineChart as RechartsLineChart, Brush} from "recharts";
-import {renderTooltipContent} from "./customChartComponents";
+import {CustomLegend, renderTooltipContent} from "./customChartComponents";
 import {barChartColors} from "../../constants/colors";
 import React from "react";
+import classes from './chartsStyles.module.scss'
 
 interface ILineChartProps {
     data: any[],
@@ -11,6 +12,7 @@ interface ILineChartProps {
 
 const LineChart = ({data, dataKeys, xAxisDataKey}: ILineChartProps) => <RechartsLineChart
     width={1200}
+    className={classes.chart}
     height={400}
     data={data}
     margin={{
@@ -24,8 +26,8 @@ const LineChart = ({data, dataKeys, xAxisDataKey}: ILineChartProps) => <Recharts
     <XAxis dataKey={xAxisDataKey}/>
     <YAxis/>
     <Tooltip content={renderTooltipContent}/>
-    <Legend/>
-    <Brush height={20}/>
+    <Legend content={<CustomLegend/>}/>
+    <Brush height={20} fill={'#5fa35c'}/>
     {dataKeys.map((dataKey, index) =>
         <Line
             dataKey={dataKey}

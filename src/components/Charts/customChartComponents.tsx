@@ -27,15 +27,31 @@ export const TooltipContent = ({o, calculateLabel}: ITooltipContentProps) => {
     const {payload, label} = o;
 
     return <div className={classes.tooltipContainer}>
-            <div className={classes.tooltipHeading}>Year {label}</div>
-            <div className={classes.tooltipItemList}>
-                {payload.map((entry: any, index: number) => {
-                    // @ts-ignore
-                    const itemName = keyNames[entry.name]
-                    return <span className={classes.tooltipItem} key={`item-${index}`} style={{color: entry.color}}>
+        <div className={classes.tooltipHeading}>Year {label}</div>
+        <div className={classes.tooltipItemList}>
+            {payload.map((entry: any, index: number) => {
+                // @ts-ignore
+                const itemName = keyNames[entry.name]
+                return <span className={classes.tooltipItem} key={`item-${index}`} style={{color: entry.color}}>
                         {calculateLabel ? calculateLabel(entry.name, entry.value) : `${itemName}: ${entry.value}`}
                     </span>
-                })}
-            </div>
+            })}
         </div>
+    </div>
 };
+
+export const CustomLegend = ({payload}: any) => {
+    console.log(payload)
+    return <div className={classes.legendItemList}>
+        {payload.map((entry: any, index: number) => {
+            // @ts-ignore
+            const itemName = keyNames[entry.value]
+            return <div
+                className={classes.legendItem}
+                style={{color: entry.color}}
+                key={`item-${index}`}>
+                {itemName}
+            </div>
+        })}
+    </div>
+}

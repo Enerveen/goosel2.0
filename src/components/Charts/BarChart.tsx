@@ -10,7 +10,7 @@ import {
     Brush
 } from 'recharts';
 import {barChartColors} from "../../constants/colors";
-import {renderTooltipContent} from "./customChartComponents";
+import {CustomLegend, renderTooltipContent} from "./customChartComponents";
 
 interface IBarChartProps {
     data: any[],
@@ -33,8 +33,8 @@ const BarChart = ({data, dataKeys, xAxisDataKey}: IBarChartProps) => <RechartsBa
     <XAxis dataKey={xAxisDataKey}/>
     <YAxis/>
     <Tooltip content={renderTooltipContent}/>
-    <Legend/>
-    <Brush height={20}/>
+    <Legend content={<CustomLegend/>}/>
+    <Brush height={20} fill={'#5fa35c'}/>
     {dataKeys.map((dataKey, index) =>
         <Bar
             dataKey={dataKey}
