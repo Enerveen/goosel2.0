@@ -25,8 +25,8 @@ const AreaChart = ({data, xAxisDataKey, dataKeys}: IAreaChartProps) => <Recharts
 >
     <CartesianGrid strokeDasharray="3 3"/>
     <Tooltip content={renderTooltipContent}/>
-    <XAxis dataKey={xAxisDataKey}/>
-    <YAxis tickFormatter={toPercent}/>
+    <XAxis dataKey={xAxisDataKey} stroke={'#fafafa'}/>
+    <YAxis tickFormatter={toPercent} stroke={'#fafafa'}/>
     <>
         {dataKeys.map((dataKey, index) =>
             <Area

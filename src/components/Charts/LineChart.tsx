@@ -23,17 +23,18 @@ const LineChart = ({data, dataKeys, xAxisDataKey}: ILineChartProps) => <Recharts
     }}
 >
     <CartesianGrid strokeDasharray="3 3"/>
-    <XAxis dataKey={xAxisDataKey}/>
-    <YAxis/>
+    <XAxis dataKey={xAxisDataKey} stroke={'#fafafa'}/>
+    <YAxis stroke={'#fafafa'}/>
     <Tooltip content={renderTooltipContent}/>
     <Legend content={<CustomLegend/>}/>
-    <Brush height={20} fill={'#5fa35c'}/>
+    <Brush height={20} fill={'#5fa35c'} stroke={'#fafafa'}/>
     {dataKeys.map((dataKey, index) =>
         <Line
             dataKey={dataKey}
             key={`dataKey${index}`}
             stroke={barChartColors[index]}
             strokeWidth={4}
+            dot={null}
         />
     )}
 </RechartsLineChart>

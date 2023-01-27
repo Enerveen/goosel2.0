@@ -28,6 +28,8 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     const step = useCallback(() => {
         const timestamp = store.getTimestamp
         if (timestamp === 0) {
+            console.log('Simulation has started with the following constants:',
+                JSON.stringify(store.getSimulationConstants, null, 4))
             store.addAnimal(generateAnimals(store.getSimulationConstants.initialAnimalCount,
                 {width: fieldSize.edgeX, height: fieldSize.edgeY}, store.getSimulationConstants.animalMaxEnergy))
             store.addPlant(generateFood(store.getSimulationConstants.initialFoodCount,
