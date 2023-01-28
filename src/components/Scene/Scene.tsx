@@ -109,6 +109,8 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                     store.setActiveEntity(entity)
                 }
             })
+
+            view.drawClouds(timestamp);
         }
     }, [context, canvasWidth, canvasHeight]);
 

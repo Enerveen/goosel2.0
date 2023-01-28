@@ -1,5 +1,5 @@
-import bgSrc from '../img/background.jpg'
-import cloudsSrc from '../img/clouds.png'
+import bgSrc from '../img/backgroundNew.jpg'
+import cloudsSrc from '../img/cloudsBlack.png'
 import plantSrc from '../img/plant.png'
 import animalTextureAtlasSrc from '../img/animalTextureAtlas.png'
 import eggSrc from '../img/egg.png'
@@ -53,7 +53,7 @@ class View {
     teenAnimalTextureAtlas: TextureAtlas
     childAnimalTextureAtlas: TextureAtlas
     backgroundTexture: HTMLImageElement
-    //cloudsTexture: Texture
+    cloudsTexture: Texture
 
     constructor(ctx: CanvasRenderingContext2D | null) {
         this.context = ctx || null
@@ -66,6 +66,7 @@ class View {
 
         this.eggTexture = loadTexture(eggSrc, {width: 40, height: 40});
         this.plantTexture = loadTexture(plantSrc, {width: 50, height: 45, offsetX: 0.5, offsetY: 0.6});
+        this.cloudsTexture = loadTexture(cloudsSrc);
         this.breedingTexture = loadTexture(heartSrc, {width: 20, height: 20});
 
         this.backgroundTexture = loadImage(bgSrc);
@@ -74,7 +75,29 @@ class View {
     public drawBackground(size: FieldDimensions) {
         const [image, {width, height}] = [this.backgroundTexture, size]
         if (this.context) {
-            this.context.drawImage(image, 0, 0, width, height)
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    this.context.drawImage(image, j * width / 3, i * height / 3, width / 3, height / 3)
+                }
+            }
+        }
+    }
+
+    public drawClouds(timestamp: number) {
+        if (this.context) {
+            const width = 10.0 * this.cloudsTexture.width;
+            const height = 10.0 * this.cloudsTexture.height;
+
+            this.context.save();
+
+            this.context.globalAlpha = 0.45;
+            this.context.globalCompositeOperation = 'source-atop';
+            this.context.drawImage(this.cloudsTexture.image,
+                -500 - height / 4 * (0.5 * Math.cos(0.0002 * timestamp) + 0.5),
+                -500 - height / 4 * (0.5 * Math.sin(0.0002 * timestamp) + 0.5),
+                width,
+                height);
+            this.context.restore();
         }
     }
 
