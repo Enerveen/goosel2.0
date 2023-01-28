@@ -30,6 +30,7 @@ const LineChart = ({data, dataKeys, xAxisDataKey}: ILineChartProps) => <Recharts
     <Brush height={20} fill={'#5fa35c'} stroke={'#fafafa'}/>
     {dataKeys.map((dataKey, index) =>
         <Line
+            type={'monotone'}
             dataKey={dataKey}
             key={`dataKey${index}`}
             stroke={barChartColors[index]}

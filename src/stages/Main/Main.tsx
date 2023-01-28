@@ -18,17 +18,7 @@ interface IMainProps {
 const Main = ({ setAppPhase }: IMainProps) => {
     const [isDefaultSettings, setIsDefaultSettings] = useState(true)
     const isImagesPreloaded = useImagePreload([bgSrc, plantSrc, animalTextureAtlasSrc, eggSrc, heartSrc, egg2Src])
-    const [constantsValues, setConstantsValues] = useState({
-        breedingMinAge: 5,
-        breedingMaxAge: 15,
-        foodNutritionMin: 300,
-        foodNutritionMax: 800,
-        breedingMaxProgress: 200,
-        animalMaxEnergy: 1200,
-        foodSpawnChanceK: 50,
-        initialFoodCount: 200,
-        initialAnimalCount: 8
-    })
+    const [constantsValues, setConstantsValues] = useState(simulationStore.simulationConstants)
 
     const toggleSettingsCheckbox = useCallback(
         () => setIsDefaultSettings(prevState => !prevState), []
