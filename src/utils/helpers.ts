@@ -93,8 +93,6 @@ export const handleCanvasClick = (
                 bottom: position.y + height * (1 - offsetY) * transform.d
             }
 
-            console.log(bounds);
-
             return event.nativeEvent.offsetX > bounds.left &&
                 event.nativeEvent.offsetX < bounds.right &&
                 event.nativeEvent.offsetY > bounds.top &&
