@@ -20,6 +20,14 @@ export type Color = {
 }
 
 
+export type BoundingBox = {
+    left: number,
+    right: number,
+    top: number,
+    bottom: number
+}
+
+
 export type FieldDimensions = {
     width: number,
     height: number

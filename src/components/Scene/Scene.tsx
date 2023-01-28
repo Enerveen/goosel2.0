@@ -57,9 +57,13 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             context.resetTransform();
             context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
-            const aspect = { x: canvasWidth / mainCamera.fov.x / mainCamera.scale.x, y: canvasHeight / mainCamera.fov.y / mainCamera.scale.y };
-            context.translate(canvasWidth / 2 - mainCamera.position.x * aspect.x, canvasHeight / 2 - mainCamera.position.y * aspect.y);
-            context.scale(aspect.x, aspect.y);
+            mainCamera.checkBounds({left: 0, top: 0, right: canvasWidth, bottom: canvasHeight});
+
+            {
+                const scale = mainCamera.getFovScale();
+                context.translate(canvasWidth / 2 - mainCamera.position.x * scale, canvasHeight / 2 - mainCamera.position.y * scale);
+                context.scale(scale, scale);
+            }
 
             context.textAlign = 'center';
             context.font = "bold 18px Comic Sans MS"
