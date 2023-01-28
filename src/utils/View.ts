@@ -19,13 +19,18 @@ class View {
 
     constructor(ctx: CanvasRenderingContext2D | null) {
         this.context = ctx || null
+
         const plantImage = new Image()
         plantImage.src = plantSrc
         this.plantTexture = {
             image: plantImage,
             width: 50,
-            height: 45
+            height: 45,
+            offsetX: 0.5,
+            offsetY: 0.6
         }
+
+        const animalTextureOffset = { x: 0.5, y: 0.8 };
         const animalTextureAtlas = new Image()
         animalTextureAtlas.src = animalTextureAtlasSrc
         this.matureAnimalTextureAtlas = {
@@ -33,28 +38,36 @@ class View {
             width: 80,
             height: 100,
             frameWidth: 200,
-            frameHeight: 250
+            frameHeight: 250,
+            offsetX: animalTextureOffset.x,
+            offsetY: animalTextureOffset.y
         }
         this.teenAnimalTextureAtlas = {
             image: animalTextureAtlas,
             width: 60,
             height: 75,
             frameWidth: 200,
-            frameHeight: 250
+            frameHeight: 250,
+            offsetX: animalTextureOffset.x,
+            offsetY: animalTextureOffset.y
         }
         this.childAnimalTextureAtlas = {
             image: animalTextureAtlas,
             width: 40,
             height: 50,
             frameWidth: 200,
-            frameHeight: 250
+            frameHeight: 250,
+            offsetX: animalTextureOffset.x,
+            offsetY: animalTextureOffset.y
         }
         const eggTexture = new Image()
         eggTexture.src = eggSrc
         this.eggTexture = {
             image: eggTexture,
             width: 40,
-            height: 40
+            height: 40,
+            offsetX: 0,
+            offsetY: 0
         }
 
         const breedingTexture = new Image()
@@ -62,7 +75,9 @@ class View {
         this.breedingTexture = {
             image: breedingTexture,
             width: 20,
-            height: 20
+            height: 20,
+            offsetX: 0,
+            offsetY: 0
         }
 
         const background = new Image()
@@ -90,7 +105,7 @@ class View {
         animationFrameId: number,
         entity: { gender: gender, name: string, isAlive: boolean, age: number }) {
         if (this.context) {
-            const [{image, width, height, frameWidth, frameHeight}, {x, y}, {
+            const [{image, width, height, frameWidth, frameHeight, offsetX, offsetY}, {x, y}, {
                 gender,
                 name,
                 isAlive,
@@ -98,7 +113,7 @@ class View {
             }] = [this.calculateAnimalTexture(entity), position, entity]
 
             const currentFrame = Math.floor((animationFrameId % appConstants.fps) / appConstants.fps * 15);
-            const originOffset = { x: 0.5 * width, y: 0.8 * height };
+            const originOffset = { x: offsetX * width, y: offsetY * height };
             if (frameWidth) {
                 this.context.drawImage(image, frameWidth * currentFrame, 0, frameWidth, frameHeight, x - originOffset.x, y - originOffset.y, width, height)
             } else {
@@ -138,7 +153,7 @@ class View {
     calculateAnimalTexture(entity: { gender: gender, isAlive: boolean, age: number }) {
         const {age} = entity
         if (age < 0) {
-            return {...this.eggTexture, frameWidth: 0, frameHeight: 0}
+            return {...this.eggTexture, frameWidth: 0, frameHeight: 0, offsetX: this.eggTexture.offsetX, offsetY: this.eggTexture.offsetY}
         }
         if (age >= 0 && age < 5) {
             return this.childAnimalTextureAtlas
