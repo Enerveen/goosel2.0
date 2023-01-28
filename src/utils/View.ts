@@ -1,10 +1,47 @@
 import bgSrc from '../img/background.jpg'
+import cloudsSrc from '../img/clouds.png'
 import plantSrc from '../img/plant.png'
 import animalTextureAtlasSrc from '../img/animalTextureAtlas.png'
 import eggSrc from '../img/egg.png'
 import heartSrc from '../img/heart.png'
 import {FieldDimensions, gender, Position, Texture, TextureAtlas} from "../types";
 import {appConstants} from "../constants/simulation";
+
+
+const loadImage = function(name: string) {
+    const image = new Image();
+    image.src = name;
+
+    return image;
+}
+
+
+const loadTexture = function(name: string, params: {width?: number, height?: number, offsetX?: number, offsetY?: number}={}) {
+    const image = loadImage(name);
+
+    return {
+        image: image,
+        width: params.width || image.width,
+        height: params.height || image.height,
+        offsetX: params.offsetX || 0,
+        offsetY: params.offsetY || 0
+    }
+}
+
+
+const loadTextureAtlas = function(name: string, params: {width?: number, height?: number, frameWidth?: number, frameHeight?: number, offsetX?: number, offsetY?: number}={}) {
+    const image = loadImage(name);
+
+    return {
+        image: image,
+        width: params.width || image.width,
+        height: params.height || image.height,
+        frameWidth: params.frameWidth || image.width,
+        frameHeight: params.frameHeight || image.height,
+        offsetX: params.offsetX || 0,
+        offsetY: params.offsetY || 0
+    }
+}
 
 
 class View {
@@ -16,73 +53,22 @@ class View {
     teenAnimalTextureAtlas: TextureAtlas
     childAnimalTextureAtlas: TextureAtlas
     backgroundTexture: HTMLImageElement
+    //cloudsTexture: Texture
 
     constructor(ctx: CanvasRenderingContext2D | null) {
         this.context = ctx || null
 
-        const plantImage = new Image()
-        plantImage.src = plantSrc
-        this.plantTexture = {
-            image: plantImage,
-            width: 50,
-            height: 45,
-            offsetX: 0.5,
-            offsetY: 0.6
-        }
+        const animalTextureAtlas = loadTextureAtlas(animalTextureAtlasSrc, {frameWidth: 200, frameHeight: 250, offsetX: 0.5, offsetY: 0.8});
+        this.teenAnimalTextureAtlas = {...animalTextureAtlas, width: 60, height: 75};
+        this.childAnimalTextureAtlas = {...animalTextureAtlas, width: 40, height: 50};
+        this.matureAnimalTextureAtlas = {...animalTextureAtlas, width: 80, height: 100};
 
-        const animalTextureOffset = { x: 0.5, y: 0.8 };
-        const animalTextureAtlas = new Image()
-        animalTextureAtlas.src = animalTextureAtlasSrc
-        this.matureAnimalTextureAtlas = {
-            image: animalTextureAtlas,
-            width: 80,
-            height: 100,
-            frameWidth: 200,
-            frameHeight: 250,
-            offsetX: animalTextureOffset.x,
-            offsetY: animalTextureOffset.y
-        }
-        this.teenAnimalTextureAtlas = {
-            image: animalTextureAtlas,
-            width: 60,
-            height: 75,
-            frameWidth: 200,
-            frameHeight: 250,
-            offsetX: animalTextureOffset.x,
-            offsetY: animalTextureOffset.y
-        }
-        this.childAnimalTextureAtlas = {
-            image: animalTextureAtlas,
-            width: 40,
-            height: 50,
-            frameWidth: 200,
-            frameHeight: 250,
-            offsetX: animalTextureOffset.x,
-            offsetY: animalTextureOffset.y
-        }
-        const eggTexture = new Image()
-        eggTexture.src = eggSrc
-        this.eggTexture = {
-            image: eggTexture,
-            width: 40,
-            height: 40,
-            offsetX: 0,
-            offsetY: 0
-        }
 
-        const breedingTexture = new Image()
-        breedingTexture.src = heartSrc
-        this.breedingTexture = {
-            image: breedingTexture,
-            width: 20,
-            height: 20,
-            offsetX: 0,
-            offsetY: 0
-        }
+        this.eggTexture = loadTexture(eggSrc, {width: 40, height: 40});
+        this.plantTexture = loadTexture(plantSrc, {width: 50, height: 45, offsetX: 0.5, offsetY: 0.6});
+        this.breedingTexture = loadTexture(heartSrc, {width: 20, height: 20});
 
-        const background = new Image()
-        background.src = bgSrc
-        this.backgroundTexture = background
+        this.backgroundTexture = loadImage(bgSrc);
     }
 
     public drawBackground(size: FieldDimensions) {
@@ -96,7 +82,7 @@ class View {
         const [{image, width, height}, {x, y}] = [this.plantTexture, position]
         if (this.context) {
             const originOffset = { x: 0.5 * width, y: 0.6 * height };
-            this.context.drawImage(image, x - originOffset.x, y - originOffset.y, width, height)
+            this.context.drawImage(image, x - originOffset.x, y - originOffset.y, width, height);
         }
     }
 
