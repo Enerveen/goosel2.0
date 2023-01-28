@@ -20,6 +20,8 @@ export interface Texture {
     image: HTMLImageElement,
     width: number,
     height: number
+    offsetX: number
+    offsetY: number
 }
 
 export interface TextureAtlas extends Texture {

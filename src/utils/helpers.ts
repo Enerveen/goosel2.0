@@ -73,16 +73,37 @@ export const handleCanvasClick = (
     setActiveEntity: (entity: Animal) => void,
     removeActiveEntity: () => void) => {
     const activeEntity = entities.find(animal => {
-        const {width, height} = view.calculateAnimalTexture({
+        const {width, height, offsetX, offsetY} = view.calculateAnimalTexture({
             gender: animal.gender,
             age: animal.age.current,
             isAlive: animal.isAlive
         })
-        return event.nativeEvent.offsetX > animal.position.x &&
-            event.nativeEvent.offsetX < animal.position.x + width &&
-            event.nativeEvent.offsetY > animal.position.y &&
-            event.nativeEvent.offsetY < animal.position.y + height
+
+        if (view.context) {
+            const transform = view.context.getTransform();
+            const position = {
+                x: animal.position.x * transform.a + transform.e,
+                y: animal.position.y * transform.d + transform.f
+            }
+
+            const bounds = {
+                left: position.x - width * offsetX * transform.a,
+                right: position.x + width * (1 - offsetX) * transform.a,
+                top: position.y - height * offsetY * transform.d,
+                bottom: position.y + height * (1 - offsetY) * transform.d
+            }
+
+            console.log(bounds);
+
+            return event.nativeEvent.offsetX > bounds.left &&
+                event.nativeEvent.offsetX < bounds.right &&
+                event.nativeEvent.offsetY > bounds.top &&
+                event.nativeEvent.offsetY < bounds.bottom
+        }
+
+        return undefined;
     })
+
     if (activeEntity) {
         setActiveEntity(activeEntity)
     } else {
