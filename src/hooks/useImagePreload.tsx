@@ -13,14 +13,14 @@ const preloadImage = (src: string) => {
     })
 }
 
-const useImagePreloader = (imageList: string[]) => {
+const useImagePreload = (imageList: string[]) => {
     const [imagesPreloaded, setImagesPreloaded] = useState<boolean>(false)
 
     useEffect(() => {
         let isCancelled = false
 
-        const effect = async () => {
-            console.log('PRELOAD')
+        const preload = async () => {
+            console.log('textures preload started')
 
             if (isCancelled) {
                 return
@@ -40,12 +40,14 @@ const useImagePreloader = (imageList: string[]) => {
             setImagesPreloaded(true)
         }
 
-        effect()
+        preload()
 
         return () => {
             isCancelled = true
         }
     }, [imageList])
 
-    return {imagesPreloaded}
+    return imagesPreloaded
 }
+
+export default useImagePreload

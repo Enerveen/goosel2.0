@@ -40,6 +40,7 @@ export class SimulationStore {
         initialFoodCount: 200,
         initialAnimalCount: 8
     }
+    log: string[] = []
 
     constructor() {
         makeObservable(this, {
@@ -52,6 +53,7 @@ export class SimulationStore {
             statistics: observable,
             windowSize: observable,
             simulationConstants: observable,
+            log: observable,
             getAnimals: computed,
             getPlants: computed,
             getSimulationSpeed: computed,
@@ -62,6 +64,8 @@ export class SimulationStore {
             getStatistics: computed,
             getWindowSize: computed,
             getSimulationConstants: computed,
+            getLog: computed,
+            addLogItem: action,
             addAnimal: action,
             removeAnimal: action,
             addPlant: action,
@@ -115,6 +119,14 @@ export class SimulationStore {
 
     get getSimulationConstants () {
         return this.simulationConstants
+    }
+
+    get getLog() {
+        return this.log.slice(0, 5).reverse()
+    }
+
+    addLogItem = (logItem:string) => {
+        this.log.unshift(logItem)
     }
 
     addAnimal = (animal: Animal | Animal[]) => {
