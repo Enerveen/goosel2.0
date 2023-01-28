@@ -32,7 +32,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     }), [canvasWidth, canvasHeight])
 
     const view = useMemo(() => new View(context), [context])
-    const mainCamera = new Camera({ x: canvasWidth / 2, y: canvasHeight / 2 }, {x: canvasWidth, y: canvasHeight})
+    const mainCamera = useMemo(() => new Camera({ x: canvasWidth / 2, y: canvasHeight / 2 }, {x: canvasWidth, y: canvasHeight}), [canvasWidth, canvasHeight]);
 
     const step = useCallback(() => {
         const timestamp = store.getTimestamp

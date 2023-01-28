@@ -7,6 +7,7 @@ import View from "./View";
 import {simulationValuesMultipliers} from "../constants/simulation";
 import Plant from "../entities/Plant";
 import {Camera, mouseCameraController} from "../core/Camera";
+import {cameraConstants} from "../constants/view";
 
 export const findDistance = (pos1: Position, pos2: Position) =>
     Math.sqrt((pos2.x - pos1.x) ** 2 + (pos2.y - pos1.y) ** 2)
@@ -135,6 +136,8 @@ export const handleCanvasMouseWheel = (
     camera: Camera) => {
     camera.scale.x *= 1 + 0.001 * event.deltaY;
     camera.scale.y *= 1 + 0.001 * event.deltaY;
+    camera.scale.x = Math.max(cameraConstants.minZoom, Math.min(cameraConstants.maxZoom, camera.scale.x));
+    camera.scale.y = Math.max(cameraConstants.minZoom, Math.min(cameraConstants.maxZoom, camera.scale.y));
 }
 
 
