@@ -8,8 +8,6 @@ import {appPhase} from "./types";
 
 const App = () => {
     const [phase, setPhase] = useState<appPhase>('NOT_STARTED')
-
-
     return <div className={classes.container}>
         {phase === 'NOT_STARTED' && <Main setAppPhase={setPhase}/>}
         {phase === 'STARTED' && <Simulation store={simulationStore} setAppPhase={setPhase}/>}

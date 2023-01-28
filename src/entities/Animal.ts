@@ -11,6 +11,7 @@ import {
     getRandomPosition
 } from "../utils/helpers";
 import {timeConstants, simulationValuesMultipliers} from "../constants/simulation";
+import simulationStore from "../stores/simulationStore";
 
 interface IAnimalProps {
     id: string
@@ -70,7 +71,7 @@ class Animal extends Entity {
         this.name = name || generateAnimalName(gender)
         this.currentActivity = {activity: "walking", progress: 0, maxProgress: 0}
 
-        console.log(`${this.name} arrived!`)
+        simulationStore.addLogItem(`${this.name} arrived!`)
     }
 
     private moveTo(position: Position) {
@@ -112,7 +113,7 @@ class Animal extends Entity {
             if (this.energy.current <= 1 && this.isAlive) {
                 this.energy.current = 0
                 this.die(timestamp)
-                console.log(`${this.name} died from malnutrition. That is so sad, can we hit ${this.age.current} likes?`) // cringe
+                simulationStore.addLogItem(`${this.name} died from malnutrition. That is so sad, can we hit ${this.age.current} likes?`) // cringe
             }
             if (this.isAlive) {
                 this.energy.current -= simulationSpeed * calculateEnergyLoss(this.stats);
@@ -204,7 +205,7 @@ class Animal extends Entity {
                     const isDead = (Math.random() * this.age.current) > 15
                     if (isDead) {
                         this.die(timestamp)
-                        console.log(`${this.name} died from aging. RIP legend`)
+                        simulationStore.addLogItem(`${this.name} died from aging. RIP legend`)
                     }
                 }
             }

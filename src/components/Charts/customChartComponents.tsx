@@ -41,7 +41,6 @@ export const TooltipContent = ({o, calculateLabel}: ITooltipContentProps) => {
 };
 
 export const CustomLegend = ({payload}: any) => {
-    console.log(payload)
     return <div className={classes.legendItemList}>
         {payload.map((entry: any, index: number) => {
             // @ts-ignore

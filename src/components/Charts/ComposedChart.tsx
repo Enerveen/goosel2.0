@@ -33,7 +33,7 @@ const ComposedChart = ({data, xAxisDataKey, lineDataKey, barDataKey}:IComposedCh
     <YAxis orientation={'right'} yAxisId={`${lineDataKey}Y`} stroke={'#ff7300'}/>
     <Tooltip content={renderTooltipContent}/>
     <Bar dataKey={barDataKey} fill="#413ea0" yAxisId={`${barDataKey}Y`}/>
-    <Line type="monotone" dataKey={lineDataKey} stroke="#ff7300" yAxisId={`${lineDataKey}Y`} dot={null}/>
+    <Line type="monotone" dataKey={lineDataKey} stroke="#ff7300" yAxisId={`${lineDataKey}Y`} dot={false}/>
 </RechartsComposedChart>
 
 export default ComposedChart

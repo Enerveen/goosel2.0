@@ -3,6 +3,13 @@ import classes from './Main.module.scss'
 import {appPhase} from "../../types";
 import SimulationSettings from "../../components/SimulationSettings/SimulationSettings";
 import simulationStore from "../../stores/simulationStore";
+import useImagePreload from "../../hooks/useImagePreload";
+import bgSrc from '../../img/background.jpg'
+import plantSrc from '../../img/plant.png'
+import animalTextureAtlasSrc from '../../img/animalTextureAtlas.png'
+import eggSrc from '../../img/egg.png'
+import egg2Src from '../../img/egg2.png'
+import heartSrc from '../../img/heart.png'
 
 interface IMainProps {
     setAppPhase: (phase: appPhase) => void
@@ -10,6 +17,7 @@ interface IMainProps {
 
 const Main = ({ setAppPhase }: IMainProps) => {
     const [isDefaultSettings, setIsDefaultSettings] = useState(true)
+    const isImagesPreloaded = useImagePreload([bgSrc, plantSrc, animalTextureAtlasSrc, eggSrc, heartSrc, egg2Src])
     const [constantsValues, setConstantsValues] = useState({
         breedingMinAge: 5,
         breedingMaxAge: 15,
@@ -37,9 +45,9 @@ const Main = ({ setAppPhase }: IMainProps) => {
         <h1>
             MAIN
         </h1>
-        <button onClick={onSimStart}>
+        {isImagesPreloaded ? <button onClick={onSimStart}>
             Go To Sim
-        </button>
+        </button> : <h2>Images Loading...</h2>}
         <div className={classes.settingsSectionCheckbox}>
             <span>Start with default settings</span>
             <input type={'checkbox'} onChange={toggleSettingsCheckbox} checked={isDefaultSettings}/>
