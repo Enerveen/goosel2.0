@@ -5,6 +5,12 @@ export type Position = {
     y: number
 }
 
+
+export type Vector2 = {
+    x: number,
+    y: number
+}
+
 export type FieldDimensions = {
     width: number,
     height: number
@@ -14,6 +20,8 @@ export interface Texture {
     image: HTMLImageElement,
     width: number,
     height: number
+    offsetX: number
+    offsetY: number
 }
 
 export interface TextureAtlas extends Texture {
