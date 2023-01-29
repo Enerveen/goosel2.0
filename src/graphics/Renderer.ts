@@ -1,27 +1,11 @@
-import bgSrc from '../img/backgroundNew.jpg'
-import bggSrc from '../img/backroundGlade.png'
-import cloudsSrc from '../img/cloudsBlack.png'
-import plantSrc from '../img/plant.png'
-import animalTextureAtlasSrc from '../img/animalTextureAtlas.png'
-import eggSrc from '../img/egg.png'
-import heartSrc from '../img/heart.png'
 import {FieldDimensions, gender, Position, Texture, TextureAtlas} from "../types";
 import {appConstants} from "../constants/simulation";
 
 
-const loadImage = (name: string) => {
-    const image = new Image();
-    image.src = name;
-
-    return image;
-}
-
-
-const loadTexture = (name: string, params: {width?: number, height?: number, offsetX?: number, offsetY?: number}={}) => {
-    const image = loadImage(name);
+const loadTexture = (image: HTMLImageElement, params: {width?: number, height?: number, offsetX?: number, offsetY?: number}={}) => {
 
     return {
-        image: image,
+        image,
         width: params.width || image.width,
         height: params.height || image.height,
         offsetX: params.offsetX || 0,
@@ -30,11 +14,10 @@ const loadTexture = (name: string, params: {width?: number, height?: number, off
 }
 
 
-const loadTextureAtlas = (name: string, params: {width?: number, height?: number, frameWidth?: number, frameHeight?: number, offsetX?: number, offsetY?: number}={}) => {
-    const image = loadImage(name);
+const loadTextureAtlas = (image: HTMLImageElement, params: {width?: number, height?: number, frameWidth?: number, frameHeight?: number, offsetX?: number, offsetY?: number}={}) => {
 
     return {
-        image: image,
+        image,
         width: params.width || image.width,
         height: params.height || image.height,
         frameWidth: params.frameWidth || image.width,
@@ -45,7 +28,7 @@ const loadTextureAtlas = (name: string, params: {width?: number, height?: number
 }
 
 
-class View {
+class Renderer {
     context: CanvasRenderingContext2D | null
     plantTexture: Texture
     eggTexture: Texture
@@ -57,22 +40,22 @@ class View {
     backgroundGladeTexture: HTMLImageElement
     cloudsTexture: Texture
 
-    constructor(ctx: CanvasRenderingContext2D | null) {
+    constructor(ctx: CanvasRenderingContext2D | null, images: any) {
         this.context = ctx || null
 
-        const animalTextureAtlas = loadTextureAtlas(animalTextureAtlasSrc, {frameWidth: 200, frameHeight: 250, offsetX: 0.5, offsetY: 0.8});
+        const animalTextureAtlas = loadTextureAtlas(images.animalTextureAtlas, {frameWidth: 200, frameHeight: 250, offsetX: 0.5, offsetY: 0.8});
         this.teenAnimalTextureAtlas = {...animalTextureAtlas, width: 60, height: 75};
         this.childAnimalTextureAtlas = {...animalTextureAtlas, width: 40, height: 50};
         this.matureAnimalTextureAtlas = {...animalTextureAtlas, width: 80, height: 100};
 
 
-        this.eggTexture = loadTexture(eggSrc, {width: 40, height: 40});
-        this.plantTexture = loadTexture(plantSrc, {width: 50, height: 45, offsetX: 0.5, offsetY: 0.6});
-        this.cloudsTexture = loadTexture(cloudsSrc);
-        this.breedingTexture = loadTexture(heartSrc, {width: 20, height: 20});
+        this.eggTexture = loadTexture(images.egg, {width: 40, height: 40});
+        this.plantTexture = loadTexture(images.plant, {width: 50, height: 45, offsetX: 0.5, offsetY: 0.6});
+        this.cloudsTexture = loadTexture(images.clouds);
+        this.breedingTexture = loadTexture(images.heart, {width: 20, height: 20});
 
-        this.backgroundTexture = loadImage(bgSrc);
-        this.backgroundGladeTexture = loadImage(bggSrc);
+        this.backgroundTexture = images.backgroundSeamless
+        this.backgroundGladeTexture = images.backgroundGlade
     }
 
     public drawBackground(size: FieldDimensions) {
@@ -106,8 +89,9 @@ class View {
 
             this.context.save();
 
-            this.context.fillStyle = 'rgba(244, 233, 155, 0.1)';
-            this.context.fillRect(0, 0, this.context.canvas.width, this.context.canvas.height)
+            // Uncomment to adjust brightness
+            // this.context.fillStyle = 'rgba(244, 233, 155, 0.1)';
+            // this.context.fillRect(0, 0, this.context.canvas.width, this.context.canvas.height)
             this.context.globalAlpha = 0.45;
             this.context.globalCompositeOperation = 'source-atop';
             this.context.drawImage(this.cloudsTexture.image,
@@ -197,4 +181,4 @@ class View {
     }
 }
 
-export default View
+export default Renderer

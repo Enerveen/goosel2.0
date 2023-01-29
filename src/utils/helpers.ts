@@ -3,10 +3,10 @@ import Animal from "../entities/Animal";
 import {coinFlip, rollFivePercentChance} from "./utils";
 import {generateAnimalFirstName} from "./nameGen";
 import React from "react";
-import View from "./View";
+import Renderer from "../graphics/Renderer";
 import {simulationValuesMultipliers} from "../constants/simulation";
 import Plant from "../entities/Plant";
-import {Camera, mouseCameraController} from "../core/Camera";
+import {Camera, mouseCameraController} from "../graphics/Camera";
 import {cameraConstants} from "../constants/view";
 
 export const findDistance = (pos1: Position, pos2: Position) =>
@@ -71,19 +71,19 @@ export const calculateEnergyLoss = (stats: Stats) => {
 
 export const handleCanvasClick = (
     event: React.MouseEvent<HTMLCanvasElement>,
-    view: View,
+    renderer: Renderer,
     entities: Animal[],
     setActiveEntity: (entity: Animal) => void,
     removeActiveEntity: () => void) => {
     const activeEntity = entities.find(animal => {
-        const {width, height, offsetX, offsetY} = view.calculateAnimalTexture({
+        const {width, height, offsetX, offsetY} = renderer.calculateAnimalTexture({
             gender: animal.gender,
             age: animal.age.current,
             isAlive: animal.isAlive
         })
 
-        if (view.context) {
-            const transform = view.context.getTransform();
+        if (renderer.context) {
+            const transform = renderer.context.getTransform();
             const position = {
                 x: animal.position.x * transform.a + transform.e,
                 y: animal.position.y * transform.d + transform.f

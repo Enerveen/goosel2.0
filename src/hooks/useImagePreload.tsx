@@ -1,53 +1,31 @@
 import {useEffect, useState} from 'react'
 
-const preloadImage = (src: string) => {
-    return new Promise((resolve, reject) => {
-        const img = new Image()
-        img.onload = function () {
-            resolve(img)
-        }
-        img.onerror = img.onabort = function () {
-            reject(src)
-        }
-        img.src = src
-    })
-}
-
-const useImagePreload = (imageList: string[]) => {
-    const [imagesPreloaded, setImagesPreloaded] = useState<boolean>(false)
+const usePreloadedImages = (imageSources: { [key: string]: string }) => {
+    const [loadedImages, setLoadedImages] = useState({});
+    const [loadingFinished, setLoadingFinished] = useState(false);
 
     useEffect(() => {
-        let isCancelled = false
 
-        const preload = async () => {
-            console.log('textures preload started')
+        const promises = Object.keys(imageSources).map((key) => {
+            return new Promise<[string, HTMLImageElement]>((resolve, reject) => {
+                const img = new Image();
+                img.src = imageSources[key];
+                img.onload = () => resolve([key, img]);
+                img.onerror = reject;
+            });
+        });
 
-            if (isCancelled) {
-                return
-            }
+        Promise.all(promises).then((images) => {
+            const loadedImagesObject: { [key: string]: HTMLImageElement } = {};
+            images.forEach(([key, image]) => {
+                loadedImagesObject[key] = image;
+            });
+            setLoadedImages(loadedImagesObject);
+            setLoadingFinished(true);
+        });
+    }, [JSON.stringify(imageSources)]);
 
-            const imagesPromiseList: Promise<any>[] = []
-            for (const i of imageList) {
-                imagesPromiseList.push(preloadImage(i))
-            }
+    return [loadedImages, loadingFinished];
+};
 
-            await Promise.all(imagesPromiseList)
-
-            if (isCancelled) {
-                return
-            }
-
-            setImagesPreloaded(true)
-        }
-
-        preload()
-
-        return () => {
-            isCancelled = true
-        }
-    }, [imageList])
-
-    return imagesPreloaded
-}
-
-export default useImagePreload
+export default usePreloadedImages
