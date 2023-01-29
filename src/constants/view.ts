@@ -1,4 +1,4 @@
 export const cameraConstants = {
-    maxZoom: 1.0,
-    minZoom: 0.5
+    maxZoom: 4.0,
+    minZoom: 1.0
 }

@@ -136,10 +136,7 @@ export const handleCanvasMouseMove = (
 export const handleCanvasMouseWheel = (
     event: React.WheelEvent<HTMLCanvasElement>,
     camera: Camera) => {
-    camera.scale.x *= 1 + 0.001 * event.deltaY;
-    camera.scale.y *= 1 + 0.001 * event.deltaY;
-    camera.scale.x = Math.max(cameraConstants.minZoom, Math.min(cameraConstants.maxZoom, camera.scale.x));
-    camera.scale.y = Math.max(cameraConstants.minZoom, Math.min(cameraConstants.maxZoom, camera.scale.y));
+    camera.setZoom(Math.max(cameraConstants.minZoom, Math.min(cameraConstants.maxZoom, camera.getFovScale() * (1 - 0.001 * event.deltaY))));
 }
 
 

@@ -11,6 +11,23 @@ export type Vector2 = {
     y: number
 }
 
+
+export type Color = {
+    r: number,
+    g: number,
+    b: number,
+    a: number
+}
+
+
+export type BoundingBox = {
+    left: number,
+    right: number,
+    top: number,
+    bottom: number
+}
+
+
 export type FieldDimensions = {
     width: number,
     height: number
