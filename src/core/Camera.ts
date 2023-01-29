@@ -42,36 +42,34 @@ export class Camera {
 
 
     public checkBounds(bbox: BoundingBox) {
-        const halfFovX = this.fov.x / 2;
-        const halfFovY = this.fov.y / 2;
+        const boxWidth = bbox.right - bbox.left;
+        const boxHeight = bbox.bottom - bbox.top;
+
+        const newFov = {
+            x: Math.min(this.fov.x, boxWidth),
+            y: Math.min(this.fov.y, boxHeight)
+        }
+
+        const newAspect = newFov.y / newFov.x;
+        if (newAspect < this.aspect) {
+            newFov.x = newFov.y / this.aspect;
+        } else if (newAspect > this.aspect) {
+            newFov.y = newFov.x * this.aspect;
+        }
 
         const topLeftOffset = {
-            x: bbox.left - (this.position.x - halfFovX),
-            y: bbox.top - (this.position.y - halfFovY)
+            x: bbox.left - (this.position.x - newFov.x / 2),
+            y: bbox.top - (this.position.y - newFov.y / 2)
         }
-
-        this.position.x += Math.max(0, topLeftOffset.x);
-        this.position.y += Math.max(0, topLeftOffset.y);
-
         const bottomRightOffset = {
-            x: Math.max(0, this.position.x + halfFovX - bbox.right),
-            y: Math.max(0, this.position.y + halfFovY - bbox.bottom)
+            x: Math.max(0, this.position.x + newFov.x / 2 - bbox.right),
+            y: Math.max(0, this.position.y + newFov.y / 2 - bbox.bottom)
         }
 
-        if (bottomRightOffset.x > 0 && topLeftOffset.x >= 0) {
-            this.position.x -= bottomRightOffset.x / 2;
-            this.fov.x -= bottomRightOffset.x;
-        } else if (topLeftOffset.x < 0) {
-            this.position.x -= bottomRightOffset.x;
-        }
-        if (bottomRightOffset.y > 0 && topLeftOffset.y >= 0) {
-            this.position.y -= bottomRightOffset.y / 2;
-            this.fov.y -= bottomRightOffset.y;
-        } else if (topLeftOffset.y < 0) {
-            this.position.y -= bottomRightOffset.y;
-        }
+        this.position.x += Math.max(0, topLeftOffset.x) - Math.max(0, bottomRightOffset.x);
+        this.position.y += Math.max(0, topLeftOffset.y) - Math.max(0, bottomRightOffset.y);
 
-        this.scale /= this.fov.x / (2 * halfFovX)
+        this.scale /= this.fov.x / newFov.x;
     }
 }
 
