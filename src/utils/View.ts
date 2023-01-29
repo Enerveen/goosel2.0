@@ -1,4 +1,5 @@
 import bgSrc from '../img/backgroundNew.jpg'
+import bggSrc from '../img/backroundGlade.png'
 import cloudsSrc from '../img/cloudsBlack.png'
 import plantSrc from '../img/plant.png'
 import animalTextureAtlasSrc from '../img/animalTextureAtlas.png'
@@ -8,7 +9,7 @@ import {FieldDimensions, gender, Position, Texture, TextureAtlas} from "../types
 import {appConstants} from "../constants/simulation";
 
 
-const loadImage = function(name: string) {
+const loadImage = (name: string) => {
     const image = new Image();
     image.src = name;
 
@@ -16,7 +17,7 @@ const loadImage = function(name: string) {
 }
 
 
-const loadTexture = function(name: string, params: {width?: number, height?: number, offsetX?: number, offsetY?: number}={}) {
+const loadTexture = (name: string, params: {width?: number, height?: number, offsetX?: number, offsetY?: number}={}) => {
     const image = loadImage(name);
 
     return {
@@ -29,7 +30,7 @@ const loadTexture = function(name: string, params: {width?: number, height?: num
 }
 
 
-const loadTextureAtlas = function(name: string, params: {width?: number, height?: number, frameWidth?: number, frameHeight?: number, offsetX?: number, offsetY?: number}={}) {
+const loadTextureAtlas = (name: string, params: {width?: number, height?: number, frameWidth?: number, frameHeight?: number, offsetX?: number, offsetY?: number}={}) => {
     const image = loadImage(name);
 
     return {
@@ -53,6 +54,7 @@ class View {
     teenAnimalTextureAtlas: TextureAtlas
     childAnimalTextureAtlas: TextureAtlas
     backgroundTexture: HTMLImageElement
+    backgroundGladeTexture: HTMLImageElement
     cloudsTexture: Texture
 
     constructor(ctx: CanvasRenderingContext2D | null) {
@@ -70,18 +72,32 @@ class View {
         this.breedingTexture = loadTexture(heartSrc, {width: 20, height: 20});
 
         this.backgroundTexture = loadImage(bgSrc);
+        this.backgroundGladeTexture = loadImage(bggSrc);
     }
 
     public drawBackground(size: FieldDimensions) {
         const [image, {width, height}] = [this.backgroundTexture, size]
         if (this.context) {
+            this.context.drawImage(image, 0, 0, width, height)
+        }
+    }
+
+
+    public drawSeamlessBackground(size: FieldDimensions) {
+        const [image, {width, height}] = [this.backgroundTexture, size]
+        if (this.context) {
             for (let i = 0; i < 3; i++) {
                 for (let j = 0; j < 3; j++) {
-                    this.context.drawImage(image, j * width / 3, i * height / 3, width / 3, height / 3)
+                    if (i === 1 && j === 1) {
+                        this.context.drawImage(this.backgroundGladeTexture, j * width / 3, i * height / 3, width / 3, height / 3)
+                    } else {
+                        this.context.drawImage(image, j * width / 3, i * height / 3, width / 3, height / 3)
+                    }
                 }
             }
         }
     }
+
 
     public drawClouds(timestamp: number) {
         if (this.context) {
@@ -90,6 +106,8 @@ class View {
 
             this.context.save();
 
+            this.context.fillStyle = 'rgba(244, 233, 155, 0.1)';
+            this.context.fillRect(0, 0, this.context.canvas.width, this.context.canvas.height)
             this.context.globalAlpha = 0.45;
             this.context.globalCompositeOperation = 'source-atop';
             this.context.drawImage(this.cloudsTexture.image,

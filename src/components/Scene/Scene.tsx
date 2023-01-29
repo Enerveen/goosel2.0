@@ -160,4 +160,4 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             store.removeActiveEntity)}/>;
 })
 
-export default Scene
+export default Scene;
