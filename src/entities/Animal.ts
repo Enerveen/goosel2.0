@@ -113,7 +113,7 @@ class Animal extends Entity {
             if (this.energy.current <= 1 && this.isAlive) {
                 this.energy.current = 0
                 this.die(timestamp)
-                simulationStore.addLogItem(`${this.name} died from malnutrition. That is so sad, can we hit ${this.age.current} likes?`) // cringe
+                simulationStore.addLogItem(`${this.name} died from malnutrition. That is so sad, can we hit ${this.age.current} like${this.age.current % 10 === 1 && this.age.current !== 11 ? '' : 's'}?`)
             }
             if (this.isAlive) {
                 this.energy.current -= simulationSpeed * calculateEnergyLoss(this.stats);

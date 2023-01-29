@@ -49,7 +49,7 @@ export const getChild = (
         name: `${generateAnimalFirstName(gender)} ${father.name.split(' ').slice(1).join(' ')}`,
         position: mother.position,
         energy: {
-            current: (calculateEnergyLoss(father.stats) + calculateEnergyLoss(mother.stats)) * breedingMaxProgress,
+            current: (calculateEnergyLoss(father.stats) + calculateEnergyLoss(mother.stats)) * breedingMaxProgress * 0.8,
             max: animalMaxEnergy,
             breedingCD: 0
         },
@@ -65,6 +65,8 @@ export const getChild = (
 export const calculateEnergyLoss = (stats: Stats) => {
     const {speed, foodSensitivity, breedingSensitivity, breedingCD, hatchingTime} = stats
     return speed * foodSensitivity * breedingSensitivity / breedingCD / hatchingTime
+    // Alternative formula:
+    // (speed * 1.3 + foodSensitivity * 0.8 + breedingSensitivity * 0.8 - breedingCD * 0.7 - hatchingTime * 0.2) / 2
 }
 
 export const handleCanvasClick = (
