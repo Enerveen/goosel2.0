@@ -16,11 +16,13 @@ import useWindowSize from "../../hooks/useWindowSize";
 import {appConstants} from "../../constants/simulation";
 
 import {Camera} from "../../core/Camera";
+import {boidsSystem} from "../../entities/BoidEntity";
 
 interface ISceneProps {
     store: SimulationStore,
     setAppPhase: (phase: appPhase) => void
 }
+
 
 const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -57,7 +59,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             context.resetTransform();
             context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
-            mainCamera.checkBounds({left: 0, top: 0, right: canvasWidth, bottom: canvasHeight});
+            mainCamera.checkBounds({left: 0, top: 0, right: 2* canvasWidth, bottom: canvasHeight});
 
             {
                 const scale = mainCamera.getFovScale();
