@@ -4,6 +4,7 @@ import {SimulationStore} from "../../stores/simulationStore";
 import {getRandomInRange} from "../../utils/utils";
 import Plant from "../../entities/Plant";
 import {
+    checkBreedingPossibility,
     generateAnimals,
     generateFood,
     getRandomPosition,
@@ -16,7 +17,7 @@ import useWindowSize from "../../hooks/useWindowSize";
 import {appConstants} from "../../constants/simulation";
 
 import {Camera} from "../../core/Camera";
-import {boidsSystem} from "../../entities/BoidEntity";
+import {BoidEntity, boidsSystem} from "../../entities/BoidEntity";
 
 interface ISceneProps {
     store: SimulationStore,
@@ -56,10 +57,23 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                 return;
             }
 
+            if (!boidsSystem.boids.length) {
+                for (let i = 0; i < 1000; i++) {
+                    boidsSystem.boids.push(new BoidEntity(getRandomPosition(fieldSize.edgeX, fieldSize.edgeY), {x: 1 * Math.random(), y: 1 * Math.random()}, 15 + 5 * Math.random(), 30));
+                }
+            }
+
+            boidsSystem.boids.forEach(boid => {
+                boid.direction.x += 0.00005 * (canvasWidth / 2 - boid.position.x);
+                boid.direction.y += 0.00005 * (canvasHeight / 2 - boid.position.y);
+            })
+
+            boidsSystem.update(0.1 * store.simulationSpeed);
+
             context.resetTransform();
             context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
-            mainCamera.checkBounds({left: 0, top: 0, right: 2* canvasWidth, bottom: canvasHeight});
+            mainCamera.checkBounds({left: 0, top: 0, right: canvasWidth, bottom: canvasHeight});
 
             {
                 const scale = mainCamera.getFovScale();
@@ -69,7 +83,21 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
 
             context.textAlign = 'center';
             context.font = "bold 18px Comic Sans MS"
-            view.drawBackground({width:canvasWidth, height:canvasHeight})
+            view.drawSeamlessBackground({width:canvasWidth, height:canvasHeight})
+
+            boidsSystem.boids.forEach(boid => {
+                // context.fillStyle = 'rgba(255, 255, 0, 1.0)';
+                // context.beginPath();
+                // context.arc(boid.position.x, boid.position.y, boid.senseRadius, 0, 2 * Math.PI);
+                // context.stroke();
+                // context.beginPath();
+                // context.strokeStyle = 'yellow';
+                // context.moveTo(boid.position.x, boid.position.y);
+                // context.lineTo(boid.position.x + 200 * boid.direction.x, boid.position.y + 200 * boid.direction.y);
+                // context.stroke();
+                // context.fillRect(boid.position.x, boid.position.y, 10, 10);
+            })
+
             if (!getRandomInRange(0, store.getSimulationConstants.foodSpawnChanceK / store.simulationSpeed)) {
                 store.addPlant(new Plant({
                     id: `P${store.getId}`,
@@ -116,6 +144,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                 }
             })
 
+            view.drawButterflies(timestamp);
             view.drawClouds(timestamp);
         }
     }, [context, canvasWidth, canvasHeight]);

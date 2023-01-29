@@ -1,5 +1,7 @@
 import bgSrc from '../img/backgroundNew.jpg'
 import bggSrc from '../img/backroundGlade.png'
+import butterflySrc from '../img/butterfly400x400.png'
+import butterflyShadowSrc from '../img/butterflyShadow400x400.png'
 import cloudsSrc from '../img/cloudsBlack.png'
 import plantSrc from '../img/plant.png'
 import animalTextureAtlasSrc from '../img/animalTextureAtlas.png'
@@ -7,6 +9,7 @@ import eggSrc from '../img/egg.png'
 import heartSrc from '../img/heart.png'
 import {FieldDimensions, gender, Position, Texture, TextureAtlas} from "../types";
 import {appConstants} from "../constants/simulation";
+import {boidsSystem} from "../entities/BoidEntity";
 
 
 const loadImage = (name: string) => {
@@ -53,6 +56,8 @@ class View {
     matureAnimalTextureAtlas: TextureAtlas
     teenAnimalTextureAtlas: TextureAtlas
     childAnimalTextureAtlas: TextureAtlas
+    butterflyTextureAtlas: TextureAtlas
+    butterflyShadowTextureAtlas : TextureAtlas
     backgroundTexture: HTMLImageElement
     backgroundGladeTexture: HTMLImageElement
     cloudsTexture: Texture
@@ -64,6 +69,8 @@ class View {
         this.teenAnimalTextureAtlas = {...animalTextureAtlas, width: 60, height: 75};
         this.childAnimalTextureAtlas = {...animalTextureAtlas, width: 40, height: 50};
         this.matureAnimalTextureAtlas = {...animalTextureAtlas, width: 80, height: 100};
+        this.butterflyTextureAtlas = loadTextureAtlas(butterflySrc, {frameWidth: 100, frameHeight: 100, width: 25, height: 25, offsetX: 0.5, offsetY: 0.5});
+        this.butterflyShadowTextureAtlas = loadTextureAtlas(butterflyShadowSrc, {frameWidth: 100, frameHeight: 100, width: 25, height: 25, offsetX: 0.5, offsetY: 0.5});
 
 
         this.eggTexture = loadTexture(eggSrc, {width: 40, height: 40});
@@ -108,7 +115,7 @@ class View {
 
             this.context.fillStyle = 'rgba(244, 233, 155, 0.1)';
             this.context.fillRect(0, 0, this.context.canvas.width, this.context.canvas.height)
-            this.context.globalAlpha = 0.45;
+            this.context.globalAlpha = 0.35;
             this.context.globalCompositeOperation = 'source-atop';
             this.context.drawImage(this.cloudsTexture.image,
                 -500 - height / 4 * (0.5 * Math.cos(0.0002 * timestamp) + 0.5),
@@ -118,6 +125,80 @@ class View {
             this.context.restore();
         }
     }
+
+
+    public drawButterflies(timestamp: number) {
+        if (this.context) {
+            const animationSpeed = 0.2 * appConstants.fps;
+
+            boidsSystem.boids.forEach((butterfly, index) => {
+                if (!this.context) {
+                    return;
+                }
+
+                const currentFrame = Math.floor(((timestamp + 37 * index) % animationSpeed) / animationSpeed * 16);
+
+                const position = {
+                    x: butterfly.position.x - this.butterflyTextureAtlas.offsetX * this.butterflyTextureAtlas.width,
+                    y: butterfly.position.y - this.butterflyTextureAtlas.offsetY * this.butterflyTextureAtlas.height
+                }
+
+                const angle = Math.atan2(butterfly.direction.y, butterfly.direction.x) + Math.PI / 2;
+
+                this.context.save();
+                this.context.globalAlpha = 0.3;
+                this.context.translate(0, 40);
+                this.context.translate(butterfly.position.x, butterfly.position.y);
+                this.context.rotate(angle);
+                this.context.translate(-butterfly.position.x, -butterfly.position.y);
+                this.context.drawImage(this.butterflyShadowTextureAtlas.image,
+                    this.butterflyTextureAtlas.frameWidth * (currentFrame % 4),
+                    this.butterflyTextureAtlas.frameHeight * Math.floor(currentFrame / 4),
+                    this.butterflyTextureAtlas.frameWidth,
+                    this.butterflyTextureAtlas.frameHeight,
+                    position.x,
+                    position.y,
+                    this.butterflyTextureAtlas.width,
+                    this.butterflyTextureAtlas.height
+                );
+
+                this.context.restore();
+            })
+
+            boidsSystem.boids.forEach((butterfly, index) => {
+                if (!this.context) {
+                    return
+                }
+
+                const currentFrame = Math.floor(((timestamp + 37 * index) % animationSpeed) / animationSpeed * 16);
+
+                const position = {
+                    x: butterfly.position.x - this.butterflyTextureAtlas.offsetX * this.butterflyTextureAtlas.width,
+                    y: butterfly.position.y - this.butterflyTextureAtlas.offsetY * this.butterflyTextureAtlas.height
+                }
+
+                const angle = Math.atan2(butterfly.direction.y, butterfly.direction.x) + Math.PI / 2;
+
+                this.context.save();
+                this.context.translate(butterfly.position.x, butterfly.position.y);
+                this.context.rotate(angle);
+                this.context.translate(-butterfly.position.x, -butterfly.position.y);
+                this.context.drawImage(this.butterflyTextureAtlas.image,
+                    this.butterflyTextureAtlas.frameWidth * (currentFrame % 4),
+                    this.butterflyTextureAtlas.frameHeight * Math.floor(currentFrame / 4),
+                    this.butterflyTextureAtlas.frameWidth,
+                    this.butterflyTextureAtlas.frameHeight,
+                    position.x,
+                    position.y,
+                    this.butterflyTextureAtlas.width,
+                    this.butterflyTextureAtlas.height
+                );
+
+                this.context.restore();
+            });
+        }
+    }
+
 
     public drawPlant(position: Position) {
         const [{image, width, height}, {x, y}] = [this.plantTexture, position]
