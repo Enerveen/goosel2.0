@@ -16,6 +16,7 @@ import useWindowSize from "../../hooks/useWindowSize";
 import {appConstants} from "../../constants/simulation";
 
 import {Camera} from "../../graphics/Camera";
+import {BoidEntity, boidsSystem} from "../../entities/BoidEntity";
 
 interface ISceneProps {
     store: SimulationStore,
@@ -128,7 +129,7 @@ const Scene = observer(({store, setAppPhase, images}: ISceneProps) => {
                 }
             })
 
-            renderer.drawButterflies(timestamp);
+            //renderer.drawButterflies(timestamp);
             renderer.drawClouds(timestamp);
         }
     }, [context, canvasWidth, canvasHeight]);

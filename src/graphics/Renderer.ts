@@ -60,7 +60,8 @@ class Renderer {
         this.teenAnimalTextureAtlas = {...animalTextureAtlas, width: 60, height: 75};
         this.childAnimalTextureAtlas = {...animalTextureAtlas, width: 40, height: 50};
         this.matureAnimalTextureAtlas = {...animalTextureAtlas, width: 80, height: 100};
-
+        this.butterflyTextureAtlas = loadTextureAtlas(images.butterflyTextureAtlas, {width: 25, height:25, frameWidth: 100, frameHeight: 100, offsetX: 0.5, offsetY: 0.5});
+        this.butterflyShadowTextureAtlas = loadTextureAtlas(images.butterflyShadowTextureAtlas, {width: 25, height:25, frameWidth: 100, frameHeight: 100, offsetX: 0.5, offsetY: 0.5});
 
         this.eggTexture = loadTexture(images.egg, {width: 40, height: 40});
         this.plantTexture = loadTexture(images.plant, {width: 50, height: 45, offsetX: 0.5, offsetY: 0.6});
