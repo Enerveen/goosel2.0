@@ -4,28 +4,26 @@ import {SimulationStore} from "../../stores/simulationStore";
 import {getRandomInRange} from "../../utils/utils";
 import Plant from "../../entities/Plant";
 import {
-    checkBreedingPossibility,
     generateAnimals,
     generateFood,
     getRandomPosition,
     handleCanvasClick, handleCanvasMouseMove,
     handleCanvasMousePress, handleCanvasMouseRelease, handleCanvasMouseWheel
 } from "../../utils/helpers";
-import View from "../../utils/View";
+import Renderer from "../../graphics/Renderer";
 import {appPhase} from "../../types";
 import useWindowSize from "../../hooks/useWindowSize";
 import {appConstants} from "../../constants/simulation";
 
-import {Camera} from "../../core/Camera";
-import {BoidEntity, boidsSystem} from "../../entities/BoidEntity";
+import {Camera} from "../../graphics/Camera";
 
 interface ISceneProps {
     store: SimulationStore,
     setAppPhase: (phase: appPhase) => void
+    images: any
 }
 
-
-const Scene = observer(({store, setAppPhase}: ISceneProps) => {
+const Scene = observer(({store, setAppPhase, images}: ISceneProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
     const {width: canvasWidth, height: canvasHeight} = useWindowSize(store)
@@ -34,7 +32,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         edgeY: canvasHeight - appConstants.fieldYPadding,
     }), [canvasWidth, canvasHeight])
 
-    const view = useMemo(() => new View(context), [context])
+    const renderer = useMemo(() => new Renderer(context, images), [context])
     const mainCamera = useMemo(() => new Camera({ x: canvasWidth / 2, y: canvasHeight / 2 }, {x: canvasWidth, y: canvasHeight}), [canvasWidth, canvasHeight]);
 
     const step = useCallback(() => {
@@ -83,21 +81,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
 
             context.textAlign = 'center';
             context.font = "bold 18px Comic Sans MS"
-            view.drawSeamlessBackground({width:canvasWidth, height:canvasHeight})
-
-            boidsSystem.boids.forEach(boid => {
-                // context.fillStyle = 'rgba(255, 255, 0, 1.0)';
-                // context.beginPath();
-                // context.arc(boid.position.x, boid.position.y, boid.senseRadius, 0, 2 * Math.PI);
-                // context.stroke();
-                // context.beginPath();
-                // context.strokeStyle = 'yellow';
-                // context.moveTo(boid.position.x, boid.position.y);
-                // context.lineTo(boid.position.x + 200 * boid.direction.x, boid.position.y + 200 * boid.direction.y);
-                // context.stroke();
-                // context.fillRect(boid.position.x, boid.position.y, 10, 10);
-            })
-
+            renderer.drawSeamlessBackground({width:canvasWidth, height:canvasHeight})
             if (!getRandomInRange(0, store.getSimulationConstants.foodSpawnChanceK / store.simulationSpeed)) {
                 store.addPlant(new Plant({
                     id: `P${store.getId}`,
@@ -109,7 +93,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                 }))
             }
             store.getPlants.forEach(entity => {
-                view.drawPlant(entity.position)
+                renderer.drawPlant(entity.position)
             })
             store.getAnimals.forEach(entity => {
                 entity.live(
@@ -127,7 +111,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                     store.getSimulationConstants.breedingMaxAge,
                     store.getSimulationConstants.breedingMaxProgress
                 )
-                view.drawAnimal(entity.position,
+                renderer.drawAnimal(entity.position,
                     timestamp - entity.age.birthTimestamp,
                     {
                         gender: entity.gender,
@@ -137,15 +121,15 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                     }
                 )
                 if (entity.currentActivity.activity === 'breeding') {
-                    view.drawBreeding({x: entity.position.x + 30, y: entity.position.y - 60})
+                    renderer.drawBreeding({x: entity.position.x + 30, y: entity.position.y - 60})
                 }
                 if (entity.id === store.getActiveEntity?.id) {
                     store.setActiveEntity(entity)
                 }
             })
 
-            view.drawButterflies(timestamp);
-            view.drawClouds(timestamp);
+            renderer.drawButterflies(timestamp);
+            renderer.drawClouds(timestamp);
         }
     }, [context, canvasWidth, canvasHeight]);
 
@@ -183,7 +167,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         onWheel={event => handleCanvasMouseWheel(event, mainCamera)}
         onClick={event => handleCanvasClick(
             event,
-            view,
+            renderer,
             store.getAnimals,
             store.setActiveEntity,
             store.removeActiveEntity)}/>;

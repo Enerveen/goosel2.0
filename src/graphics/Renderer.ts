@@ -1,12 +1,3 @@
-import bgSrc from '../img/backgroundNew.jpg'
-import bggSrc from '../img/backroundGlade.png'
-import butterflySrc from '../img/butterfly400x400.png'
-import butterflyShadowSrc from '../img/butterflyShadow400x400.png'
-import cloudsSrc from '../img/cloudsBlack.png'
-import plantSrc from '../img/plant.png'
-import animalTextureAtlasSrc from '../img/animalTextureAtlas.png'
-import eggSrc from '../img/egg.png'
-import heartSrc from '../img/heart.png'
 import {FieldDimensions, gender, Position, Texture, TextureAtlas} from "../types";
 import {appConstants} from "../constants/simulation";
 import {boidsSystem} from "../entities/BoidEntity";
@@ -48,7 +39,7 @@ const loadTextureAtlas = (name: string, params: {width?: number, height?: number
 }
 
 
-class View {
+class Renderer {
     context: CanvasRenderingContext2D | null
     plantTexture: Texture
     eggTexture: Texture
@@ -62,24 +53,22 @@ class View {
     backgroundGladeTexture: HTMLImageElement
     cloudsTexture: Texture
 
-    constructor(ctx: CanvasRenderingContext2D | null) {
+    constructor(ctx: CanvasRenderingContext2D | null, images: any) {
         this.context = ctx || null
 
-        const animalTextureAtlas = loadTextureAtlas(animalTextureAtlasSrc, {frameWidth: 200, frameHeight: 250, offsetX: 0.5, offsetY: 0.8});
+        const animalTextureAtlas = loadTextureAtlas(images.animalTextureAtlas, {frameWidth: 200, frameHeight: 250, offsetX: 0.5, offsetY: 0.8});
         this.teenAnimalTextureAtlas = {...animalTextureAtlas, width: 60, height: 75};
         this.childAnimalTextureAtlas = {...animalTextureAtlas, width: 40, height: 50};
         this.matureAnimalTextureAtlas = {...animalTextureAtlas, width: 80, height: 100};
-        this.butterflyTextureAtlas = loadTextureAtlas(butterflySrc, {frameWidth: 100, frameHeight: 100, width: 25, height: 25, offsetX: 0.5, offsetY: 0.5});
-        this.butterflyShadowTextureAtlas = loadTextureAtlas(butterflyShadowSrc, {frameWidth: 100, frameHeight: 100, width: 25, height: 25, offsetX: 0.5, offsetY: 0.5});
 
 
-        this.eggTexture = loadTexture(eggSrc, {width: 40, height: 40});
-        this.plantTexture = loadTexture(plantSrc, {width: 50, height: 45, offsetX: 0.5, offsetY: 0.6});
-        this.cloudsTexture = loadTexture(cloudsSrc);
-        this.breedingTexture = loadTexture(heartSrc, {width: 20, height: 20});
+        this.eggTexture = loadTexture(images.egg, {width: 40, height: 40});
+        this.plantTexture = loadTexture(images.plant, {width: 50, height: 45, offsetX: 0.5, offsetY: 0.6});
+        this.cloudsTexture = loadTexture(images.clouds);
+        this.breedingTexture = loadTexture(images.heart, {width: 20, height: 20});
 
-        this.backgroundTexture = loadImage(bgSrc);
-        this.backgroundGladeTexture = loadImage(bggSrc);
+        this.backgroundTexture = images.backgroundSeamless
+        this.backgroundGladeTexture = images.backgroundGlade
     }
 
     public drawBackground(size: FieldDimensions) {
@@ -113,9 +102,10 @@ class View {
 
             this.context.save();
 
-            this.context.fillStyle = 'rgba(244, 233, 155, 0.1)';
-            this.context.fillRect(0, 0, this.context.canvas.width, this.context.canvas.height)
-            this.context.globalAlpha = 0.35;
+            // Uncomment to adjust brightness
+            // this.context.fillStyle = 'rgba(244, 233, 155, 0.1)';
+            // this.context.fillRect(0, 0, this.context.canvas.width, this.context.canvas.height)
+            this.context.globalAlpha = 0.45;
             this.context.globalCompositeOperation = 'source-atop';
             this.context.drawImage(this.cloudsTexture.image,
                 -500 - height / 4 * (0.5 * Math.cos(0.0002 * timestamp) + 0.5),
@@ -278,4 +268,4 @@ class View {
     }
 }
 
-export default View
+export default Renderer
