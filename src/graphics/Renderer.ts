@@ -1,21 +1,12 @@
 import {FieldDimensions, gender, Position, Texture, TextureAtlas} from "../types";
 import {appConstants} from "../constants/simulation";
-import {boidsSystem} from "../entities/BoidEntity";
+import {BoidEntity} from "../entities/BoidEntity";
 
 
-const loadImage = (name: string) => {
-    const image = new Image();
-    image.src = name;
-
-    return image;
-}
-
-
-const loadTexture = (name: string, params: {width?: number, height?: number, offsetX?: number, offsetY?: number}={}) => {
-    const image = loadImage(name);
+const loadTexture = (image: HTMLImageElement, params: {width?: number, height?: number, offsetX?: number, offsetY?: number}={}) => {
 
     return {
-        image: image,
+        image,
         width: params.width || image.width,
         height: params.height || image.height,
         offsetX: params.offsetX || 0,
@@ -24,11 +15,10 @@ const loadTexture = (name: string, params: {width?: number, height?: number, off
 }
 
 
-const loadTextureAtlas = (name: string, params: {width?: number, height?: number, frameWidth?: number, frameHeight?: number, offsetX?: number, offsetY?: number}={}) => {
-    const image = loadImage(name);
+const loadTextureAtlas = (image: HTMLImageElement, params: {width?: number, height?: number, frameWidth?: number, frameHeight?: number, offsetX?: number, offsetY?: number}={}) => {
 
     return {
-        image: image,
+        image,
         width: params.width || image.width,
         height: params.height || image.height,
         frameWidth: params.frameWidth || image.width,
@@ -61,7 +51,7 @@ class Renderer {
         this.childAnimalTextureAtlas = {...animalTextureAtlas, width: 40, height: 50};
         this.matureAnimalTextureAtlas = {...animalTextureAtlas, width: 80, height: 100};
         this.butterflyTextureAtlas = loadTextureAtlas(images.butterflyTextureAtlas, {width: 25, height:25, frameWidth: 100, frameHeight: 100, offsetX: 0.5, offsetY: 0.5});
-        this.butterflyShadowTextureAtlas = loadTextureAtlas(images.butterflyShadowTextureAtlas, {width: 25, height:25, frameWidth: 100, frameHeight: 100, offsetX: 0.5, offsetY: 0.5});
+        this.butterflyShadowTextureAtlas = loadTextureAtlas(images.butterflyShadowTextureAtlas, {width: 25, height: 25, frameWidth: 100, frameHeight: 100, offsetX: 0.5, offsetY: 0.5});
 
         this.eggTexture = loadTexture(images.egg, {width: 40, height: 40});
         this.plantTexture = loadTexture(images.plant, {width: 50, height: 45, offsetX: 0.5, offsetY: 0.6});
@@ -104,8 +94,10 @@ class Renderer {
             this.context.save();
 
             // Uncomment to adjust brightness
-            // this.context.fillStyle = 'rgba(244, 233, 155, 0.1)';
-            // this.context.fillRect(0, 0, this.context.canvas.width, this.context.canvas.height)
+            // this.context.globalCompositeOperation = 'lighter';
+            // this.context.fillStyle = 'rgba(244, 233, 155, 0.2)';
+            //this.context.fillStyle = 'rgba(255 + 244, 255 + 233, 255 + 155, 0.1)';
+            //this.context.fillRect(0, 0, this.context.canvas.width, this.context.canvas.height)
             this.context.globalAlpha = 0.45;
             this.context.globalCompositeOperation = 'source-atop';
             this.context.drawImage(this.cloudsTexture.image,
@@ -118,11 +110,11 @@ class Renderer {
     }
 
 
-    public drawButterflies(timestamp: number) {
+    public drawButterflies(boids: BoidEntity[], timestamp: number) {
         if (this.context) {
             const animationSpeed = 0.2 * appConstants.fps;
 
-            boidsSystem.boids.forEach((butterfly, index) => {
+            boids.forEach((butterfly, index) => {
                 if (!this.context) {
                     return;
                 }
@@ -156,7 +148,7 @@ class Renderer {
                 this.context.restore();
             })
 
-            boidsSystem.boids.forEach((butterfly, index) => {
+            boids.forEach((butterfly, index) => {
                 if (!this.context) {
                     return
                 }

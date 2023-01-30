@@ -16,7 +16,8 @@ import useWindowSize from "../../hooks/useWindowSize";
 import {appConstants} from "../../constants/simulation";
 
 import {Camera} from "../../graphics/Camera";
-import {BoidEntity, boidsSystem} from "../../entities/BoidEntity";
+import {BoidsSystem} from "../../entities/BoidEntity";
+import Entity from "../../entities/Entity";
 
 interface ISceneProps {
     store: SimulationStore,
@@ -34,6 +35,7 @@ const Scene = observer(({store, setAppPhase, images}: ISceneProps) => {
     }), [canvasWidth, canvasHeight])
 
     const renderer = useMemo(() => new Renderer(context, images), [context])
+    const boidsSystem = useMemo(() => new BoidsSystem(20, fieldSize), [fieldSize]);
     const mainCamera = useMemo(() => new Camera({ x: canvasWidth / 2, y: canvasHeight / 2 }, {x: canvasWidth, y: canvasHeight}), [canvasWidth, canvasHeight]);
 
     const step = useCallback(() => {
@@ -56,17 +58,8 @@ const Scene = observer(({store, setAppPhase, images}: ISceneProps) => {
                 return;
             }
 
-            if (!boidsSystem.boids.length) {
-                for (let i = 0; i < 1000; i++) {
-                    boidsSystem.boids.push(new BoidEntity(getRandomPosition(fieldSize.edgeX, fieldSize.edgeY), {x: 1 * Math.random(), y: 1 * Math.random()}, 15 + 5 * Math.random(), 30));
-                }
-            }
-
-            boidsSystem.boids.forEach(boid => {
-                boid.direction.x += 0.00005 * (canvasWidth / 2 - boid.position.x);
-                boid.direction.y += 0.00005 * (canvasHeight / 2 - boid.position.y);
-            })
-
+            boidsSystem.follow([new Entity({x: canvasWidth / 2, y: canvasHeight / 2})], 50000.0);
+            boidsSystem.steerAwayFrom(store.getAnimals, 5.0);
             boidsSystem.update(0.1 * store.simulationSpeed);
 
             context.resetTransform();
@@ -129,7 +122,7 @@ const Scene = observer(({store, setAppPhase, images}: ISceneProps) => {
                 }
             })
 
-            //renderer.drawButterflies(timestamp);
+            renderer.drawButterflies(boidsSystem.boids, timestamp);
             renderer.drawClouds(timestamp);
         }
     }, [context, canvasWidth, canvasHeight]);
