@@ -19,6 +19,11 @@ const normalized = function(v: Vector2) {
 }
 
 
+const dot = (v1: Vector2, v2: Vector2) => {
+    return v1.x * v2.x + v1.y * v2.y;
+}
+
+
 export class BoidEntity extends Entity {
     direction: Vector2
     velocity: number
@@ -27,7 +32,7 @@ export class BoidEntity extends Entity {
     midPoint: Vector2
     activeMidPoint: boolean
 
-    constructor(position: Position={x: 0, y: 0}, direction: Vector2={x: 1, y: 0}, velocity: number=0, senseRadius: number=1, senseAngle: number=360) {
+    constructor(position: Position={x: 0, y: 0}, direction: Vector2={x: 1, y: 0}, velocity: number=0, senseRadius: number=1, senseAngle: number=270) {
         super(position);
 
         this.direction = normalized(direction);
@@ -40,26 +45,36 @@ export class BoidEntity extends Entity {
     }
 
 
-    steerAwayFrom(entity: Entity, senseFactor: number=1.0, precalculatedDistance?: number) {
+    hasVisionOf(entity: Entity, senseFactor: number=1.0, ignoreSenseAngle: boolean=false, precalculatedDistance?: number) {
         const distance = precalculatedDistance || length({
             x: this.position.x - entity.position.x,
             y: this.position.y - entity.position.y
         });
 
-        if (distance < senseFactor * this.senseRadius) {
+        return distance < senseFactor * this.senseRadius && (ignoreSenseAngle || Math.acos(dot(normalized(this.direction), normalized({x: entity.position.x - this.position.x, y: entity.position.y - this.position.y}))) * 180 / Math.PI < this.senseAngle / 2);
+    }
+
+
+    steerAwayFrom(entity: Entity, senseFactor: number=1.0, ignoreSenseAngle: boolean=false, precalculatedDistance?: number) {
+        const distance = precalculatedDistance || length({
+            x: this.position.x - entity.position.x,
+            y: this.position.y - entity.position.y
+        });
+
+        if (this.hasVisionOf(entity, senseFactor, ignoreSenseAngle, distance)) {
             this.direction.x += 0.25 * (this.position.x - entity.position.x) / distance;
             this.direction.y += 0.25 * (this.position.y - entity.position.y) / distance;
         }
     }
 
 
-    follow(entity: Entity, senseFactor: number=1.0) {
+    follow(entity: Entity, senseFactor: number=1.0, ignoreSenseAngle: boolean=false) {
         const distance = length({
             x: this.position.x - entity.position.x,
             y: this.position.y - entity.position.y
         });
 
-        if (distance < senseFactor * this.senseRadius) {
+        if (this.hasVisionOf(entity, senseFactor, ignoreSenseAngle, distance)) {
             this.direction.x += 0.25 * (entity.position.x - this.position.x) * distance / (senseFactor * this.senseRadius);
             this.direction.y += 0.25 * (entity.position.y - this.position.y) * distance / (senseFactor * this.senseRadius);
         }
@@ -113,12 +128,12 @@ export class BoidEntity extends Entity {
     calculateDirection(other: BoidEntity) {
         const distance = findDistance(this.position, other.position)
 
-        if (distance > this.senseRadius) {
+        if (!this.hasVisionOf(other, 1.0, false, distance)) {
             return;
         }
 
         this.dodge(other, distance);
-        this.steerAwayFrom(other, 1.0, distance);
+        this.steerAwayFrom(other, 1.0, false, distance);
         this.keepDirectionOf(other);
 
         if (!this.activeMidPoint) {
@@ -153,19 +168,19 @@ export class BoidsSystem {
     }
 
 
-    steerAwayFrom(entities: Entity[], senseFactor = 1.0) {
+    steerAwayFrom(entities: Entity[], senseFactor = 1.0, ignoreSenseAngle: boolean=false) {
         this.boids.forEach(boid => {
             entities.forEach(entity => {
-                boid.steerAwayFrom(entity, senseFactor);
+                boid.steerAwayFrom(entity, senseFactor, ignoreSenseAngle);
             })
         })
     }
 
 
-    follow(entities: Entity[], senseFactor = 1.0) {
+    follow(entities: Entity[], senseFactor = 1.0, ignoreSenseAngle: boolean=false) {
         this.boids.forEach(boid => {
             entities.forEach(entity => {
-                boid.follow(entity, senseFactor);
+                boid.follow(entity, senseFactor, ignoreSenseAngle);
             })
         })
     }

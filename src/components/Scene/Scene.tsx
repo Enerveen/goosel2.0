@@ -58,8 +58,8 @@ const Scene = observer(({store, setAppPhase, images}: ISceneProps) => {
                 return;
             }
 
-            boidsSystem.follow([new Entity({x: canvasWidth / 2, y: canvasHeight / 2})], 50000.0);
-            boidsSystem.steerAwayFrom(store.getAnimals, 5.0);
+            boidsSystem.follow([new Entity({x: canvasWidth / 2, y: canvasHeight / 2})], 50000.0, true);
+            boidsSystem.steerAwayFrom(store.getAnimals, 5.0, true);
             boidsSystem.update(0.1 * store.simulationSpeed);
 
             context.resetTransform();
