@@ -97,7 +97,8 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                     store.simulationSpeed,
                     store.getSimulationConstants.breedingMinAge,
                     store.getSimulationConstants.breedingMaxAge,
-                    store.getSimulationConstants.breedingMaxProgress
+                    store.getSimulationConstants.breedingMaxProgress,
+                    store.getId
                 )
                 renderer.drawAnimal(entity.position,
                     timestamp - entity.age.birthTimestamp,

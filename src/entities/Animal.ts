@@ -1,6 +1,6 @@
 import Entity from "./Entity";
 import {Activity, Age, Energy, FieldDimensions, gender, Position, Stats} from "../types";
-import {coinFlip, getRandomInRange} from "../utils/utils";
+import {coinFlip} from "../utils/utils";
 import Plant from "./Plant";
 import {generateAnimalName} from "../utils/nameGen";
 import {
@@ -106,7 +106,8 @@ class Animal extends Entity {
         simulationSpeed: number,
         breedingMinAge: number,
         breedingMaxAge: number,
-        breedingMaxProgress: number
+        breedingMaxProgress: number,
+        getId: () => number
     ) {
         if (this.age.current >= 0) {
             const {width: fieldWidth, height: fieldHeight} = fieldDimensions
@@ -121,7 +122,7 @@ class Animal extends Entity {
                     this.energy.breedingCD -= simulationSpeed
                 }
                 if (this.currentActivity.activity === 'breeding' && this.currentActivity.partner?.isAlive) {
-                    this.breed(this.currentActivity.partner, addAnimal, timestamp, simulationSpeed, breedingMaxProgress)
+                    this.breed(this.currentActivity.partner, addAnimal, timestamp, simulationSpeed, breedingMaxProgress, getId)
                 } else {
                     this.currentActivity = {
                         activity: "walking",
@@ -252,7 +253,8 @@ class Animal extends Entity {
         addAnimal: (animal: Animal) => void,
         timestamp: number,
         simulationSpeed: number,
-        breedingMaxProgress: number
+        breedingMaxProgress: number,
+        getId: () => number
     ) {
         const {progress, maxProgress} = this.currentActivity
         this.energy.current -= +((simulationSpeed * calculateEnergyLoss(this.stats)).toFixed(3));
@@ -262,7 +264,7 @@ class Animal extends Entity {
             const child = getChild(
                 timestamp,
                 {father, mother},
-                `A${getRandomInRange(0, 10000)}`,
+                `A${getId()}`,
                 breedingMaxProgress,
                 this.energy.max
             )
