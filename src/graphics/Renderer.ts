@@ -71,15 +71,29 @@ class Renderer {
 
 
     public drawSeamlessBackground(size: FieldDimensions) {
-        const [image, {width, height}] = [this.backgroundTexture, size]
-        if (this.context) {
-            for (let i = 0; i < 3; i++) {
-                for (let j = 0; j < 3; j++) {
-                    if (i === 1 && j === 1) {
-                        this.context.drawImage(this.backgroundGladeTexture, j * width / 3, i * height / 3, width / 3, height / 3)
-                    } else {
-                        this.context.drawImage(image, j * width / 3, i * height / 3, width / 3, height / 3)
-                    }
+        const [image, gladeImage, {width, height}] = [this.backgroundTexture, this.backgroundGladeTexture, size]
+
+        if (!this.context) {
+            return;
+        }
+
+        const tileSize = {
+            width: image.width / 3,
+            height: image.height / 3
+        }
+
+        const countX = Math.floor(width / tileSize.width);
+        const countY = Math.floor(height / tileSize.height);
+
+        for (let i = 0; i < countY + 1; i++) {
+            for (let j = 0; j < countX + 1; j++) {
+                const cutX = Math.min(tileSize.width, size.width - j * tileSize.width) / tileSize.width;
+                const cutY = Math.min(tileSize.height, size.height - i * tileSize.height) / tileSize.height;
+
+                if (i === 1 && j === 1) {
+                    this.context.drawImage(gladeImage, 0, 0, cutX * gladeImage.width, cutY * gladeImage.height, j * tileSize.width, i * tileSize.height, cutX * tileSize.width, cutY * tileSize.height)
+                } else {
+                    this.context.drawImage(image, 0, 0, cutX * image.width, cutY * image.height,j * tileSize.width, i * tileSize.height, cutX * tileSize.width, cutY * tileSize.height)
                 }
             }
         }
@@ -94,10 +108,8 @@ class Renderer {
             this.context.save();
 
             // Uncomment to adjust brightness
-            // this.context.globalCompositeOperation = 'lighter';
-            // this.context.fillStyle = 'rgba(244, 233, 155, 0.2)';
-            //this.context.fillStyle = 'rgba(255 + 244, 255 + 233, 255 + 155, 0.1)';
-            //this.context.fillRect(0, 0, this.context.canvas.width, this.context.canvas.height)
+            this.context.fillStyle = 'rgba(244, 233, 155, 0.05)';
+            this.context.fillRect(0, 0, this.context.canvas.width, this.context.canvas.height)
             this.context.globalAlpha = 0.45;
             this.context.globalCompositeOperation = 'source-atop';
             this.context.drawImage(this.cloudsTexture.image,

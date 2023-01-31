@@ -15,8 +15,8 @@ const ActiveEntityInfo = observer(({activeEntity, energy}: IProps) => {
         setEntity(activeEntity)
     }, [activeEntity])
 
-    return <div className={classes.container}>
-        {entity ? <div>
+    return entity ? <div className={classes.container}>
+        <div>
             <h2 className={entity.gender === 'male' ? classes.maleName : classes.femaleName}>
                 {entity.name}
             </h2>
@@ -30,7 +30,7 @@ const ActiveEntityInfo = observer(({activeEntity, energy}: IProps) => {
                 </div>
             </> : <div className={classes.stat}>Homunculus</div>}
             <div className={classes.stat}>
-                <b>Energy: </b>{energy}/{entity.energy.max}
+                <b>Energy: </b>{energy?.toFixed(2)}/{entity.energy.max}
             </div>
             <div className={classes.stat}>
                 <b>Breeding CD: </b>
@@ -42,11 +42,11 @@ const ActiveEntityInfo = observer(({activeEntity, energy}: IProps) => {
             </div>
             <div className={classes.stat}>
                 <b>FS: </b>
-                {entity.stats.foodSensitivity} <i>({entity.stats.foodSensitivity * simulationValuesMultipliers.foodSensitivity} units)</i>
+                {entity.stats.foodSensitivity} <i>({(entity.stats.foodSensitivity * simulationValuesMultipliers.foodSensitivity).toFixed(2)} units)</i>
             </div>
             <div className={classes.stat}>
                 <b>BS: </b>
-                {entity.stats.breedingSensitivity} <i>({entity.stats.breedingSensitivity * simulationValuesMultipliers.breedingSensitivity} units)</i>
+                {entity.stats.breedingSensitivity} <i>({(entity.stats.breedingSensitivity * simulationValuesMultipliers.breedingSensitivity).toFixed(2)} units)</i>
             </div>
             <div className={classes.stat}>
                 <b>Hatching time: </b>
@@ -56,8 +56,8 @@ const ActiveEntityInfo = observer(({activeEntity, energy}: IProps) => {
                 <b>Activity: </b>
                 {entity.currentActivity.activity} {entity.currentActivity.progress}/{entity.currentActivity.maxProgress}
             </div>
-        </div> : <></>}
-    </div>
+        </div>
+    </div> : <></>
 });
 
 export default ActiveEntityInfo

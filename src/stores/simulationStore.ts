@@ -58,7 +58,7 @@ export class SimulationStore {
             getPlants: computed,
             getSimulationSpeed: computed,
             getActiveEntity: computed,
-            getId: computed,
+            getId: action,
             getTimestamp: computed,
             getCurrentYear: computed,
             getStatistics: computed,
@@ -93,10 +93,6 @@ export class SimulationStore {
         return this.activeEntity
     }
 
-    get getId() {
-        return this.idCounter++
-    }
-
     get getTimestamp() {
         return this.timestamp
     }
@@ -123,6 +119,10 @@ export class SimulationStore {
 
     get getLog() {
         return this.log.slice(0, 5).reverse()
+    }
+
+    getId = () => {
+        return this.idCounter++
     }
 
     addLogItem = (logItem:string) => {

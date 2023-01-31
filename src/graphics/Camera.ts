@@ -4,7 +4,7 @@ import {BoundingBox} from "../types";
 
 export class Camera {
     position: Position
-    private fov: Vector2
+    fov: Vector2
     private scale: number
     private readonly aspect: number
 
@@ -69,7 +69,7 @@ export class Camera {
         this.position.x += Math.max(0, topLeftOffset.x) - Math.max(0, bottomRightOffset.x);
         this.position.y += Math.max(0, topLeftOffset.y) - Math.max(0, bottomRightOffset.y);
 
-        this.scale /= this.fov.x / newFov.x;
+        this.scale *= Number((this.fov.x / newFov.x).toFixed(9));
         this.fov = newFov;
     }
 }

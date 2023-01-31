@@ -1,12 +1,12 @@
 import React, {ChangeEvent, useEffect, useState} from "react";
 import {observer} from "mobx-react-lite";
 import classes from "./Controls.module.scss";
-import {getReadableDate} from "../../utils/nameGen";
 import {appPhase} from "../../types";
 import Animal from "../../entities/Animal";
 import {getRandomInRange} from "../../utils/utils";
 import {getRandomPosition} from "../../utils/helpers";
 import Slider from "../Slider/Slider";
+import Clock from "../Clock/Clock";
 
 interface IControlsProps {
     simulationSpeed: number
@@ -17,7 +17,14 @@ interface IControlsProps {
     animalMaxEnergy: number
 }
 
-const Controls = observer(({simulationSpeed, setSimulationSpeed, timestamp, setAppPhase, addAnimal, animalMaxEnergy}: IControlsProps) => {
+const Controls = observer(({
+                               simulationSpeed,
+                               setSimulationSpeed,
+                               timestamp,
+                               setAppPhase,
+                               addAnimal,
+                               animalMaxEnergy
+                           }: IControlsProps) => {
     const [value, setValue] = useState(simulationSpeed)
 
     const createNewAnimal = () => {
@@ -36,24 +43,26 @@ const Controls = observer(({simulationSpeed, setSimulationSpeed, timestamp, setA
     }, [value, setSimulationSpeed])
 
     return <div className={classes.container}>
-        <div className={classes.clock}>
-            {getReadableDate(timestamp)}
+        <div className={classes.timeBlock}>
+            <Clock timestamp={timestamp}/>
+            <Slider
+                label={'Speed'}
+                id={'simulationSpeed'}
+                value={value}
+                min={0}
+                max={10}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(+e.target.value)}
+                className={classes.sliderContainer}
+            />
         </div>
-        <Slider
-            label={'Speed'}
-            id={'simulationSpeed'}
-            value={value}
-            min={0}
-            max={10}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(+e.target.value)}
-            className={classes.sliderContainer}
-        />
-        <button onClick={createNewAnimal}>
-            Goose!
-        </button>
-        <button onClick={() => setAppPhase('FINISHED')}>
-            Fin
-        </button>
+        <div>
+            <button onClick={createNewAnimal}>
+                Goose!
+            </button>
+            <button onClick={() => setAppPhase('FINISHED')}>
+                Fin
+            </button>
+        </div>
     </div>
 })
 

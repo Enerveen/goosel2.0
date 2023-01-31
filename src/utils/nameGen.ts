@@ -12,5 +12,8 @@ export const getReadableDate = (timestamp: number) => {
     const year = Math.floor(timestamp / timeConstants.yearLength)
     const month = Math.floor((timestamp - year * timeConstants.yearLength) / timeConstants.monthLength)
     const day = Math.ceil((timestamp - year * timeConstants.yearLength - month * timeConstants.monthLength + 1) / timeConstants.dayLength)
-    return `${day} ${monthNames[month]} ${year} y.`
+    return {
+        date: `${day} ${monthNames[month]}`,
+        year: `${year} y.`
+    }
 }
