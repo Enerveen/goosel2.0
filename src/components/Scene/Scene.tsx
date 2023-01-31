@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import {observer} from "mobx-react-lite";
 import {SimulationStore} from "../../stores/simulationStore";
 import {getRandomInRange} from "../../utils/utils";
@@ -122,6 +122,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                 }
             })
 
+            renderer.drawButterflies(boidsSystem.boids, timestamp);
             renderer.drawClouds(timestamp);
         }
     }, [context, canvasWidth, canvasHeight]);
