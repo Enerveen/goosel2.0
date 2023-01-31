@@ -7,14 +7,14 @@ import {getRandomInRange} from "../../utils/utils";
 import {getRandomPosition} from "../../utils/helpers";
 import Slider from "../Slider/Slider";
 import Clock from "../Clock/Clock";
+import useSimConstantsStore from "../../stores/simConstantsStore";
 
 interface IControlsProps {
     simulationSpeed: number
     setSimulationSpeed: (speed: number) => void,
     timestamp: number,
     setAppPhase: (state: appPhase) => void
-    addAnimal: (animal: Animal) => void,
-    animalMaxEnergy: number
+    addAnimal: (animal: Animal) => void
 }
 
 const Controls = observer(({
@@ -22,9 +22,9 @@ const Controls = observer(({
                                setSimulationSpeed,
                                timestamp,
                                setAppPhase,
-                               addAnimal,
-                               animalMaxEnergy
+                               addAnimal
                            }: IControlsProps) => {
+    const animalMaxEnergy = useSimConstantsStore(state => state.constants.animalMaxEnergy)
     const [value, setValue] = useState(simulationSpeed)
 
     const createNewAnimal = () => {

@@ -1,7 +1,7 @@
 import {create} from "zustand";
 import {Statistics} from "../types";
 
-interface StatisticsStore {
+interface IStatisticsStore {
     age: { child: number, teen: number, mature: number, elder: number, year: number }[],
     gender: { male: number, female: number, year: number }[]
     averageStats: {
@@ -18,7 +18,7 @@ interface StatisticsStore {
     updateStatistics: (statistics: Statistics, currentYear: number) => void
 }
 
-const useStatisticsStore = create<StatisticsStore>((set) => ({
+const useStatisticsStore = create<IStatisticsStore>(set => ({
     age: [],
     gender: [],
     averageStats: [],

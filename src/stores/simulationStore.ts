@@ -1,7 +1,7 @@
 import Animal from "../entities/Animal";
 import Plant from "../entities/Plant";
 import {action, computed, makeObservable, observable} from "mobx";
-import {FieldDimensions, SimulationConstants} from "../types";
+import {FieldDimensions} from "../types";
 import {timeConstants} from "../constants/simulation";
 
 export class SimulationStore {
@@ -13,17 +13,6 @@ export class SimulationStore {
     idCounter: number = 0
     simulationSpeed: number = 10
     currentYear: number = -1
-    simulationConstants: SimulationConstants = {
-        breedingMinAge: 5,
-        breedingMaxAge: 15,
-        foodNutritionMin: 300,
-        foodNutritionMax: 800,
-        breedingMaxProgress: 200,
-        animalMaxEnergy: 1200,
-        foodSpawnChanceK: 50,
-        initialFoodCount: 200,
-        initialAnimalCount: 8
-    }
     log: string[] = []
 
     constructor() {
@@ -35,7 +24,6 @@ export class SimulationStore {
             plants: observable,
             idCounter: observable,
             windowSize: observable,
-            simulationConstants: observable,
             log: observable,
             getAnimals: computed,
             getPlants: computed,
@@ -45,7 +33,6 @@ export class SimulationStore {
             getTimestamp: computed,
             getCurrentYear: computed,
             getWindowSize: computed,
-            getSimulationConstants: computed,
             getLog: computed,
             addLogItem: action,
             addAnimal: action,
@@ -57,8 +44,7 @@ export class SimulationStore {
             updateTimestamp: action,
             setSimulationSpeed: action,
             clearAnimalCorpses: action,
-            setWindowSize: action,
-            setSimulationConstants: action
+            setWindowSize: action
         })
     }
 
@@ -88,10 +74,6 @@ export class SimulationStore {
 
     get getWindowSize() {
         return this.windowSize
-    }
-
-    get getSimulationConstants () {
-        return this.simulationConstants
     }
 
     get getLog() {
@@ -150,10 +132,6 @@ export class SimulationStore {
 
     setWindowSize = (windowSize: {width: number, height: number}) => {
         this.windowSize = windowSize
-    }
-
-    setSimulationConstants = (constants: SimulationConstants) => {
-        this.simulationConstants = constants
     }
 
     clearAnimalCorpses = () => {

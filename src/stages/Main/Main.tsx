@@ -2,7 +2,8 @@ import React, {useCallback, useState} from "react";
 import classes from './Main.module.scss'
 import {appPhase} from "../../types";
 import SimulationSettings from "../../components/SimulationSettings/SimulationSettings";
-import simulationStore from "../../stores/simulationStore";
+import useSimConstantsStore from "../../stores/simConstantsStore";
+import {defaultSimulationConstants} from "../../constants/simulation";
 
 interface IMainProps {
     setAppPhase: (phase: appPhase) => void
@@ -10,16 +11,15 @@ interface IMainProps {
 
 const Main = ({setAppPhase}: IMainProps) => {
     const [isDefaultSettings, setIsDefaultSettings] = useState(true)
-    const [constantsValues, setConstantsValues] = useState(simulationStore.simulationConstants)
+    const {constants, setConstants} = useSimConstantsStore()
+    const [constantsValues, setConstantsValues] = useState(constants)
 
     const toggleSettingsCheckbox = useCallback(
         () => setIsDefaultSettings(prevState => !prevState), []
     )
 
     const onSimStart = useCallback(() => {
-        if (!isDefaultSettings) {
-            simulationStore.setSimulationConstants(constantsValues)
-        }
+        setConstants(isDefaultSettings ? defaultSimulationConstants : constantsValues)
         setAppPhase('STARTED')
     }, [constantsValues, setAppPhase, isDefaultSettings])
 

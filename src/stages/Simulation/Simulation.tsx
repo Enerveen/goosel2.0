@@ -40,7 +40,6 @@ const Simulation = observer(({store, setAppPhase}: ISimulationProps) => {
                     timestamp={store.getTimestamp}
                     setAppPhase={setAppPhase}
                     addAnimal={store.addAnimal}
-                    animalMaxEnergy={store.getSimulationConstants.animalMaxEnergy}
                 />
             </div>
         </Drawer>

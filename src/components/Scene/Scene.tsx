@@ -19,6 +19,7 @@ import {Camera} from "../../graphics/Camera";
 import ImageContext from "../../stores/ImageContext";
 import useStatisticsStore from "../../stores/statisticsStore";
 import generateStatistics from "../../utils/generateStatistics";
+import useSimConstantsStore from "../../stores/simConstantsStore";
 
 interface ISceneProps {
     store: SimulationStore,
@@ -30,6 +31,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
     const {width: canvasWidth, height: canvasHeight} = useWindowSize(store)
     const updateStatistics = useStatisticsStore(state => state.updateStatistics)
+    const simConstants = useSimConstantsStore(state => state.constants)
     const fieldSize = useMemo(() => ({
         edgeX: canvasWidth - appConstants.fieldXPadding,
         edgeY: canvasHeight - appConstants.fieldYPadding,
@@ -42,10 +44,10 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         const timestamp = store.getTimestamp
         if (timestamp === 0) {
             console.log('Simulation has started with the following constants:',
-                JSON.stringify(store.getSimulationConstants, null, 4))
-            store.addAnimal(generateAnimals(store.getSimulationConstants.initialAnimalCount,
-                {width: fieldSize.edgeX, height: fieldSize.edgeY}, store.getSimulationConstants.animalMaxEnergy))
-            store.addPlant(generateFood(store.getSimulationConstants.initialFoodCount,
+                JSON.stringify(simConstants, null, 4))
+            store.addAnimal(generateAnimals(simConstants.initialAnimalCount,
+                {width: fieldSize.edgeX, height: fieldSize.edgeY}, simConstants.animalMaxEnergy))
+            store.addPlant(generateFood(simConstants.initialFoodCount,
                 {width: fieldSize.edgeX, height: fieldSize.edgeY}))
         }
         if(!store.getAnimals.length) {
@@ -74,12 +76,12 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             context.textAlign = 'center';
             context.font = "bold 18px Comic Sans MS"
             renderer.drawSeamlessBackground({width: fieldSize.edgeX, height:fieldSize.edgeY})
-            if (!getRandomInRange(0, store.getSimulationConstants.foodSpawnChanceK / store.simulationSpeed)) {
+            if (!getRandomInRange(0, simConstants.foodSpawnChanceK / store.simulationSpeed)) {
                 store.addPlant(new Plant({
                     id: `P${store.getId()}`,
                     nutritionValue: getRandomInRange(
-                        store.getSimulationConstants.foodNutritionMin,
-                        store.getSimulationConstants.foodNutritionMax
+                        simConstants.foodNutritionMin,
+                        simConstants.foodNutritionMax
                     ),
                     position: getRandomPosition(fieldSize.edgeX, fieldSize.edgeY)
                 }))
@@ -99,9 +101,9 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                         height: fieldSize.edgeY
                     },
                     store.simulationSpeed,
-                    store.getSimulationConstants.breedingMinAge,
-                    store.getSimulationConstants.breedingMaxAge,
-                    store.getSimulationConstants.breedingMaxProgress,
+                    simConstants.breedingMinAge,
+                    simConstants.breedingMaxAge,
+                    simConstants.breedingMaxProgress,
                     store.getId
                 )
                 renderer.drawAnimal(entity.position,
