@@ -42,12 +42,12 @@ const Simulation = observer(({store, setAppPhase}: ISimulationProps) => {
                     addAnimal={store.addAnimal}
                     animalMaxEnergy={store.getSimulationConstants.animalMaxEnergy}
                 />
-                <ActiveEntityInfo
-                    activeEntity={store.getActiveEntity}
-                    energy={store.getActiveEntity?.energy.current}
-                />
             </div>
         </Drawer>
+        <ActiveEntityInfo
+            activeEntity={store.getActiveEntity}
+            energy={store.getActiveEntity?.energy.current}
+        />
     </div>
 })
 

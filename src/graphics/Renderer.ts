@@ -90,8 +90,8 @@ class Renderer {
             this.context.save();
 
             // Uncomment to adjust brightness
-            // this.context.fillStyle = 'rgba(244, 233, 155, 0.1)';
-            // this.context.fillRect(0, 0, this.context.canvas.width, this.context.canvas.height)
+            this.context.fillStyle = 'rgba(244, 233, 155, 0.05)';
+            this.context.fillRect(0, 0, this.context.canvas.width, this.context.canvas.height)
             this.context.globalAlpha = 0.45;
             this.context.globalCompositeOperation = 'source-atop';
             this.context.drawImage(this.cloudsTexture.image,
