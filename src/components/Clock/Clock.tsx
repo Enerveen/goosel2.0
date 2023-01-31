@@ -7,7 +7,6 @@ interface IClockProps {
 }
 
 const Clock = observer(({timestamp}:IClockProps) => {
-    console.log('clock')
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
 

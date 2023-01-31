@@ -28,11 +28,10 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
     const {width: canvasWidth, height: canvasHeight} = useWindowSize(store)
     const fieldSize = useMemo(() => ({
-        edgeX: canvasWidth - 0 * appConstants.fieldXPadding,
-        edgeY: canvasHeight - 0 * appConstants.fieldYPadding,
+        edgeX: canvasWidth - appConstants.fieldXPadding,
+        edgeY: canvasHeight - appConstants.fieldYPadding,
     }), [canvasWidth, canvasHeight])
     const images = useContext(ImageContext)
-
     const renderer = useMemo(() => new Renderer(context, images), [context])
     const mainCamera = useMemo(() => new Camera({ x: fieldSize.edgeX / 2, y: fieldSize.edgeY / 2 }, {x: canvasWidth, y: canvasHeight}), [fieldSize, canvasWidth, canvasHeight]);
 
@@ -71,7 +70,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             renderer.drawSeamlessBackground({width: fieldSize.edgeX, height:fieldSize.edgeY})
             if (!getRandomInRange(0, store.getSimulationConstants.foodSpawnChanceK / store.simulationSpeed)) {
                 store.addPlant(new Plant({
-                    id: `P${store.getId}`,
+                    id: `P${store.getId()}`,
                     nutritionValue: getRandomInRange(
                         store.getSimulationConstants.foodNutritionMin,
                         store.getSimulationConstants.foodNutritionMax
