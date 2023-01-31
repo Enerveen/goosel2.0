@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import {observer} from "mobx-react-lite";
 import {SimulationStore} from "../../stores/simulationStore";
 import {getRandomInRange} from "../../utils/utils";
@@ -16,14 +16,14 @@ import useWindowSize from "../../hooks/useWindowSize";
 import {appConstants} from "../../constants/simulation";
 
 import {Camera} from "../../graphics/Camera";
+import ImageContext from "../../stores/ImageContext";
 
 interface ISceneProps {
     store: SimulationStore,
     setAppPhase: (phase: appPhase) => void
-    images: any
 }
 
-const Scene = observer(({store, setAppPhase, images}: ISceneProps) => {
+const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
     const {width: canvasWidth, height: canvasHeight} = useWindowSize(store)
@@ -31,6 +31,7 @@ const Scene = observer(({store, setAppPhase, images}: ISceneProps) => {
         edgeX: canvasWidth - appConstants.fieldXPadding,
         edgeY: canvasHeight - appConstants.fieldYPadding,
     }), [canvasWidth, canvasHeight])
+    const images = useContext(ImageContext)
 
     const renderer = useMemo(() => new Renderer(context, images), [context])
     const mainCamera = useMemo(() => new Camera({ x: canvasWidth / 2, y: canvasHeight / 2 }, {x: canvasWidth, y: canvasHeight}), [canvasWidth, canvasHeight]);

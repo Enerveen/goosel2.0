@@ -14,10 +14,9 @@ import Log from "../../components/Log/Log";
 interface ISimulationProps {
     store: SimulationStore
     setAppPhase: (phase: appPhase) => void
-    images: any
 }
 
-const Simulation = observer(({store, setAppPhase, images}: ISimulationProps) => {
+const Simulation = observer(({store, setAppPhase}: ISimulationProps) => {
     const [drawerOpen, setDrawerOpen] = useState(false)
     const onDrawerClose = useCallback(() => {
         setDrawerOpen(false)
@@ -28,7 +27,7 @@ const Simulation = observer(({store, setAppPhase, images}: ISimulationProps) => 
     }, [])
 
     return <div className={classes.container}>
-        <Scene store={simulationStore} setAppPhase={setAppPhase} images={images}/>
+        <Scene store={simulationStore} setAppPhase={setAppPhase}/>
         <Log logs={simulationStore.getLog}/>
         <div className={clsSum(classes.menuOpenBtn, drawerOpen ? classes.active : null)} onClick={onDrawerOpen}>
             <Menu/>

@@ -8,15 +8,18 @@ import {appPhase} from "./types";
 import Loader from "./components/Loader/Loader";
 import imagesSrc from "./img";
 import usePreloadedImages from "./hooks/useImagePreload";
+import ImageContext from './stores/ImageContext';
 
 const App = () => {
     const [phase, setPhase] = useState<appPhase>('NOT_STARTED')
     const [images, isImagesPreloaded] = usePreloadedImages(imagesSrc)
-    return isImagesPreloaded ? <div className={classes.container}>
-        {phase === 'NOT_STARTED' && <Main setAppPhase={setPhase}/>}
-        {phase === 'STARTED' && <Simulation store={simulationStore} setAppPhase={setPhase} images={images}/>}
-        {phase === 'FINISHED' && <Results statistics={simulationStore.getStatistics}/>}
-    </div> : <Loader/>
+    return isImagesPreloaded ? <ImageContext.Provider value={images}>
+        <div className={classes.container}>
+            {phase === 'NOT_STARTED' && <Main setAppPhase={setPhase}/>}
+            {phase === 'STARTED' && <Simulation store={simulationStore} setAppPhase={setPhase}/>}
+            {phase === 'FINISHED' && <Results statistics={simulationStore.getStatistics}/>}
+        </div>
+    </ImageContext.Provider> : <Loader/>
 }
 
 export default App
