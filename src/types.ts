@@ -96,3 +96,8 @@ export type Statistics = {
     plantsStats: {count: number, totalNutrition: number},
     animalsCount: number,
 }
+
+export type LogItem = {
+    message: string,
+    timestamp: number
+}

@@ -1,4 +1,4 @@
-import {FieldDimensions, gender, Position, Stats} from "../types";
+import {FieldDimensions, gender, LogItem, Position, Stats} from "../types";
 import Animal from "../entities/Animal";
 import {coinFlip, rollFivePercentChance} from "./utils";
 import {generateAnimalFirstName} from "./nameGen";
@@ -22,7 +22,8 @@ export const getChild = (
     parents: { mother: Animal, father: Animal },
     id: string,
     breedingMaxProgress: number,
-    animalMaxEnergy: number
+    animalMaxEnergy: number,
+    addLogItem: (logItem: LogItem) => void
 ) => {
     const {mother, father} = parents
     const statsDelta = Math.random() * 0.3
@@ -58,7 +59,8 @@ export const getChild = (
             birthTimestamp: timestamp + stats.hatchingTime * simulationValuesMultipliers.hatchingTime,
             deathTimestamp: undefined
         },
-        stats
+        stats,
+        addLogItem
     })
 }
 
@@ -150,6 +152,11 @@ export const generateFood = (amount: number, fieldSize: FieldDimensions) =>
     new Array(amount).fill(null).map((elem, index) =>
         new Plant({id: `P${index}init`, position: getRandomPosition(fieldSize.width, fieldSize.height)}))
 
-export const generateAnimals = (amount: number, fieldSize: FieldDimensions, animalMaxEnergy: number) =>
+export const generateAnimals = (amount: number, fieldSize: FieldDimensions, animalMaxEnergy: number, addLogItem: (logItem: LogItem) => void) =>
     new Array(amount).fill(null).map((elem, index) =>
-        new Animal({id: `A${index}init`, position: getRandomPosition(fieldSize.width, fieldSize.height), energy: {current: animalMaxEnergy, max: animalMaxEnergy, breedingCD: 0}}))
+        new Animal({
+            id: `A${index}init`,
+            position: getRandomPosition(fieldSize.width, fieldSize.height),
+            energy: {current: animalMaxEnergy, max: animalMaxEnergy, breedingCD: 0},
+            addLogItem
+        }))

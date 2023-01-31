@@ -9,10 +9,4 @@
   display: block;
   margin: 5px 0;
   color: #fafafa;
-  animation: fadeOut 5s;
-}
-
-@keyframes fadeOut {
-  0% { opacity: 1; }
-  100% { opacity: 0; }
 }

@@ -7,13 +7,15 @@ import {timeConstants} from "../constants/simulation";
 export class SimulationStore {
     animals: Animal[] = []
     plants: Plant[] = []
-    activeEntity: Animal | null = null
-    windowSize: FieldDimensions = {width:0, height: 0}
-    timestamp: number = 0
     idCounter: number = 0
+    activeEntity: Animal | null = null
+
+    timestamp: number = 0
     simulationSpeed: number = 10
     currentYear: number = -1
-    log: string[] = []
+    // ?
+    windowSize: FieldDimensions = {width:0, height: 0}
+
 
     constructor() {
         makeObservable(this, {
@@ -24,7 +26,6 @@ export class SimulationStore {
             plants: observable,
             idCounter: observable,
             windowSize: observable,
-            log: observable,
             getAnimals: computed,
             getPlants: computed,
             getSimulationSpeed: computed,
@@ -33,8 +34,6 @@ export class SimulationStore {
             getTimestamp: computed,
             getCurrentYear: computed,
             getWindowSize: computed,
-            getLog: computed,
-            addLogItem: action,
             addAnimal: action,
             removeAnimal: action,
             addPlant: action,
@@ -76,16 +75,8 @@ export class SimulationStore {
         return this.windowSize
     }
 
-    get getLog() {
-        return this.log.slice(0, 5).reverse()
-    }
-
     getId = () => {
         return this.idCounter++
-    }
-
-    addLogItem = (logItem:string) => {
-        this.log.unshift(logItem)
     }
 
     addAnimal = (animal: Animal | Animal[]) => {

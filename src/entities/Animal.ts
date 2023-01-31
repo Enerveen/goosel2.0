@@ -1,5 +1,5 @@
 import Entity from "./Entity";
-import {Activity, Age, Energy, FieldDimensions, gender, Position, Stats} from "../types";
+import {Activity, Age, Energy, FieldDimensions, gender, LogItem, Position, Stats} from "../types";
 import {coinFlip} from "../utils/utils";
 import Plant from "./Plant";
 import {generateAnimalName} from "../utils/nameGen";
@@ -11,7 +11,6 @@ import {
     getRandomPosition
 } from "../utils/helpers";
 import {timeConstants, simulationValuesMultipliers} from "../constants/simulation";
-import simulationStore from "../stores/simulationStore";
 
 interface IAnimalProps {
     id: string
@@ -25,7 +24,8 @@ interface IAnimalProps {
     parents?: {
         mother: Animal,
         father: Animal
-    } | null
+    } | null,
+    addLogItem: (logItem: LogItem) => void
 }
 
 class Animal extends Entity {
@@ -54,7 +54,8 @@ class Animal extends Entity {
             isAlive = true,
             name,
             stats = {foodSensitivity: 1, speed: 1, breedingCD: 1, hatchingTime: 1, breedingSensitivity: 1},
-            parents = null
+            parents = null,
+            addLogItem
         } = props
 
         super(position);
@@ -71,7 +72,11 @@ class Animal extends Entity {
         this.name = name || generateAnimalName(gender)
         this.currentActivity = {activity: "walking", progress: 0, maxProgress: 0}
 
-        simulationStore.addLogItem(`${this.name} arrived!`)
+        addLogItem({
+            message: `${this.name} arrived!`,
+            timestamp: !!parents ?
+                age.birthTimestamp - stats.hatchingTime * simulationValuesMultipliers.hatchingTime : age.birthTimestamp
+        })
     }
 
     private moveTo(position: Position) {
@@ -107,14 +112,18 @@ class Animal extends Entity {
         breedingMinAge: number,
         breedingMaxAge: number,
         breedingMaxProgress: number,
-        getId: () => number
+        getId: () => number,
+        addLogItem: (logItem: LogItem) => void
     ) {
         if (this.age.current >= 0) {
             const {width: fieldWidth, height: fieldHeight} = fieldDimensions
             if (this.energy.current <= 1 && this.isAlive) {
                 this.energy.current = 0
                 this.die(timestamp)
-                simulationStore.addLogItem(`${this.name} died from malnutrition. That is so sad, can we hit ${this.age.current} like${this.age.current % 10 === 1 && this.age.current !== 11 ? '' : 's'}?`)
+                addLogItem({
+                    message: `${this.name} died from malnutrition. That is so sad, can we hit ${this.age.current} like${this.age.current % 10 === 1 && this.age.current !== 11 ? '' : 's'}?`,
+                    timestamp
+                })
             }
             if (this.isAlive) {
                 this.energy.current -= simulationSpeed * calculateEnergyLoss(this.stats);
@@ -122,7 +131,15 @@ class Animal extends Entity {
                     this.energy.breedingCD -= simulationSpeed
                 }
                 if (this.currentActivity.activity === 'breeding' && this.currentActivity.partner?.isAlive) {
-                    this.breed(this.currentActivity.partner, addAnimal, timestamp, simulationSpeed, breedingMaxProgress, getId)
+                    this.breed(
+                        this.currentActivity.partner,
+                        addAnimal,
+                        timestamp,
+                        simulationSpeed,
+                        breedingMaxProgress,
+                        getId,
+                        addLogItem
+                    )
                 } else {
                     this.currentActivity = {
                         activity: "walking",
@@ -149,7 +166,7 @@ class Animal extends Entity {
                 if (this.currentActivity.activity === 'walking') {
                     this.walk(fieldWidth, fieldHeight, simulationSpeed)
                 }
-                this.applyAging(timestamp)
+                this.applyAging(timestamp, addLogItem)
             }
         } else if (timestamp >= this.age.birthTimestamp) {
             this.age.current = 0
@@ -197,7 +214,7 @@ class Animal extends Entity {
         return null
     }
 
-    private applyAging(timestamp: number) {
+    private applyAging(timestamp: number, addLogItem: (logItem:LogItem) => void) {
         if (this.age.current >= 0) {
             const isBirthday: boolean = Math.floor((timestamp - this.age.birthTimestamp) / timeConstants.yearLength) > this.age.current
             if (isBirthday) {
@@ -206,7 +223,10 @@ class Animal extends Entity {
                     const isDead = (Math.random() * this.age.current) > 15
                     if (isDead) {
                         this.die(timestamp)
-                        simulationStore.addLogItem(`${this.name} died from aging. RIP legend`)
+                        addLogItem({
+                            message: `${this.name} died from aging. RIP legend`,
+                            timestamp
+                        })
                     }
                 }
             }
@@ -254,7 +274,8 @@ class Animal extends Entity {
         timestamp: number,
         simulationSpeed: number,
         breedingMaxProgress: number,
-        getId: () => number
+        getId: () => number,
+        addLogItem: (logItem: LogItem) => void
     ) {
         const {progress, maxProgress} = this.currentActivity
         this.energy.current -= +((simulationSpeed * calculateEnergyLoss(this.stats)).toFixed(3));
@@ -266,7 +287,8 @@ class Animal extends Entity {
                 {father, mother},
                 `A${getId()}`,
                 breedingMaxProgress,
-                this.energy.max
+                this.energy.max,
+                addLogItem
             )
             addAnimal(child)
             this.currentActivity = {

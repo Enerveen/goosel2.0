@@ -20,6 +20,7 @@ import ImageContext from "../../stores/ImageContext";
 import useStatisticsStore from "../../stores/statisticsStore";
 import generateStatistics from "../../utils/generateStatistics";
 import useSimConstantsStore from "../../stores/simConstantsStore";
+import useLogStore from "../../stores/logStore";
 
 interface ISceneProps {
     store: SimulationStore,
@@ -32,6 +33,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     const {width: canvasWidth, height: canvasHeight} = useWindowSize(store)
     const updateStatistics = useStatisticsStore(state => state.updateStatistics)
     const simConstants = useSimConstantsStore(state => state.constants)
+    const addLogItem = useLogStore(state => state.addLogItem)
     const fieldSize = useMemo(() => ({
         edgeX: canvasWidth - appConstants.fieldXPadding,
         edgeY: canvasHeight - appConstants.fieldYPadding,
@@ -46,7 +48,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             console.log('Simulation has started with the following constants:',
                 JSON.stringify(simConstants, null, 4))
             store.addAnimal(generateAnimals(simConstants.initialAnimalCount,
-                {width: fieldSize.edgeX, height: fieldSize.edgeY}, simConstants.animalMaxEnergy))
+                {width: fieldSize.edgeX, height: fieldSize.edgeY}, simConstants.animalMaxEnergy, addLogItem))
             store.addPlant(generateFood(simConstants.initialFoodCount,
                 {width: fieldSize.edgeX, height: fieldSize.edgeY}))
         }
@@ -104,7 +106,8 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                     simConstants.breedingMinAge,
                     simConstants.breedingMaxAge,
                     simConstants.breedingMaxProgress,
-                    store.getId
+                    store.getId,
+                    addLogItem
                 )
                 renderer.drawAnimal(entity.position,
                     timestamp - entity.age.birthTimestamp,
