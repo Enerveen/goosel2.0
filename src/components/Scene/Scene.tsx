@@ -28,12 +28,12 @@ const Scene = observer(({store, setAppPhase, images}: ISceneProps) => {
     const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
     const {width: canvasWidth, height: canvasHeight} = useWindowSize(store)
     const fieldSize = useMemo(() => ({
-        edgeX: canvasWidth - appConstants.fieldXPadding,
-        edgeY: canvasHeight - appConstants.fieldYPadding,
+        edgeX: canvasWidth - 0 * appConstants.fieldXPadding,
+        edgeY: canvasHeight - 0 * appConstants.fieldYPadding,
     }), [canvasWidth, canvasHeight])
 
     const renderer = useMemo(() => new Renderer(context, images), [context])
-    const mainCamera = useMemo(() => new Camera({ x: canvasWidth / 2, y: canvasHeight / 2 }, {x: canvasWidth, y: canvasHeight}), [canvasWidth, canvasHeight]);
+    const mainCamera = useMemo(() => new Camera({ x: fieldSize.edgeX / 2, y: fieldSize.edgeY / 2 }, {x: canvasWidth, y: canvasHeight}), [fieldSize, canvasWidth, canvasHeight]);
 
     const step = useCallback(() => {
         const timestamp = store.getTimestamp
@@ -58,17 +58,16 @@ const Scene = observer(({store, setAppPhase, images}: ISceneProps) => {
             context.resetTransform();
             context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
-            mainCamera.checkBounds({left: 0, top: 0, right: canvasWidth, bottom: canvasHeight});
-
+            mainCamera.checkBounds({left: 0, top: 0, right: fieldSize.edgeX, bottom: fieldSize.edgeY});
             {
-                const scale = mainCamera.getFovScale();
+                const scale = Math.min(canvasWidth / mainCamera.fov.x, canvasHeight / mainCamera.fov.y);
                 context.translate(canvasWidth / 2 - mainCamera.position.x * scale, canvasHeight / 2 - mainCamera.position.y * scale);
                 context.scale(scale, scale);
             }
 
             context.textAlign = 'center';
             context.font = "bold 18px Comic Sans MS"
-            renderer.drawSeamlessBackground({width:canvasWidth, height:canvasHeight})
+            renderer.drawSeamlessBackground({width: fieldSize.edgeX, height:fieldSize.edgeY})
             if (!getRandomInRange(0, store.getSimulationConstants.foodSpawnChanceK / store.simulationSpeed)) {
                 store.addPlant(new Plant({
                     id: `P${store.getId}`,
