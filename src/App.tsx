@@ -17,7 +17,7 @@ const App = () => {
         <div className={classes.container}>
             {phase === 'NOT_STARTED' && <Main setAppPhase={setPhase}/>}
             {phase === 'STARTED' && <Simulation store={simulationStore} setAppPhase={setPhase}/>}
-            {phase === 'FINISHED' && <Results statistics={simulationStore.getStatistics}/>}
+            {phase === 'FINISHED' && <Results/>}
         </div>
     </ImageContext.Provider> : <Loader/>
 }

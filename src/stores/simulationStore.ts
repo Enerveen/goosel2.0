@@ -1,7 +1,6 @@
 import Animal from "../entities/Animal";
 import Plant from "../entities/Plant";
 import {action, computed, makeObservable, observable} from "mobx";
-import generateStatistics from "../utils/generateStatistics";
 import {FieldDimensions, SimulationConstants} from "../types";
 import {timeConstants} from "../constants/simulation";
 
@@ -14,21 +13,6 @@ export class SimulationStore {
     idCounter: number = 0
     simulationSpeed: number = 10
     currentYear: number = -1
-    statistics: {
-        age: { child: number, teen: number, mature: number, elder: number, year: number }[],
-        gender: { male: number, female: number, year: number }[]
-        averageStats: {
-            breedingCD: number,
-            breedingSensitivity: number,
-            hatchingTime: number,
-            foodSensitivity: number,
-            speed: number,
-            year: number
-        }[]
-        populationChange: {value: number, year: number}[]
-        plantStats: {year: number, count: number, totalNutrition: number}[]
-        animalCount: number[]
-    } = {age: [], gender: [], averageStats: [], populationChange:[], animalCount: [], plantStats: []}
     simulationConstants: SimulationConstants = {
         breedingMinAge: 5,
         breedingMaxAge: 15,
@@ -50,7 +34,6 @@ export class SimulationStore {
             animals: observable,
             plants: observable,
             idCounter: observable,
-            statistics: observable,
             windowSize: observable,
             simulationConstants: observable,
             log: observable,
@@ -61,7 +44,6 @@ export class SimulationStore {
             getId: action,
             getTimestamp: computed,
             getCurrentYear: computed,
-            getStatistics: computed,
             getWindowSize: computed,
             getSimulationConstants: computed,
             getLog: computed,
@@ -75,7 +57,6 @@ export class SimulationStore {
             updateTimestamp: action,
             setSimulationSpeed: action,
             clearAnimalCorpses: action,
-            gatherStatistics: action,
             setWindowSize: action,
             setSimulationConstants: action
         })
@@ -103,10 +84,6 @@ export class SimulationStore {
 
     get getCurrentYear() {
         return this.currentYear
-    }
-
-    get getStatistics() {
-        return this.statistics
     }
 
     get getWindowSize() {
@@ -177,22 +154,6 @@ export class SimulationStore {
 
     setSimulationConstants = (constants: SimulationConstants) => {
         this.simulationConstants = constants
-    }
-
-    gatherStatistics = () => {
-        if (Math.round(this.timestamp / timeConstants.yearLength) > this.currentYear || this.timestamp === 0) {
-            this.currentYear += 1
-            const {gender, age, averageStats, animalsCount, plantsStats} = generateStatistics(this.animals, this.plants)
-            const populationChange = animalsCount - (this.statistics.animalCount.at(-1) || 0)
-            this.statistics = {
-                age: [...this.statistics.age, {year: this.currentYear, ...age}],
-                gender: [...this.statistics.gender, {year: this.currentYear, ...gender}],
-                averageStats: [...this.statistics.averageStats, {year: this.currentYear, ...averageStats}],
-                populationChange: [...this.statistics.populationChange, {year: this.currentYear, value: populationChange}],
-                animalCount: [...this.statistics.animalCount, animalsCount],
-                plantStats: [...this.statistics.plantStats, {year: this.currentYear, ...plantsStats}],
-            }
-        }
     }
 
     clearAnimalCorpses = () => {

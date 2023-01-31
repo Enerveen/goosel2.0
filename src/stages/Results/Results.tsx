@@ -5,8 +5,10 @@ import BarChart from "../../components/Charts/BarChart";
 import DynamicsChart from "../../components/Charts/DynamicsChart";
 import ComposedChart from "../../components/Charts/ComposedChart";
 import LineChart from "../../components/Charts/LineChart";
+import useStatisticsStore from "../../stores/statisticsStore";
 
-const Results = ({statistics}: any) => {
+const Results = () => {
+    const {gender, populationChange, plantStats, age, averageStats} = useStatisticsStore()
     return <div className={classes.container}>
         <h1>
             FIN!
@@ -14,16 +16,16 @@ const Results = ({statistics}: any) => {
         <div className={classes.chartsSection}>
             <div className={classes.chartContainer}>
                 <h2>Male/Female ratio</h2>
-                <AreaChart data={statistics.gender} xAxisDataKey={'year'} dataKeys={['male', 'female']}/>
+                <AreaChart data={gender} xAxisDataKey={'year'} dataKeys={['male', 'female']}/>
             </div>
             <div className={classes.chartContainer}>
                 <h2>Population Change</h2>
-                <DynamicsChart data={statistics.populationChange}/>
+                <DynamicsChart data={populationChange}/>
             </div>
             <div className={classes.chartContainer}>
                 <h2>Plants count</h2>
                 <ComposedChart
-                    data={statistics.plantStats}
+                    data={plantStats}
                     barDataKey={'count'}
                     xAxisDataKey={'year'}
                     lineDataKey={'totalNutrition'}
@@ -31,12 +33,12 @@ const Results = ({statistics}: any) => {
             </div>
             <div className={classes.chartContainer}>
                 <h2>Animals age groups</h2>
-                <BarChart data={statistics.age} dataKeys={['child', 'teen', 'mature', 'elder']} xAxisDataKey={'year'}/>
+                <BarChart data={age} dataKeys={['child', 'teen', 'mature', 'elder']} xAxisDataKey={'year'}/>
             </div>
             <div className={classes.chartContainer}>
                 <h2>Average population stats</h2>
                 <LineChart
-                    data={statistics.averageStats}
+                    data={averageStats}
                     dataKeys={['speed', 'breedingSensitivity', 'foodSensitivity', 'breedingCD', 'hatchingTime']}
                     xAxisDataKey={'year'}/>
             </div>

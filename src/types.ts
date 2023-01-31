@@ -88,3 +88,11 @@ export type SimulationConstants = {
     foodNutritionMin: number,
     foodNutritionMax: number
 }
+
+export type Statistics = {
+    age: { child: number, teen: number, mature: number, elder: number},
+    gender: { male: number, female: number},
+    averageStats: Stats,
+    plantsStats: {count: number, totalNutrition: number},
+    animalsCount: number,
+}

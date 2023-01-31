@@ -13,10 +13,12 @@ import {
 import Renderer from "../../graphics/Renderer";
 import {appPhase} from "../../types";
 import useWindowSize from "../../hooks/useWindowSize";
-import {appConstants} from "../../constants/simulation";
+import {appConstants, timeConstants} from "../../constants/simulation";
 
 import {Camera} from "../../graphics/Camera";
 import ImageContext from "../../stores/ImageContext";
+import useStatisticsStore from "../../stores/statisticsStore";
+import generateStatistics from "../../utils/generateStatistics";
 
 interface ISceneProps {
     store: SimulationStore,
@@ -27,6 +29,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
     const {width: canvasWidth, height: canvasHeight} = useWindowSize(store)
+    const updateStatistics = useStatisticsStore(state => state.updateStatistics)
     const fieldSize = useMemo(() => ({
         edgeX: canvasWidth - appConstants.fieldXPadding,
         edgeY: canvasHeight - appConstants.fieldYPadding,
@@ -49,7 +52,10 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             setAppPhase('FINISHED')
         } else {
             store.clearAnimalCorpses()
-            store.gatherStatistics()
+            if (Math.round(store.timestamp / timeConstants.yearLength) > store.currentYear) {
+                store.currentYear += 1
+                updateStatistics(generateStatistics(store.animals, store.plants), store.currentYear)
+            }
 
             if (!context) {
                 return;
