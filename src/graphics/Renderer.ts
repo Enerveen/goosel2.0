@@ -38,6 +38,7 @@ class Renderer {
     teenAnimalTextureAtlas: TextureAtlas
     childAnimalTextureAtlas: TextureAtlas
     butterflyTextureAtlas: TextureAtlas
+    butterflyWhiteTextureAtlas: TextureAtlas
     butterflyShadowTextureAtlas : TextureAtlas
     backgroundTexture: HTMLImageElement
     backgroundGladeTexture: HTMLImageElement
@@ -50,8 +51,9 @@ class Renderer {
         this.teenAnimalTextureAtlas = {...animalTextureAtlas, width: 60, height: 75};
         this.childAnimalTextureAtlas = {...animalTextureAtlas, width: 40, height: 50};
         this.matureAnimalTextureAtlas = {...animalTextureAtlas, width: 80, height: 100};
-        this.butterflyTextureAtlas = loadTextureAtlas(images.butterflyTextureAtlas, {width: 25, height:25, frameWidth: 100, frameHeight: 100, offsetX: 0.5, offsetY: 0.5});
-        this.butterflyShadowTextureAtlas = loadTextureAtlas(images.butterflyShadowTextureAtlas, {width: 25, height: 25, frameWidth: 100, frameHeight: 100, offsetX: 0.5, offsetY: 0.5});
+        this.butterflyTextureAtlas = loadTextureAtlas(images.butterflyTextureAtlas, {width: 25, height:25, frameWidth: 25, frameHeight: 25, offsetX: 0.5, offsetY: 0.5});
+        this.butterflyWhiteTextureAtlas = loadTextureAtlas(images.butterflyWhiteTextureAtlas, {width: 25, height:25, frameWidth: 25, frameHeight: 25, offsetX: 0.5, offsetY: 0.5});
+        this.butterflyShadowTextureAtlas = loadTextureAtlas(images.butterflyShadowTextureAtlas, {width: 25, height: 25, frameWidth: 25, frameHeight: 25, offsetX: 0.5, offsetY: 0.5});
 
         this.eggTexture = loadTexture(images.egg, {width: 40, height: 40});
         this.plantTexture = loadTexture(images.plant, {width: 50, height: 45, offsetX: 0.5, offsetY: 0.6});
@@ -175,10 +177,27 @@ class Renderer {
                 const angle = Math.atan2(butterfly.direction.y, butterfly.direction.x) + Math.PI / 2;
 
                 this.context.save();
+                this.context.globalCompositeOperation = 'destination-out';
                 this.context.translate(butterfly.position.x, butterfly.position.y);
                 this.context.rotate(angle);
                 this.context.translate(-butterfly.position.x, -butterfly.position.y);
                 this.context.drawImage(this.butterflyTextureAtlas.image,
+                    this.butterflyTextureAtlas.frameWidth * (currentFrame % 4),
+                    this.butterflyTextureAtlas.frameHeight * Math.floor(currentFrame / 4),
+                    this.butterflyTextureAtlas.frameWidth,
+                    this.butterflyTextureAtlas.frameHeight,
+                    position.x,
+                    position.y,
+                    this.butterflyTextureAtlas.width,
+                    this.butterflyTextureAtlas.height
+                );
+                this.context.fillStyle = `rgb(${255 * Math.random()}, ${255 * Math.random()}, ${255 * Math.random()}, 1.0)`;
+                //this.context.fillStyle = 'yellow';
+                this.context.globalCompositeOperation = 'destination-over';
+                this.context.fillRect(position.x, position.y, this.butterflyTextureAtlas.width, this.butterflyShadowTextureAtlas.height);
+
+                this.context.globalCompositeOperation = 'multiply';
+                this.context.drawImage(this.butterflyWhiteTextureAtlas.image,
                     this.butterflyTextureAtlas.frameWidth * (currentFrame % 4),
                     this.butterflyTextureAtlas.frameHeight * Math.floor(currentFrame / 4),
                     this.butterflyTextureAtlas.frameWidth,
