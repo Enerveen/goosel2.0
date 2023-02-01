@@ -11,12 +11,13 @@ import {
     handleCanvasMousePress, handleCanvasMouseRelease, handleCanvasMouseWheel
 } from "../../utils/helpers";
 import Renderer from "../../graphics/Renderer";
-import {appPhase} from "../../types";
+import {appPhase, BoundingBox} from "../../types";
 import useWindowSize from "../../hooks/useWindowSize";
 import {appConstants} from "../../constants/simulation";
 
 import {Camera} from "../../graphics/Camera";
 import ImageContext from "../../stores/ImageContext";
+import {Quadtree} from "../../dataStructures/quadtree";
 import {BoidsSystem} from "../../entities/BoidEntity";
 import Entity from "../../entities/Entity";
 
@@ -36,7 +37,6 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     const images = useContext(ImageContext)
     const renderer = useMemo(() => new Renderer(context, images), [context])
     const mainCamera = useMemo(() => new Camera({ x: fieldSize.edgeX / 2, y: fieldSize.edgeY / 2 }, {x: canvasWidth, y: canvasHeight}), [fieldSize, canvasWidth, canvasHeight]);
-    const boidsSystem = useMemo(() => new BoidsSystem(20, fieldSize), [fieldSize]);
 
     const step = useCallback(() => {
         const timestamp = store.getTimestamp
@@ -57,10 +57,6 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             if (!context) {
                 return;
             }
-
-            boidsSystem.follow([new Entity({x: canvasWidth / 2, y: canvasHeight / 2})], 50000.0, true);
-            boidsSystem.steerAwayFrom(store.getAnimals, 5.0, true);
-            boidsSystem.update(0.1 * store.simulationSpeed);
 
             context.resetTransform();
             context.clearRect(0, 0, context.canvas.width, context.canvas.height);
@@ -122,7 +118,6 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                 }
             })
 
-            renderer.drawButterflies(boidsSystem.boids, timestamp);
             renderer.drawClouds(timestamp);
         }
     }, [context, canvasWidth, canvasHeight]);
