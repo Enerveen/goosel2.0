@@ -11,12 +11,13 @@ import {
     handleCanvasMousePress, handleCanvasMouseRelease, handleCanvasMouseWheel
 } from "../../utils/helpers";
 import Renderer from "../../graphics/Renderer";
-import {appPhase} from "../../types";
+import {appPhase, BoundingBox} from "../../types";
 import useWindowSize from "../../hooks/useWindowSize";
 import {appConstants} from "../../constants/simulation";
 
 import {Camera} from "../../graphics/Camera";
 import ImageContext from "../../stores/ImageContext";
+import {Quadtree} from "../../dataStructures/quadtree";
 
 interface ISceneProps {
     store: SimulationStore,
@@ -58,7 +59,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             context.resetTransform();
             context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
-            mainCamera.checkBounds({left: 0, top: 0, right: fieldSize.edgeX, bottom: fieldSize.edgeY});
+            mainCamera.checkBounds(new BoundingBox(0, fieldSize.edgeX, 0, fieldSize.edgeY));
             {
                 const scale = Math.min(canvasWidth / mainCamera.fov.x, canvasHeight / mainCamera.fov.y);
                 context.translate(canvasWidth / 2 - mainCamera.position.x * scale, canvasHeight / 2 - mainCamera.position.y * scale);
@@ -116,6 +117,23 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             })
 
             renderer.drawClouds(timestamp);
+
+            // Plants example
+            // const searchObb = new BoundingBox(500, 1000, 500, 1000);
+            //
+            // context.strokeStyle = 'blue';
+            // context.strokeRect(searchObb.left, searchObb.top, 500, 500);
+            //
+            // const quadtree = new Quadtree({x: 100, y: 100}, 2000);
+            // store.getPlants.forEach(animal => {
+            //     quadtree.push(animal);
+            // })
+            // const result = quadtree.get(searchObb);
+            // result.forEach(entity => {
+            //     context.fillRect(entity.position.x, entity.position.y, 10, 10);
+            // })
+            //
+            // quadtree.dbgDraw(context);
         }
     }, [context, canvasWidth, canvasHeight]);
 
