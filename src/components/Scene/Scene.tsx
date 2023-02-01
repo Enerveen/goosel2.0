@@ -37,6 +37,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     const images = useContext(ImageContext)
     const renderer = useMemo(() => new Renderer(context, images), [context])
     const mainCamera = useMemo(() => new Camera({ x: fieldSize.edgeX / 2, y: fieldSize.edgeY / 2 }, {x: canvasWidth, y: canvasHeight}), [fieldSize, canvasWidth, canvasHeight]);
+    const boidsSystem = useMemo(() => new BoidsSystem(20, fieldSize), [fieldSize]);
 
     const step = useCallback(() => {
         const timestamp = store.getTimestamp
@@ -58,10 +59,14 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                 return;
             }
 
+            boidsSystem.follow([new Entity({x: canvasWidth / 2, y: canvasHeight / 2})], 50000.0, true);
+            boidsSystem.steerAwayFrom(store.getAnimals, 5.0, true);
+            boidsSystem.update(0.1 * store.simulationSpeed);
+
             context.resetTransform();
             context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
-            mainCamera.checkBounds({left: 0, top: 0, right: fieldSize.edgeX, bottom: fieldSize.edgeY});
+            mainCamera.checkBounds(new BoundingBox(0, fieldSize.edgeX, 0, fieldSize.edgeY));
             {
                 const scale = Math.min(canvasWidth / mainCamera.fov.x, canvasHeight / mainCamera.fov.y);
                 context.translate(canvasWidth / 2 - mainCamera.position.x * scale, canvasHeight / 2 - mainCamera.position.y * scale);
@@ -118,6 +123,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                 }
             })
 
+            renderer.drawButterflies(boidsSystem.boids, timestamp);
             renderer.drawClouds(timestamp);
         }
     }, [context, canvasWidth, canvasHeight]);
