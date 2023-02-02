@@ -3,6 +3,7 @@ import classes from './Main.module.scss'
 import {appPhase} from "../../types";
 import SimulationSettings from "../../components/SimulationSettings/SimulationSettings";
 import simulationStore from "../../stores/simulationStore";
+import {defaultSimConstants} from "../../constants/simulation";
 
 interface IMainProps {
     setAppPhase: (phase: appPhase) => void
@@ -10,7 +11,10 @@ interface IMainProps {
 
 const Main = ({setAppPhase}: IMainProps) => {
     const [isDefaultSettings, setIsDefaultSettings] = useState(true)
-    const [constantsValues, setConstantsValues] = useState(simulationStore.simulationConstants)
+    const localConstants = localStorage.getItem('simConstants')
+    const [constantsValues, setConstantsValues] = useState(localConstants ?
+        JSON.parse(localConstants) : defaultSimConstants
+    )
 
     const toggleSettingsCheckbox = useCallback(
         () => setIsDefaultSettings(prevState => !prevState), []
@@ -20,6 +24,7 @@ const Main = ({setAppPhase}: IMainProps) => {
         if (!isDefaultSettings) {
             simulationStore.setSimulationConstants(constantsValues)
         }
+        localStorage.setItem('simConstants', JSON.stringify(constantsValues))
         setAppPhase('STARTED')
     }, [constantsValues, setAppPhase, isDefaultSettings])
 

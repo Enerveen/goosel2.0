@@ -16,3 +16,15 @@ export const appConstants = {
     fieldXPadding: 0,
     fieldYPadding: 0
 }
+
+export const defaultSimConstants = {
+    breedingMinAge: 5,
+    breedingMaxAge: 15,
+    foodNutritionMin: 300,
+    foodNutritionMax: 800,
+    breedingMaxProgress: 200,
+    animalMaxEnergy: 1200,
+    foodSpawnChanceK: 50,
+    initialFoodCount: 200,
+    initialAnimalCount: 8
+}
