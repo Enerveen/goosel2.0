@@ -20,11 +20,33 @@ export type Color = {
 }
 
 
-export type BoundingBox = {
-    left: number,
-    right: number,
-    top: number,
-    bottom: number
+export class BoundingBox {
+    left: number = 0
+    right: number = 0
+    top: number = 0
+    bottom: number = 0
+
+
+    constructor(left: number=0, right: number=0, top: number=0, bottom: number=0) {
+        this.left = left;
+        this.right = right;
+        this.top = top;
+        this.bottom = bottom;
+    }
+
+
+    check(position: Position) {
+        return position.x >= this.left &&
+            position.x <= this.right &&
+            position.y >= this.top &&
+            position.y <= this.bottom;
+    }
+
+
+    intersects(obb: BoundingBox) {
+        return Math.max(this.right, obb.right) - Math.min(this.left, obb.left) <= this.right - this.left + obb.right - obb.left &&
+            Math.max(this.bottom, obb.bottom) - Math.min(this.top, obb.top) <= this.bottom - this.top + obb.bottom - obb.top;
+    }
 }
 
 
