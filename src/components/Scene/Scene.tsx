@@ -14,10 +14,8 @@ import Renderer from "../../graphics/Renderer";
 import {appPhase, BoundingBox} from "../../types";
 import useWindowSize from "../../hooks/useWindowSize";
 import {appConstants} from "../../constants/simulation";
-
 import {Camera} from "../../graphics/Camera";
 import ImageContext from "../../stores/ImageContext";
-import {Quadtree} from "../../dataStructures/quadtree";
 
 interface ISceneProps {
     store: SimulationStore,
@@ -34,107 +32,114 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     }), [canvasWidth, canvasHeight])
     const images = useContext(ImageContext)
     const renderer = useMemo(() => new Renderer(context, images), [context])
-    const mainCamera = useMemo(() => new Camera({ x: fieldSize.edgeX / 2, y: fieldSize.edgeY / 2 }, {x: canvasWidth, y: canvasHeight}), [fieldSize, canvasWidth, canvasHeight]);
+    const mainCamera = useMemo(() => new Camera({x: fieldSize.edgeX / 2, y: fieldSize.edgeY / 2}, {
+        x: canvasWidth,
+        y: canvasHeight
+    }), [fieldSize, canvasWidth, canvasHeight]);
 
-    const step = useCallback(() => {
-        const timestamp = store.getTimestamp
+    const init = useCallback(() => {
+        console.log('Simulation has started with the following constants:',
+            JSON.stringify(store.getSimulationConstants, null, 4))
+        store.addAnimal(generateAnimals(store.getSimulationConstants.initialAnimalCount,
+            {width: fieldSize.edgeX, height: fieldSize.edgeY}, store.getSimulationConstants.animalMaxEnergy))
+        store.addPlant(generateFood(store.getSimulationConstants.initialFoodCount,
+            {width: fieldSize.edgeX, height: fieldSize.edgeY}))
+    }, [canvasWidth, canvasHeight])
+
+
+    const calculateStep = useCallback((timestamp: number) => {
         if (timestamp === 0) {
-            console.log('Simulation has started with the following constants:',
-                JSON.stringify(store.getSimulationConstants, null, 4))
-            store.addAnimal(generateAnimals(store.getSimulationConstants.initialAnimalCount,
-                {width: fieldSize.edgeX, height: fieldSize.edgeY}, store.getSimulationConstants.animalMaxEnergy))
-            store.addPlant(generateFood(store.getSimulationConstants.initialFoodCount,
-                {width: fieldSize.edgeX, height: fieldSize.edgeY}))
+            init()
         }
-        if(!store.getAnimals.length) {
+        if (!store.getAnimals.length) {
             setAppPhase('FINISHED')
-        } else {
-            store.clearAnimalCorpses()
-            store.gatherStatistics()
-
-            if (!context) {
-                return;
-            }
-
-            context.resetTransform();
-            context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-
-            mainCamera.checkBounds(new BoundingBox(0, fieldSize.edgeX, 0, fieldSize.edgeY));
-            {
-                const scale = Math.min(canvasWidth / mainCamera.fov.x, canvasHeight / mainCamera.fov.y);
-                context.translate(canvasWidth / 2 - mainCamera.position.x * scale, canvasHeight / 2 - mainCamera.position.y * scale);
-                context.scale(scale, scale);
-            }
-
-            context.textAlign = 'center';
-            context.font = "bold 18px Comic Sans MS"
-            renderer.drawSeamlessBackground({width: fieldSize.edgeX, height:fieldSize.edgeY})
-            if (!getRandomInRange(0, store.getSimulationConstants.foodSpawnChanceK / store.simulationSpeed)) {
-                store.addPlant(new Plant({
-                    id: `P${store.getId()}`,
-                    nutritionValue: getRandomInRange(
-                        store.getSimulationConstants.foodNutritionMin,
-                        store.getSimulationConstants.foodNutritionMax
-                    ),
-                    position: getRandomPosition(fieldSize.edgeX, fieldSize.edgeY)
-                }))
-            }
-            store.getPlants.forEach(entity => {
-                renderer.drawPlant(entity.position)
-            })
-            store.getAnimals.forEach(entity => {
-                entity.live(
-                    timestamp,
-                    store.getPlants,
-                    store.getAnimals,
-                    store.removePlant,
-                    store.addAnimal,
-                    {
-                        width: fieldSize.edgeX,
-                        height: fieldSize.edgeY
-                    },
-                    store.simulationSpeed,
-                    store.getSimulationConstants.breedingMinAge,
-                    store.getSimulationConstants.breedingMaxAge,
-                    store.getSimulationConstants.breedingMaxProgress,
-                    store.getId
-                )
-                renderer.drawAnimal(entity.position,
-                    timestamp - entity.age.birthTimestamp,
-                    {
-                        gender: entity.gender,
-                        age: entity.age.current,
-                        isAlive: entity.isAlive,
-                        name: entity.name
-                    }
-                )
-                if (entity.currentActivity.activity === 'breeding') {
-                    renderer.drawBreeding({x: entity.position.x + 30, y: entity.position.y - 60})
-                }
-                if (entity.id === store.getActiveEntity?.id) {
-                    store.setActiveEntity(entity)
-                }
-            })
-
-            renderer.drawClouds(timestamp);
-
-            // Plants example
-            // const searchObb = new BoundingBox(500, 1000, 500, 1000);
-            //
-            // context.strokeStyle = 'blue';
-            // context.strokeRect(searchObb.left, searchObb.top, 500, 500);
-            //
-            // const quadtree = new Quadtree({x: 100, y: 100}, 2000);
-            // store.getPlants.forEach(animal => {
-            //     quadtree.push(animal);
-            // })
-            // const result = quadtree.get(searchObb);
-            // result.forEach(entity => {
-            //     context.fillRect(entity.position.x, entity.position.y, 10, 10);
-            // })
-            //
-            // quadtree.dbgDraw(context);
+            return
         }
+        store.clearAnimalCorpses()
+        store.gatherStatistics()
+        if (!getRandomInRange(0, store.getSimulationConstants.foodSpawnChanceK / store.simulationSpeed)) {
+            store.addPlant(new Plant({
+                id: `P${store.getId()}`,
+                nutritionValue: getRandomInRange(
+                    store.getSimulationConstants.foodNutritionMin,
+                    store.getSimulationConstants.foodNutritionMax
+                ),
+                position: getRandomPosition(fieldSize.edgeX, fieldSize.edgeY)
+            }))
+        }
+        store.getAnimals.forEach(animal => animal.live(
+            timestamp,
+            store.getPlants,
+            store.getAnimals,
+            store.removePlant,
+            store.addAnimal,
+            {
+                width: fieldSize.edgeX,
+                height: fieldSize.edgeY
+            },
+            store.simulationSpeed,
+            store.getSimulationConstants.breedingMinAge,
+            store.getSimulationConstants.breedingMaxAge,
+            store.getSimulationConstants.breedingMaxProgress,
+            store.getId
+        ))
+    }, [context, canvasWidth, canvasHeight])
+
+
+    const drawStep = useCallback((timestamp: number) => {
+
+        if (!context) {
+            return;
+        }
+
+        context.resetTransform();
+        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+
+        mainCamera.checkBounds(new BoundingBox(0, fieldSize.edgeX, 0, fieldSize.edgeY));
+        {
+            const scale = Math.min(canvasWidth / mainCamera.fov.x, canvasHeight / mainCamera.fov.y);
+            context.translate(canvasWidth / 2 - mainCamera.position.x * scale, canvasHeight / 2 - mainCamera.position.y * scale);
+            context.scale(scale, scale);
+        }
+
+        renderer.drawSeamlessBackground({width: fieldSize.edgeX, height: fieldSize.edgeY})
+        store.getPlants.forEach(entity => {
+            renderer.drawPlant(entity.position)
+        })
+        store.getAnimals.forEach(entity => {
+            renderer.drawAnimal(entity.position,
+                timestamp - entity.age.birthTimestamp,
+                {
+                    gender: entity.gender,
+                    age: entity.age.current,
+                    isAlive: entity.isAlive,
+                    name: entity.name,
+                    currentActivity: entity.currentActivity.activity
+                }
+            )
+            if (entity.id === store.getActiveEntity?.id) {
+                store.setActiveEntity(entity)
+            }
+        })
+
+        renderer.drawClouds(timestamp);
+
+        // Plants example
+        // const searchObb = new BoundingBox(500, 1000, 500, 1000);
+        //
+        // context.strokeStyle = 'blue';
+        // context.strokeRect(searchObb.left, searchObb.top, 500, 500);
+        //
+        // const quadtree = new Quadtree({x: 100, y: 100}, 2000);
+        // store.getPlants.forEach(animal => {
+        //     quadtree.push(animal);
+        // })
+        // const result = quadtree.get(searchObb);
+        // result.forEach(entity => {
+        //     context.fillRect(entity.position.x, entity.position.y, 10, 10);
+        // })
+        //
+        // quadtree.dbgDraw(context);
     }, [context, canvasWidth, canvasHeight]);
 
     useEffect(() => {
@@ -150,7 +155,9 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
 
         if (context) {
             const render = () => {
-                step();
+                const timestamp = store.timestamp
+                calculateStep(timestamp);
+                drawStep(timestamp);
                 store.updateTimestamp()
                 animationFrameId = window.requestAnimationFrame(render);
             };
@@ -159,7 +166,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         return () => {
             window.cancelAnimationFrame(animationFrameId);
         };
-    }, [context, step, store]);
+    }, [context, drawStep, store]);
 
     return <canvas
         ref={canvasRef}
