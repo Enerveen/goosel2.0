@@ -13,7 +13,7 @@ import {
 import Renderer from "../../graphics/Renderer";
 import {appPhase, BoundingBox} from "../../types";
 import useWindowSize from "../../hooks/useWindowSize";
-import {appConstants} from "../../constants/simulation";
+import {fieldSize} from "../../constants/simulation";
 import {Camera} from "../../graphics/Camera";
 import ImageContext from "../../stores/ImageContext";
 
@@ -26,24 +26,20 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
     const {width: canvasWidth, height: canvasHeight} = useWindowSize(store)
-    const fieldSize = useMemo(() => ({
-        edgeX: canvasWidth - appConstants.fieldXPadding,
-        edgeY: canvasHeight - appConstants.fieldYPadding,
-    }), [canvasWidth, canvasHeight])
     const images = useContext(ImageContext)
     const renderer = useMemo(() => new Renderer(context, images), [context])
-    const mainCamera = useMemo(() => new Camera({x: fieldSize.edgeX / 2, y: fieldSize.edgeY / 2}, {
-        x: canvasWidth,
-        y: canvasHeight
+    const mainCamera = useMemo(() => new Camera({x: fieldSize.x / 2, y: fieldSize.y / 2}, {
+        x: fieldSize.x ,
+        y: fieldSize.y
     }), [fieldSize, canvasWidth, canvasHeight]);
 
     const init = useCallback(() => {
         console.log('Simulation has started with the following constants:',
             JSON.stringify(store.getSimulationConstants, null, 4))
         store.addAnimal(generateAnimals(store.getSimulationConstants.initialAnimalCount,
-            {width: fieldSize.edgeX, height: fieldSize.edgeY}, store.getSimulationConstants.animalMaxEnergy))
+            {width: fieldSize.x, height: fieldSize.y}, store.getSimulationConstants.animalMaxEnergy))
         store.addPlant(generateFood(store.getSimulationConstants.initialFoodCount,
-            {width: fieldSize.edgeX, height: fieldSize.edgeY}))
+            {width: fieldSize.x, height: fieldSize.y}))
     }, [canvasWidth, canvasHeight])
 
 
@@ -64,7 +60,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                     store.getSimulationConstants.foodNutritionMin,
                     store.getSimulationConstants.foodNutritionMax
                 ),
-                position: getRandomPosition(fieldSize.edgeX, fieldSize.edgeY)
+                position: getRandomPosition(fieldSize.x, fieldSize.y)
             }))
         }
         store.getAnimals.forEach(animal => animal.live(
@@ -74,8 +70,8 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             store.removePlant,
             store.addAnimal,
             {
-                width: fieldSize.edgeX,
-                height: fieldSize.edgeY
+                width: fieldSize.x,
+                height: fieldSize.y
             },
             store.simulationSpeed,
             store.getSimulationConstants.breedingMinAge,
@@ -95,14 +91,14 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         context.resetTransform();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
-        mainCamera.checkBounds(new BoundingBox(0, fieldSize.edgeX, 0, fieldSize.edgeY));
+        mainCamera.checkBounds(new BoundingBox(0, fieldSize.x, 0, fieldSize.y));
         {
             const scale = Math.min(canvasWidth / mainCamera.fov.x, canvasHeight / mainCamera.fov.y);
             context.translate(canvasWidth / 2 - mainCamera.position.x * scale, canvasHeight / 2 - mainCamera.position.y * scale);
             context.scale(scale, scale);
         }
 
-        renderer.drawSeamlessBackground({width: fieldSize.edgeX, height: fieldSize.edgeY})
+        renderer.drawSeamlessBackground({width: fieldSize.x, height: fieldSize.y})
         store.getPlants.forEach(entity => {
             renderer.drawPlant(entity.position)
         })

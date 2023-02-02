@@ -28,3 +28,8 @@ export const defaultSimConstants = {
     initialFoodCount: 200,
     initialAnimalCount: 8
 }
+
+export const fieldSize = {
+    x: 3200,
+    y: 1800
+}
