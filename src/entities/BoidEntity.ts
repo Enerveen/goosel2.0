@@ -1,11 +1,11 @@
 import Entity from "./Entity";
-import {Position, Vector2} from "../types";
-import {findDistance, getRandomPosition} from "../utils/helpers";
-import entity from "./Entity";
+import {BoundingBox, Circle, Position, Vector2} from "../types";
+import {findDistance} from "../utils/helpers";
+import {Quadtree} from "../dataStructures/quadtree";
 
 
 const length = function(v: Vector2) {
-    return Math.sqrt(Math.pow(v.x, 2) + Math.pow(v.y, 2));
+    return Math.sqrt(v.x ** 2 + v.y ** 2);
 }
 
 
@@ -25,23 +25,24 @@ const dot = (v1: Vector2, v2: Vector2) => {
 
 
 export class BoidEntity extends Entity {
+    readonly id: number = BoidsSystem.getUniqueBoidId()
+
     direction: Vector2
+    newDirection: Vector2 = {x: 0, y: 0}
     velocity: number
     senseRadius: number
     senseAngle: number
-    midPoint: Vector2
-    activeMidPoint: boolean
+    centerPoints: Position[] = []
 
     constructor(position: Position={x: 0, y: 0}, direction: Vector2={x: 1, y: 0}, velocity: number=0, senseRadius: number=1, senseAngle: number=270) {
         super(position);
 
         this.direction = normalized(direction);
+        this.newDirection.x = this.direction.x;
+        this.newDirection.y = this.direction.y;
         this.velocity = velocity;
         this.senseRadius = senseRadius;
         this.senseAngle = senseAngle;
-
-        this.midPoint = {x: 0, y: 0};
-        this.activeMidPoint = false;
     }
 
 
@@ -55,15 +56,15 @@ export class BoidEntity extends Entity {
     }
 
 
-    steerAwayFrom(entity: Entity, senseFactor: number=1.0, ignoreSenseAngle: boolean=false, precalculatedDistance?: number) {
+    steerAwayFrom(entity: Entity, senseFactor: number=1.0, ignoreSenseAngle: boolean=false, ignoreDistance: boolean=false, precalculatedDistance?: number) {
         const distance = precalculatedDistance || length({
             x: this.position.x - entity.position.x,
             y: this.position.y - entity.position.y
         });
 
-        if (this.hasVisionOf(entity, senseFactor, ignoreSenseAngle, distance)) {
-            this.direction.x += 0.25 * (this.position.x - entity.position.x) / distance;
-            this.direction.y += 0.25 * (this.position.y - entity.position.y) / distance;
+        if (ignoreDistance || this.hasVisionOf(entity, senseFactor, ignoreSenseAngle, distance)) {
+            this.newDirection.x += 0.025 * (this.position.x - entity.position.x) / distance;
+            this.newDirection.y += 0.025 * (this.position.y - entity.position.y) / distance;
         }
     }
 
@@ -75,15 +76,15 @@ export class BoidEntity extends Entity {
         });
 
         if (this.hasVisionOf(entity, senseFactor, ignoreSenseAngle, distance)) {
-            this.direction.x += 0.25 * (entity.position.x - this.position.x) * distance / (senseFactor * this.senseRadius);
-            this.direction.y += 0.25 * (entity.position.y - this.position.y) * distance / (senseFactor * this.senseRadius);
+            this.newDirection.x += 0.25 * (entity.position.x - this.position.x) * distance / (senseFactor * this.senseRadius);
+            this.newDirection.y += 0.25 * (entity.position.y - this.position.y) * distance / (senseFactor * this.senseRadius);
         }
     }
 
 
     private keepDirectionOf(entity: BoidEntity) {
-        this.direction.x += 0.09 * entity.direction.x;
-        this.direction.y += 0.09 * entity.direction.y;
+        this.newDirection.x += 0.01 * entity.direction.x;
+        this.newDirection.y += 0.01 * entity.direction.y;
     }
 
 
@@ -102,26 +103,37 @@ export class BoidEntity extends Entity {
                 y: this.direction.y - dot * normal.y
             })
 
-            // possible nan but who cares
-            this.direction.x += 0.05 * tangent.x;
-            this.direction.y += 0.05 * tangent.y;
+            this.newDirection.x += 0.025 * tangent.x;
+            this.newDirection.y += 0.025 * tangent.y;
         }
     }
 
 
     update(elapsedTime: number) {
-        if (this.activeMidPoint) {
-            const unit = normalized({x: this.midPoint.x - this.position.x, y: this.midPoint.y - this.position.y});
-            this.direction.x += 0.6 * unit.x;
-            this.direction.y += 0.6 * unit.y;
+        if (this.centerPoints.length) {
+            const centerPoint = {x: 0, y: 0};
+
+            this.centerPoints.forEach(point => {
+                centerPoint.x += point.x;
+                centerPoint.y += point.y;
+            })
+
+            centerPoint.x /= this.centerPoints.length;
+            centerPoint.y /= this.centerPoints.length;
+
+            const unit = normalized({x: centerPoint.x - this.position.x, y: centerPoint.y - this.position.y});
+            this.newDirection.x += 0.2 * unit.x;
+            this.newDirection.y += 0.2 * unit.y;
         }
 
-        this.position.x += elapsedTime * this.velocity * this.direction.x;
-        this.position.y += elapsedTime * this.velocity * this.direction.y;
+        this.position.x += elapsedTime * this.velocity * (this.newDirection.x + 2 * Math.random() - 1);
+        this.position.y += elapsedTime * this.velocity * (this.newDirection.y + 2 * Math.random() - 1);
 
-        this.direction = normalized(this.direction);
+        this.direction = normalized(this.newDirection);
+        this.newDirection.x = this.direction.x;
+        this.newDirection.y = this.direction.y;
 
-        this.activeMidPoint = false;
+        this.centerPoints = []
     }
 
 
@@ -129,38 +141,33 @@ export class BoidEntity extends Entity {
         const distance = findDistance(this.position, other.position)
 
         if (!this.hasVisionOf(other, 1.0, false, distance)) {
-            return;
+           return false;
         }
 
         this.dodge(other, distance);
-        this.steerAwayFrom(other, 1.0, false, distance);
+        this.steerAwayFrom(other, 1.0, false, true, distance);
         this.keepDirectionOf(other);
 
-        if (!this.activeMidPoint) {
-            this.activeMidPoint = true;
+        this.centerPoints.push(other.position);
 
-            this.midPoint = {
-                x: (this.position.x + other.position.x) / 2,
-                y: (this.position.y + other.position.y) / 2
-            }
-
-            this.midPoint = other.position;
-        } else {
-            this.midPoint = {
-                x: (this.midPoint.x + other.position.x) / 2,
-                y: (this.midPoint.y + other.position.y) / 2
-            }
-        }
+        return true;
     }
 }
 
 
 export class BoidsSystem {
+    private static uniqueBoidId: number = 0
+
+    static getUniqueBoidId() {
+        return this.uniqueBoidId++;
+    }
+
+
     boids: BoidEntity[] = []
 
     constructor(count: number, fieldSize: {edgeX: number, edgeY: number}) {
         for (let i = 0; i < count; i++) {
-            this.boids.push(new BoidEntity(getRandomPosition(fieldSize.edgeX, fieldSize.edgeY), {
+            this.boids.push(new BoidEntity({x: Math.random() * fieldSize.edgeX, y: Math.random() * fieldSize.edgeY}, {
                 x: 2 * Math.random() - 1,
                 y: 2 * Math.random() - 1
             }, 1 + 5 * Math.random(), 50));
@@ -186,10 +193,26 @@ export class BoidsSystem {
     }
 
 
-    update(elapsedTime: number) {
+    update(elapsedTime: number, ctx: CanvasRenderingContext2D) {
+        const quadtree = new Quadtree({x: -1000, y: -1000}, 6000);
+        this.boids.forEach(boid => {
+            quadtree.push(boid);
+        })
+
+        //quadtree.dbgDraw(ctx);
+
         this.boids.forEach((entity, indexI) => {
-            this.boids.forEach((other, indexJ) => {
-                if (indexI === indexJ) {
+            // const obb = new BoundingBox(
+            //     entity.position.x - entity.senseRadius,
+            //     entity.position.x + entity.senseRadius,
+            //     entity.position.y - entity.senseRadius,
+            //     entity.position.y + entity.senseRadius
+            // )
+            const circle = new Circle(entity.position.x, entity.position.y, entity.senseRadius);
+            const possibleBoids = quadtree.get(circle) as BoidEntity[];
+
+            possibleBoids.forEach(other => {
+                if (entity.id === other.id) {
                     return;
                 }
 
