@@ -21,12 +21,12 @@ const Clock = observer(({timestamp}:IClockProps) => {
     useEffect(() => {
 
         if (context) {
-            drawClock(timestamp, context, 300, 300);
+            drawClock(timestamp, context, 220, 220);
         }
 
     }, [context, timestamp]);
 
-    return <canvas width={300} height={300} ref={canvasRef}/>
+    return <canvas width={220} height={220} ref={canvasRef}/>
 })
 
 export default Clock
