@@ -2,12 +2,8 @@ import {FieldDimensions, gender, Position, Stats} from "../types";
 import Animal from "../entities/Animal";
 import {coinFlip, rollFivePercentChance} from "./utils";
 import {generateAnimalFirstName} from "./nameGen";
-import React from "react";
-import Renderer from "../graphics/Renderer";
 import {simulationValuesMultipliers} from "../constants/simulation";
 import Plant from "../entities/Plant";
-import {Camera, mouseCameraController} from "../graphics/Camera";
-import {cameraConstants} from "../constants/view";
 
 export const findDistance = (pos1: Position, pos2: Position) =>
     Math.sqrt((pos2.x - pos1.x) ** 2 + (pos2.y - pos1.y) ** 2)
@@ -69,77 +65,6 @@ export const calculateEnergyLoss = (stats: Stats) => {
     // (speed * 1.3 + foodSensitivity * 0.8 + breedingSensitivity * 0.8 - breedingCD * 0.7 - hatchingTime * 0.2) / 2
 }
 
-export const handleCanvasClick = (
-    event: React.MouseEvent<HTMLCanvasElement>,
-    renderer: Renderer,
-    entities: Animal[],
-    setActiveEntity: (entity: Animal) => void,
-    removeActiveEntity: () => void) => {
-    const activeEntity = entities.find(animal => {
-        const {width, height, offsetX, offsetY} = renderer.calculateAnimalTexture({
-            gender: animal.gender,
-            age: animal.age.current,
-            isAlive: animal.isAlive
-        })
-
-        if (renderer.context) {
-            const transform = renderer.context.getTransform();
-            const position = {
-                x: animal.position.x * transform.a + transform.e,
-                y: animal.position.y * transform.d + transform.f
-            }
-
-            const bounds = {
-                left: position.x - width * offsetX * transform.a,
-                right: position.x + width * (1 - offsetX) * transform.a,
-                top: position.y - height * offsetY * transform.d,
-                bottom: position.y + height * (1 - offsetY) * transform.d
-            }
-
-            return event.nativeEvent.offsetX > bounds.left &&
-                event.nativeEvent.offsetX < bounds.right &&
-                event.nativeEvent.offsetY > bounds.top &&
-                event.nativeEvent.offsetY < bounds.bottom
-        }
-
-        return undefined;
-    })
-
-    if (activeEntity) {
-        setActiveEntity(activeEntity)
-    } else {
-        removeActiveEntity()
-    }
-}
-
-
-export const handleCanvasMousePress = (
-    event: React.MouseEvent<HTMLCanvasElement>,
-    camera: Camera) => {
-    mouseCameraController.moveStart(camera, {x: event.clientX, y: event.clientY});
-}
-
-
-export const handleCanvasMouseRelease = (
-    event: React.MouseEvent<HTMLCanvasElement>,
-    camera: Camera) => {
-    mouseCameraController.moveStop();
-}
-
-
-export const handleCanvasMouseMove = (
-    event: React.MouseEvent<HTMLCanvasElement>,
-    camera: Camera) => {
-    mouseCameraController.moveUpdate(camera, {x: event.clientX, y: event.clientY});
-}
-
-export const handleCanvasMouseWheel = (
-    event: React.WheelEvent<HTMLCanvasElement>,
-    camera: Camera) => {
-    camera.setZoom(Math.max(cameraConstants.minZoom, Math.min(cameraConstants.maxZoom, camera.getFovScale() * (1 - 0.001 * event.deltaY))));
-}
-
-
 export const checkBreedingPossibility = (animal: Animal, breedingMinAge: number, breedingMaxAge: number) => animal.energy.current > animal.energy.max / 2 &&
     animal.energy.breedingCD <= 0 &&
     animal.age.current >= breedingMinAge &&
@@ -152,4 +77,8 @@ export const generateFood = (amount: number, fieldSize: FieldDimensions) =>
 
 export const generateAnimals = (amount: number, fieldSize: FieldDimensions, animalMaxEnergy: number) =>
     new Array(amount).fill(null).map((elem, index) =>
-        new Animal({id: `A${index}init`, position: getRandomPosition(fieldSize.width, fieldSize.height), energy: {current: animalMaxEnergy, max: animalMaxEnergy, breedingCD: 0}}))
+        new Animal({
+            id: `A${index}init`,
+            position: getRandomPosition(fieldSize.width, fieldSize.height),
+            energy: {current: animalMaxEnergy, max: animalMaxEnergy, breedingCD: 0}
+        }))

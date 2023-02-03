@@ -41,6 +41,7 @@ class Renderer {
     butterflyWhiteTextureAtlas: TextureAtlas
     butterflyShadowTextureAtlas : TextureAtlas
     backgroundTexture: HTMLImageElement
+    backgroundSeamlessTexture: HTMLImageElement
     backgroundGladeTexture: HTMLImageElement
     cloudsTexture: Texture
 
@@ -61,7 +62,8 @@ class Renderer {
         this.cloudsTexture = loadTexture(images.clouds);
         this.breedingTexture = loadTexture(images.heart, {width: 20, height: 20, offsetX: 0.5, offsetY: 0.5});
 
-        this.backgroundTexture = images.backgroundSeamless
+        this.backgroundTexture = images.background
+        this.backgroundSeamlessTexture = images.backgroundSeamless
         this.backgroundGladeTexture = images.backgroundGlade
     }
 
@@ -74,7 +76,7 @@ class Renderer {
 
 
     public drawSeamlessBackground(size: FieldDimensions) {
-        const [image, gladeImage, {width, height}] = [this.backgroundTexture, this.backgroundGladeTexture, size]
+        const [image, gladeImage, {width, height}] = [this.backgroundSeamlessTexture, this.backgroundGladeTexture, size]
 
         if (!this.context) {
             return;

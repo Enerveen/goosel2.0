@@ -14,7 +14,8 @@ export const timeConstants = {
 export const appConstants = {
     fps: 60,
     fieldXPadding: 0,
-    fieldYPadding: 0
+    fieldYPadding: 0,
+    version: '0.0.1'
 }
 
 export const defaultSimConstants = {

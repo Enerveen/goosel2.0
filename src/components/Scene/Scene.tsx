@@ -1,4 +1,5 @@
 import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
+import classes from './Scene.module.scss'
 import {observer} from "mobx-react-lite";
 import {SimulationStore} from "../../stores/simulationStore";
 import {getRandomInRange} from "../../utils/utils";
@@ -6,9 +7,7 @@ import Plant from "../../entities/Plant";
 import {
     generateAnimals,
     generateFood,
-    getRandomPosition,
-    handleCanvasClick, handleCanvasMouseMove,
-    handleCanvasMousePress, handleCanvasMouseRelease, handleCanvasMouseWheel
+    getRandomPosition
 } from "../../utils/helpers";
 import Renderer from "../../graphics/Renderer";
 import {appPhase, BoundingBox} from "../../types";
@@ -16,6 +15,12 @@ import useWindowSize from "../../hooks/useWindowSize";
 import {fieldSize} from "../../constants/simulation";
 import {Camera} from "../../graphics/Camera";
 import ImageContext from "../../stores/ImageContext";
+import {
+    handleCanvasClick, handleCanvasMouseMove,
+    handleCanvasMousePress, handleCanvasMouseRelease, handleCanvasMouseWheel, handleCanvasTouchEnd,
+    handleCanvasTouchMove,
+    handleCanvasTouchStart
+} from "../../utils/eventHandlers";
 import {BoidsSystem} from "../../entities/BoidEntity";
 import Entity from "../../entities/Entity";
 
@@ -26,6 +31,7 @@ interface ISceneProps {
 
 const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const touchRef = useRef({start: 0, end: 0})
     const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
     const {width: canvasWidth, height: canvasHeight} = useWindowSize(store)
     const images = useContext(ImageContext)
@@ -183,13 +189,17 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     }, [context, drawStep, store]);
 
     return <canvas
+        className={classes.canvas}
         ref={canvasRef}
         width={canvasWidth}
         height={canvasHeight}
         onMouseDown={event => handleCanvasMousePress(event, mainCamera)}
-        onMouseUp={event => handleCanvasMouseRelease(event, mainCamera)}
+        onMouseUp={handleCanvasMouseRelease}
         onMouseMove={event => handleCanvasMouseMove(event, mainCamera)}
         onWheel={event => handleCanvasMouseWheel(event, mainCamera)}
+        onTouchStart = {event => handleCanvasTouchStart(event, mainCamera, touchRef.current)}
+        onTouchMove={event => handleCanvasTouchMove(event, mainCamera, touchRef.current)}
+        onTouchEnd={event => handleCanvasTouchEnd(event)}
         onClick={event => handleCanvasClick(
             event,
             renderer,

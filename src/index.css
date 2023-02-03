@@ -1,5 +1,8 @@
 html, body {
     margin: 0;
+    background-color: #222222;
+    touch-action: pan-y pan-x;
+    overflow: hidden;
 }
 
 * {

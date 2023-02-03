@@ -1,5 +1,7 @@
 .container {
   position: relative;
-  background-color: #222222;
-  min-height: 100vh;
+  height: 100vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y pan-x;
 }
