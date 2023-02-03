@@ -3,6 +3,7 @@ import Renderer from "../graphics/Renderer";
 import Animal from "../entities/Animal";
 import {Camera, mouseCameraController} from "../graphics/Camera";
 import {cameraConstants} from "../constants/view";
+import {findDistance} from "./helpers";
 
 export const handleCanvasClick = (
     event: React.MouseEvent<HTMLCanvasElement>,
@@ -81,7 +82,10 @@ export const handleCanvasTouchStart = (
         mouseCameraController.moveStart(camera, {x: event.touches[0].clientX, y: event.touches[0].clientY});
     }
     if (event.touches.length === 2){
-        touchRef.start = event.touches[0].clientY
+        touchRef.start = findDistance(
+            {x: event.touches[0].clientX, y: event.touches[0].clientY},
+            {x: event.touches[1].clientX, y: event.touches[1].clientY}
+        )
     }
 }
 
@@ -94,23 +98,20 @@ export const handleCanvasTouchMove = (
         mouseCameraController.moveUpdate(camera, {x: event.touches[0].clientX, y: event.touches[0].clientY});
     }
     if (event.touches.length === 2) {
-        //event.preventDefault()
-        touchRef.end = event.touches[0].clientY
+        const end = findDistance(
+            {x: event.touches[0].clientX, y: event.touches[0].clientY},
+            {x: event.touches[1].clientX, y: event.touches[1].clientY}
+        )
+        camera.setZoom(
+            Math.max(cameraConstants.minZoom,
+                Math.min(cameraConstants.maxZoom, camera.getFovScale() * (1 - 0.01 * (touchRef.start - end)))))
     }
 }
 
 export const handleCanvasTouchEnd = (
-    event: React.TouchEvent<HTMLCanvasElement>,
-    camera: Camera,
-    touchRef: { start: number, end: number }
+    event: React.TouchEvent<HTMLCanvasElement>
 ) => {
     if (event.touches.length === 1) {
         mouseCameraController.moveStop();
     }
-    if (event.touches.length === 2){
-        camera.setZoom(
-            Math.max(cameraConstants.minZoom,
-                Math.min(cameraConstants.maxZoom, camera.getFovScale() * (1 - 0.001 * (touchRef.start - touchRef.end)))));
-    }
-
 }

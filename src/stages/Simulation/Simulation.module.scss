@@ -1,5 +1,6 @@
 .container {
   height: 100vh;
+  height: -webkit-fill-available;
   position: relative;
   overflow-y: hidden;
   overflow-x: hidden;

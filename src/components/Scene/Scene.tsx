@@ -1,4 +1,5 @@
 import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
+import classes from './Scene.module.scss'
 import {observer} from "mobx-react-lite";
 import {SimulationStore} from "../../stores/simulationStore";
 import {getRandomInRange} from "../../utils/utils";
@@ -179,6 +180,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     }, [context, drawStep, store]);
 
     return <canvas
+        className={classes.canvas}
         ref={canvasRef}
         width={canvasWidth}
         height={canvasHeight}
@@ -188,7 +190,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         onWheel={event => handleCanvasMouseWheel(event, mainCamera)}
         onTouchStart = {event => handleCanvasTouchStart(event, mainCamera, touchRef.current)}
         onTouchMove={event => handleCanvasTouchMove(event, mainCamera, touchRef.current)}
-        onTouchEnd={event => handleCanvasTouchEnd(event, mainCamera, touchRef.current)}
+        onTouchEnd={event => handleCanvasTouchEnd(event)}
         onClick={event => handleCanvasClick(
             event,
             renderer,

@@ -9,6 +9,7 @@ const useWindowSize = (store?: SimulationStore) => {
             if (store) {
                 store.setWindowSize({width: window.innerWidth, height: window.innerHeight})
             }
+            document.documentElement.style.setProperty(' — app-height', `${window.innerHeight}px`)
         }
         window.addEventListener('resize', updateSize);
         updateSize();

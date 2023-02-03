@@ -3,6 +3,7 @@
   width: 40%;
   top:0;
   height: 100vh;
+  height: -webkit-fill-available;
   background-color: rgba(34, 34, 34, 0.5);
   right: -40%;
   transition: 0.5s;
