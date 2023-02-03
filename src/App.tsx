@@ -15,10 +15,8 @@ const App = () => {
     const [images, isImagesPreloaded] = usePreloadedImages(imagesSrc)
     useEffect(() => {
         const gestureEndHandler = (event: Event) =>  {
-            alert('smth')
             // @ts-ignore
             if (event.scale !== 1) {
-                alert('smth2')
                 event.preventDefault()
             }
         }
