@@ -51,7 +51,7 @@ class Renderer {
         this.eggTexture = loadTexture(images.egg, {width: 40, height: 40});
         this.plantTexture = loadTexture(images.plant, {width: 50, height: 45, offsetX: 0.5, offsetY: 0.6});
         this.cloudsTexture = loadTexture(images.clouds);
-        this.breedingTexture = loadTexture(images.heart, {width: 20, height: 20});
+        this.breedingTexture = loadTexture(images.heart, {width: 20, height: 20, offsetX: 0.5, offsetY: 0.5});
 
         this.backgroundTexture = images.backgroundSeamless
         this.backgroundGladeTexture = images.backgroundGlade
@@ -130,13 +130,8 @@ class Renderer {
         animationFrameId: number,
         entity: { gender: gender, name: string, isAlive: boolean, age: number, currentActivity: string }) {
         if (this.context) {
-            const [{image, width, height, frameWidth, frameHeight, offsetX, offsetY}, {x, y}, {
-                gender,
-                name,
-                isAlive,
-                age,
-                currentActivity
-            }] = [this.calculateAnimalTexture(entity), position, entity]
+            const [{image, width, height, frameWidth, frameHeight, offsetX, offsetY}, {x, y}]
+                = [this.calculateAnimalTexture(entity), position]
 
             const currentFrame = Math.floor((animationFrameId % appConstants.fps) / appConstants.fps * 15);
             const originOffset = { x: offsetX * width, y: offsetY * height };
@@ -145,38 +140,47 @@ class Renderer {
             } else {
                 this.context.drawImage(image, x - originOffset.x, y - originOffset.y, width, height)
             }
-            this.context.textAlign = 'center';
-            this.context.font = "bold 18px Comic Sans MS"
-            const styles = [
-                'rgba(0, 0, 0, 1.0)',
-                `rgba(${gender === 'male' ? '0,180,255' : '255,100,255'},1.0)`
-            ]
-
-            styles.forEach((style, index) => {
-                const textPos = {
-                    x: x + 2 * (styles.length - index - 1),
-                    y: y + 2 * (styles.length - index - 1)
-                }
-
-                if (this.context) {
-                    this.context.fillStyle = style;
-                    this.context.fillText(name, textPos.x - originOffset.x + width / 2, textPos.y - originOffset.y - 26)
-                    this.context?.fillText(isAlive ? age >= 0 ? `${age} y.o.` : 'Egg' : 'Corpse',
-                        textPos.x - originOffset.x + width / 2, textPos.y - originOffset.y - 6)
-                }
-            })
-            if (currentActivity === 'breeding') {
-                this.drawBreeding({x: x + 30, y: y - 60})
-            }
         }
-
-
     }
 
     public drawBreeding (position: Position) {
-        const [{image, width, height}, {x, y}] = [this.breedingTexture, position]
+        const [{image, width, height, offsetX, offsetY}, {x, y}] = [this.breedingTexture, position]
         if (this.context) {
-            this.context.drawImage(image, x, y, width, height)
+            this.context.drawImage(image, x - offsetX * width, y - offsetY * height, width, height)
+        }
+    }
+
+    public drawLabels (position: Position,
+                       entity: { gender: gender, name: string, isAlive: boolean, age: number, currentActivity: string }
+    ) {
+        if (!this.context) {
+            return
+        }
+        const [{width, height, offsetX, offsetY}, {x, y},
+            {gender, name, age, isAlive, currentActivity}] = [this.calculateAnimalTexture(entity), position, entity]
+        const originOffset = { x: offsetX * width, y: offsetY * height };
+        this.context.textAlign = 'center';
+        this.context.font = "bold 18px Comic Sans MS"
+        const styles = [
+            'rgba(0, 0, 0, 1.0)',
+            `rgba(${gender === 'male' ? '0,180,255' : '255,100,255'},1.0)`
+        ]
+
+        styles.forEach((style, index) => {
+            const textPos = {
+                x: x + 2 * (styles.length - index - 1),
+                y: y + 2 * (styles.length - index - 1)
+            }
+
+            if (this.context) {
+                this.context.fillStyle = style;
+                this.context.fillText(name, textPos.x - originOffset.x + width / 2, textPos.y - originOffset.y - 26)
+                this.context?.fillText(isAlive ? age >= 0 ? `${age} y.o.` : 'Egg' : 'Corpse',
+                    textPos.x - originOffset.x + width / 2, textPos.y - originOffset.y - 6)
+            }
+        })
+        if (currentActivity === 'breeding') {
+            this.drawBreeding({x: x + 30 - offsetX * width, y: y - 90})
         }
     }
 
