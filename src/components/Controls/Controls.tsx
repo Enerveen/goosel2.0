@@ -7,6 +7,7 @@ import {getRandomInRange} from "../../utils/utils";
 import {getRandomPosition} from "../../utils/helpers";
 import Slider from "../Slider/Slider";
 import Clock from "../Clock/Clock";
+import {fieldSize} from "../../constants/simulation";
 
 interface IControlsProps {
     simulationSpeed: number
@@ -31,7 +32,7 @@ const Controls = observer(({
         addAnimal(
             new Animal({
                 id: `A${getRandomInRange(1, 10000)}`,
-                position: getRandomPosition(500, 500),
+                position: getRandomPosition(fieldSize.x, fieldSize.y),
                 age: {current: 0, birthTimestamp: timestamp, deathTimestamp: undefined},
                 energy: {current: animalMaxEnergy, max: animalMaxEnergy, breedingCD: 0}
             })

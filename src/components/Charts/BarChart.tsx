@@ -32,7 +32,7 @@ const BarChart = ({data, dataKeys, xAxisDataKey}: IBarChartProps) => <RechartsBa
     <CartesianGrid strokeDasharray="3 3"/>
     <XAxis dataKey={xAxisDataKey} stroke={'#fafafa'}/>
     <YAxis stroke={'#fafafa'}/>
-    <Tooltip content={renderTooltipContent}/>
+    <Tooltip content={renderTooltipContent} cursor={false}/>
     <Legend content={<CustomLegend/>}/>
     <Brush height={20} fill={'#5fa35c'} stroke={'#fafafa'}/>
     {dataKeys.map((dataKey, index) =>
