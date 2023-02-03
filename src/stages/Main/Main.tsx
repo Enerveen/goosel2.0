@@ -3,7 +3,7 @@ import classes from './Main.module.scss'
 import {appPhase} from "../../types";
 import SimulationSettings from "../../components/SimulationSettings/SimulationSettings";
 import simulationStore from "../../stores/simulationStore";
-import {defaultSimConstants} from "../../constants/simulation";
+import {appConstants, defaultSimConstants} from "../../constants/simulation";
 import BackgroundScene from "../../components/BackgroundScene/BackgroundScene";
 
 interface IMainProps {
@@ -11,6 +11,8 @@ interface IMainProps {
 }
 
 const MemoizedBackground = memo(BackgroundScene)
+
+const Version = () => <span className={classes.version}>v. {appConstants.version}</span>
 
 const Main = ({setAppPhase}: IMainProps) => {
     const [isDefaultSettings, setIsDefaultSettings] = useState(true)
@@ -32,6 +34,7 @@ const Main = ({setAppPhase}: IMainProps) => {
     }, [constantsValues, setAppPhase, isDefaultSettings])
 
     return <>
+        <Version/>
         <MemoizedBackground/>
         <div className={classes.container}>
             <h1>

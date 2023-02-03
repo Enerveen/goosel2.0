@@ -120,9 +120,7 @@ export const handleCanvasMousePress = (
 }
 
 
-export const handleCanvasMouseRelease = (
-    event: React.MouseEvent<HTMLCanvasElement>,
-    camera: Camera) => {
+export const handleCanvasMouseRelease = () => {
     mouseCameraController.moveStop();
 }
 
@@ -139,6 +137,45 @@ export const handleCanvasMouseWheel = (
     camera.setZoom(Math.max(cameraConstants.minZoom, Math.min(cameraConstants.maxZoom, camera.getFovScale() * (1 - 0.001 * event.deltaY))));
 }
 
+export const handleCanvasTouchStart = (
+    event: React.TouchEvent<HTMLCanvasElement>,
+    camera: Camera,
+    touchRef: { start: number, end: number }
+) => {
+    if (event.touches.length === 1) {
+        mouseCameraController.moveStart(camera, {x: event.touches[0].clientX, y: event.touches[0].clientY});
+    } else {
+        touchRef.start = event.touches[0].clientY
+    }
+}
+
+export const handleCanvasTouchMove = (
+    event: React.TouchEvent<HTMLCanvasElement>,
+    camera: Camera,
+    touchRef: { start: number, end: number },
+) => {
+    if (event.touches.length === 1) {
+        mouseCameraController.moveUpdate(camera, {x: event.touches[0].clientX, y: event.touches[0].clientY});
+    } else {
+        touchRef.end = event.touches[0].clientY
+    }
+}
+
+export const handleCanvasTouchEnd = (
+    event: React.TouchEvent<HTMLCanvasElement>,
+    camera: Camera,
+    touchRef: { start: number, end: number }
+) => {
+    if (event.touches.length === 1) {
+        mouseCameraController.moveStop();
+    } else {
+        camera.setZoom(
+            Math.max(cameraConstants.minZoom,
+                Math.min(cameraConstants.maxZoom, camera.getFovScale() * (1 - 0.001 * (touchRef.start - touchRef.end)))));
+    }
+
+}
+
 
 export const checkBreedingPossibility = (animal: Animal, breedingMinAge: number, breedingMaxAge: number) => animal.energy.current > animal.energy.max / 2 &&
     animal.energy.breedingCD <= 0 &&
@@ -152,4 +189,8 @@ export const generateFood = (amount: number, fieldSize: FieldDimensions) =>
 
 export const generateAnimals = (amount: number, fieldSize: FieldDimensions, animalMaxEnergy: number) =>
     new Array(amount).fill(null).map((elem, index) =>
-        new Animal({id: `A${index}init`, position: getRandomPosition(fieldSize.width, fieldSize.height), energy: {current: animalMaxEnergy, max: animalMaxEnergy, breedingCD: 0}}))
+        new Animal({
+            id: `A${index}init`,
+            position: getRandomPosition(fieldSize.width, fieldSize.height),
+            energy: {current: animalMaxEnergy, max: animalMaxEnergy, breedingCD: 0}
+        }))

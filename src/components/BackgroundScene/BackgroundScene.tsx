@@ -18,7 +18,7 @@ const BackgroundScene = () => {
     const step = (timestamp: number) => {
         if (context) {
             context.clearRect(0, 0, canvasWidth, canvasHeight);
-            renderer.drawSeamlessBackground({width: canvasWidth, height: canvasHeight})
+            renderer.drawBackground({width: canvasWidth, height: canvasHeight})
             animalsRef.current.forEach(entity => {
                 entity.live(
                     timestamp,
