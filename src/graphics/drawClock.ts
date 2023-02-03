@@ -69,7 +69,7 @@ const drawClock = (timestamp: number, ctx: CanvasRenderingContext2D, width: numb
     ctx.stroke()
     ctx.fillStyle = '#000000'
     ctx.textAlign = 'center'
-    ctx.font = '22px ComicSansMS'
+    ctx.font = '32px AmasticBold'
     const {date, year} = getReadableDate(timestamp)
     ctx.fillText(date, centerX, centerY - 11)
     ctx.fillText(year, centerX, centerY + 22)
