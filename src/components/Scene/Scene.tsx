@@ -6,14 +6,7 @@ import Plant from "../../entities/Plant";
 import {
     generateAnimals,
     generateFood,
-    getRandomPosition,
-    handleCanvasClick,
-    handleCanvasMouseMove,
-    handleCanvasMousePress,
-    handleCanvasMouseRelease,
-    handleCanvasMouseWheel, handleCanvasTouchEnd,
-    handleCanvasTouchMove,
-    handleCanvasTouchStart
+    getRandomPosition
 } from "../../utils/helpers";
 import Renderer from "../../graphics/Renderer";
 import {appPhase, BoundingBox} from "../../types";
@@ -21,6 +14,12 @@ import useWindowSize from "../../hooks/useWindowSize";
 import {fieldSize} from "../../constants/simulation";
 import {Camera} from "../../graphics/Camera";
 import ImageContext from "../../stores/ImageContext";
+import {
+    handleCanvasClick, handleCanvasMouseMove,
+    handleCanvasMousePress, handleCanvasMouseRelease, handleCanvasMouseWheel, handleCanvasTouchEnd,
+    handleCanvasTouchMove,
+    handleCanvasTouchStart
+} from "../../utils/eventHandlers";
 
 interface ISceneProps {
     store: SimulationStore,
@@ -184,7 +183,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         width={canvasWidth}
         height={canvasHeight}
         onMouseDown={event => handleCanvasMousePress(event, mainCamera)}
-        onMouseUp={() => handleCanvasMouseRelease()}
+        onMouseUp={handleCanvasMouseRelease}
         onMouseMove={event => handleCanvasMouseMove(event, mainCamera)}
         onWheel={event => handleCanvasMouseWheel(event, mainCamera)}
         onTouchStart = {event => handleCanvasTouchStart(event, mainCamera, touchRef.current)}
