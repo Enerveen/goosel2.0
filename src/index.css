@@ -21,6 +21,10 @@ html, body {
     font-weight: 600;
 }
 
+h1 {
+    font-size: 50px;
+}
+
 button {
     color: #222222;
     background: #fafafa;
