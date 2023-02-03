@@ -1,3 +1,13 @@
+@font-face {
+    font-family: 'AmasticBold';
+    src: url(fonts/AmaticSC-Bold.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'Amastic';
+    src: url(fonts/AmaticSC-Regular.ttf) format('truetype');
+}
+
 html, body {
     margin: 0;
     background-color: #222222;
@@ -6,7 +16,13 @@ html, body {
 }
 
 * {
-    font-family: "Comic Sans MS", serif;
+    font-family: "AmasticBold", serif;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+h1 {
+    font-size: 50px;
 }
 
 button {

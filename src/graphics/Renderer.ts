@@ -245,7 +245,7 @@ class Renderer {
             {gender, name, age, isAlive, currentActivity}] = [this.calculateAnimalTexture(entity), position, entity]
         const originOffset = { x: offsetX * width, y: offsetY * height };
         this.context.textAlign = 'center';
-        this.context.font = "bold 18px Comic Sans MS"
+        this.context.font = "bold 18px AmasticBold"
         const styles = [
             'rgba(0, 0, 0, 1.0)',
             `rgba(${gender === 'male' ? '0,180,255' : '255,100,255'},1.0)`
