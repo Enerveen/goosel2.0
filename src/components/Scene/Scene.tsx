@@ -57,7 +57,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
 
         boidsSystem.follow([new Entity({x: canvasWidth / 2, y: canvasHeight / 2})], 50000.0, true);
         boidsSystem.steerAwayFrom(store.getAnimals, 1.0, true);
-        boidsSystem.update(0.1 * store.simulationSpeed, context);
+        boidsSystem.update(0.1 * store.simulationSpeed);
 
         store.clearAnimalCorpses()
         store.gatherStatistics()

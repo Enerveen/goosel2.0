@@ -165,9 +165,9 @@ export class BoidsSystem {
 
     boids: BoidEntity[] = []
 
-    constructor(count: number, fieldSize: {edgeX: number, edgeY: number}) {
+    constructor(count: number, fieldSize: {x: number, y: number}) {
         for (let i = 0; i < count; i++) {
-            this.boids.push(new BoidEntity({x: Math.random() * fieldSize.edgeX, y: Math.random() * fieldSize.edgeY}, {
+            this.boids.push(new BoidEntity({x: Math.random() * fieldSize.x, y: Math.random() * fieldSize.y}, {
                 x: 2 * Math.random() - 1,
                 y: 2 * Math.random() - 1
             }, 1 + 5 * Math.random(), 50));
@@ -193,7 +193,7 @@ export class BoidsSystem {
     }
 
 
-    update(elapsedTime: number, ctx: CanvasRenderingContext2D) {
+    update(elapsedTime: number) {
         const quadtree = new Quadtree({x: -1000, y: -1000}, 6000);
         this.boids.forEach(boid => {
             quadtree.push(boid);
