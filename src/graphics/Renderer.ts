@@ -1,5 +1,5 @@
 import {FieldDimensions, gender, Position, Texture, TextureAtlas} from "../types";
-import {appConstants} from "../constants/simulation";
+import {appConstants, fieldSize} from "../constants/simulation";
 import {BoidEntity} from "../entities/BoidEntity";
 
 
@@ -46,7 +46,6 @@ class Renderer {
 
     constructor(ctx: CanvasRenderingContext2D | null, images: any) {
         this.context = ctx || null
-
         const animalTextureAtlas = loadTextureAtlas(images.animalTextureAtlas, {frameWidth: 200, frameHeight: 250, offsetX: 0.5, offsetY: 0.8});
         this.teenAnimalTextureAtlas = {...animalTextureAtlas, width: 60, height: 75};
         this.childAnimalTextureAtlas = {...animalTextureAtlas, width: 40, height: 50};
@@ -113,7 +112,8 @@ class Renderer {
 
             // Uncomment to adjust brightness
             this.context.fillStyle = 'rgba(244, 233, 155, 0.05)';
-            this.context.fillRect(0, 0, this.context.canvas.width, this.context.canvas.height)
+            this.context.fillRect(0, 0, fieldSize.x, fieldSize.y)
+            //
             this.context.globalAlpha = 0.45;
             this.context.globalCompositeOperation = 'source-atop';
             this.context.drawImage(this.cloudsTexture.image,
@@ -211,13 +211,14 @@ class Renderer {
     public drawAnimal(
         position: Position,
         animationFrameId: number,
-        entity: { gender: gender, name: string, isAlive: boolean, age: number }) {
+        entity: { gender: gender, name: string, isAlive: boolean, age: number, currentActivity: string }) {
         if (this.context) {
             const [{image, width, height, frameWidth, frameHeight, offsetX, offsetY}, {x, y}, {
                 gender,
                 name,
                 isAlive,
-                age
+                age,
+                currentActivity
             }] = [this.calculateAnimalTexture(entity), position, entity]
 
             const currentFrame = Math.floor((animationFrameId % appConstants.fps) / appConstants.fps * 15);
@@ -227,7 +228,8 @@ class Renderer {
             } else {
                 this.context.drawImage(image, x - originOffset.x, y - originOffset.y, width, height)
             }
-
+            this.context.textAlign = 'center';
+            this.context.font = "bold 18px Comic Sans MS"
             const styles = [
                 'rgba(0, 0, 0, 1.0)',
                 `rgba(${gender === 'male' ? '0,180,255' : '255,100,255'},1.0)`
@@ -246,6 +248,9 @@ class Renderer {
                         textPos.x - originOffset.x + width / 2, textPos.y - originOffset.y - 6)
                 }
             })
+            if (currentActivity === 'breeding') {
+                this.drawBreeding({x: x + 30, y: y - 60})
+            }
         }
 
 

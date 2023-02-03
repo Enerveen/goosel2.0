@@ -164,3 +164,8 @@ export type SimulationConstants = {
     foodNutritionMin: number,
     foodNutritionMax: number
 }
+
+export type LogItem = {
+    message: string,
+    timestamp: number
+}

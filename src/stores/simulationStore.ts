@@ -2,8 +2,8 @@ import Animal from "../entities/Animal";
 import Plant from "../entities/Plant";
 import {action, computed, makeObservable, observable} from "mobx";
 import generateStatistics from "../utils/generateStatistics";
-import {FieldDimensions, SimulationConstants} from "../types";
-import {timeConstants} from "../constants/simulation";
+import {FieldDimensions, LogItem, SimulationConstants} from "../types";
+import {defaultSimConstants, timeConstants} from "../constants/simulation";
 
 export class SimulationStore {
     animals: Animal[] = []
@@ -29,18 +29,8 @@ export class SimulationStore {
         plantStats: {year: number, count: number, totalNutrition: number}[]
         animalCount: number[]
     } = {age: [], gender: [], averageStats: [], populationChange:[], animalCount: [], plantStats: []}
-    simulationConstants: SimulationConstants = {
-        breedingMinAge: 5,
-        breedingMaxAge: 15,
-        foodNutritionMin: 300,
-        foodNutritionMax: 800,
-        breedingMaxProgress: 200,
-        animalMaxEnergy: 1200,
-        foodSpawnChanceK: 50,
-        initialFoodCount: 200,
-        initialAnimalCount: 8
-    }
-    log: string[] = []
+    simulationConstants: SimulationConstants = defaultSimConstants
+    log: LogItem[] = [{message: 'Simulation has started!', timestamp:0}]
 
     constructor() {
         makeObservable(this, {
@@ -118,14 +108,14 @@ export class SimulationStore {
     }
 
     get getLog() {
-        return this.log.slice(0, 5).reverse()
+        return this.log.slice(0, 10)
     }
 
     getId = () => {
         return this.idCounter++
     }
 
-    addLogItem = (logItem:string) => {
+    addLogItem = (logItem:LogItem) => {
         this.log.unshift(logItem)
     }
 

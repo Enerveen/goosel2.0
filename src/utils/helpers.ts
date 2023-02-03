@@ -13,8 +13,8 @@ export const findDistance = (pos1: Position, pos2: Position) =>
     Math.sqrt((pos2.x - pos1.x) ** 2 + (pos2.y - pos1.y) ** 2)
 
 export const getRandomPosition = (edgeX: number, edgeY: number) => ({
-    x: Math.floor(Math.random() * edgeX),
-    y: Math.floor(Math.random() * edgeY)
+    x: Math.random() * edgeX,
+    y: Math.random() * edgeY
 })
 
 export const getChild = (
