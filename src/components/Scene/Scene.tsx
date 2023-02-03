@@ -121,6 +121,15 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                     currentActivity: entity.currentActivity.activity
                 }
             )
+            renderer.drawLabels(entity.position,
+                {
+                    gender: entity.gender,
+                    age: entity.age.current,
+                    isAlive: entity.isAlive,
+                    name: entity.name,
+                    currentActivity: entity.currentActivity.activity
+                }
+            )
             if (entity.id === store.getActiveEntity?.id) {
                 store.setActiveEntity(entity)
             }

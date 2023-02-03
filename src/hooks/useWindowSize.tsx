@@ -1,12 +1,14 @@
 import {useLayoutEffect, useState} from "react";
 import {SimulationStore} from "../stores/simulationStore";
 
-const useWindowSize = (store: SimulationStore) => {
+const useWindowSize = (store?: SimulationStore) => {
     const [size, setSize] = useState({width: 0, height: 0});
     useLayoutEffect(() => {
         const updateSize = () => {
             setSize({width: window.innerWidth, height: window.innerHeight});
-            store.setWindowSize({width: window.innerWidth, height: window.innerHeight})
+            if (store) {
+                store.setWindowSize({width: window.innerWidth, height: window.innerHeight})
+            }
         }
         window.addEventListener('resize', updateSize);
         updateSize();
