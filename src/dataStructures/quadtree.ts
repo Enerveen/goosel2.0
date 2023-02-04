@@ -1,7 +1,7 @@
 import Entity from "../entities/Entity";
-import {BoundingBox, Position} from "../types";
+import {BoundingBox, Circle, Position} from "../types";
 
-const nodeCapacity = 3;
+const nodeCapacity = 50;
 
 
 class Node {
@@ -44,10 +44,10 @@ class Node {
     }
 
 
-    get(obb: BoundingBox) {
+    get(obb: BoundingBox | Circle) {
         let result: Entity[] = [];
 
-        if (!obb.intersects(this.obb)) {
+        if (!this.obb.intersects(obb)) {
             return result;
         }
 
@@ -132,12 +132,12 @@ class Node {
 
     dbgDraw(ctx: CanvasRenderingContext2D) {
         ctx.strokeStyle = '#FF0000FF';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 1;
         ctx.strokeRect(this.obb.left, this.obb.top, this.obb.right - this.obb.left, this.obb.bottom - this.obb.top);
 
-        this.entities.forEach(entity => {
-            ctx.strokeRect(entity.position.x, entity.position.y, 1, 1);
-        })
+        // this.entities.forEach(entity => {
+        //     ctx.strokeRect(entity.position.x, entity.position.y, 1, 1);
+        // })
 
         if (!this.isLeaf()) {
             this.topLeft?.dbgDraw(ctx);
@@ -165,7 +165,7 @@ export class Quadtree {
     }
 
 
-    get(obb: BoundingBox) {
+    get(obb: BoundingBox | Circle) {
         return this.node.get(obb);
     }
 

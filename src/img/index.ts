@@ -4,6 +4,9 @@ import backgroundGlade from './backroundGlade.png'
 import clouds from './cloudsBlack.png'
 import plant from "./plant.png";
 import animalTextureAtlas from "./animalTextureAtlas.png";
+import butterflyTextureAtlas from "./butterfly400x400.png"
+import butterflyWhiteTextureAtlas from "./butterflyWhite400x400.png"
+import butterflyShadowTextureAtlas from "./butterflyShadow400x400.png"
 import egg from "./egg.png";
 import heart from "./heart.png";
 import egg2 from "../../public/egg2.png";
@@ -15,6 +18,9 @@ const imagesSrc = {
     backgroundGlade,
     plant,
     animalTextureAtlas,
+    butterflyTextureAtlas,
+    butterflyWhiteTextureAtlas,
+    butterflyShadowTextureAtlas,
     egg,
     heart,
     egg2

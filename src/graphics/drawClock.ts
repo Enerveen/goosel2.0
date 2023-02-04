@@ -6,17 +6,47 @@ const drawClock = (timestamp: number, ctx: CanvasRenderingContext2D, width: numb
     const tickInterval = 6 // Defines padding between ticks, should be multiple of 30
     const centerX = width / 2
     const centerY = height / 2
-    const radius = width / 2 - 10
+    const radius = width / 2
     ctx.clearRect(0, 0, width, height)
 
-    ctx.beginPath()
-    ctx.strokeStyle = '#fafafa'
-    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI)
-    ctx.stroke()
+    // ctx.beginPath()
+    // ctx.strokeStyle = '#fafafa'
+    // //ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI)
+    // ctx.stroke()
 
-    // Assuming that we have 4 colors, one for each month
+    const gradient1 = ctx.createRadialGradient(centerX, centerY, 0.0, centerX, centerY, radius);
+    gradient1.addColorStop(0, '#00000000');
+    gradient1.addColorStop(1, '#FFFFFFCC');
+
+    const gradient2 = ctx.createConicGradient(-45 * Math.PI / 180, centerX, centerY)
+    gradient2.addColorStop(0, clockColors[0]);
+    gradient2.addColorStop(0.25, clockColors[1]);
+    gradient2.addColorStop(0.50, clockColors[2]);
+    gradient2.addColorStop(0.75, clockColors[3]);
+    gradient2.addColorStop(1, clockColors[0]);
+
+    ctx.save();
+    ctx.fillStyle = gradient1;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.restore()
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'source-atop';
+    ctx.fillStyle = gradient2;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.restore()
+
+
+    //Assuming that we have 4 colors, one for each month
+    ctx.save();
     clockColors.forEach((color, index) => {
-        ctx.fillStyle = color
+        ctx.fillStyle = color + '44'
+        ctx.globalCompositeOperation = 'source-atop'
+        ctx.globalAlpha = 1
         ctx.beginPath()
         ctx.moveTo(centerX, centerY)
         ctx.arc(
@@ -30,6 +60,7 @@ const drawClock = (timestamp: number, ctx: CanvasRenderingContext2D, width: numb
         ctx.lineTo(centerX, centerY)
         ctx.fill()
     })
+    ctx.restore();
 
     ctx.beginPath()
     ctx.strokeStyle = "black"
@@ -57,6 +88,7 @@ const drawClock = (timestamp: number, ctx: CanvasRenderingContext2D, width: numb
     }
     ctx.stroke()
 
+    ctx.save();
     ctx.strokeStyle = "rgba(34,34,34,0.7)"
     ctx.beginPath()
     ctx.moveTo(centerX, centerY)
@@ -66,13 +98,16 @@ const drawClock = (timestamp: number, ctx: CanvasRenderingContext2D, width: numb
     ]
     ctx.lineTo(handX, handY)
     ctx.lineWidth = 5
+    ctx.lineCap = 'round';
     ctx.stroke()
-    ctx.fillStyle = '#000000'
+    ctx.globalCompositeOperation = 'lighter'
+    ctx.fillStyle = gradient2;
     ctx.textAlign = 'center'
     ctx.font = '32px AmasticBold'
     const {date, year} = getReadableDate(timestamp)
     ctx.fillText(date, centerX, centerY - 11)
     ctx.fillText(year, centerX, centerY + 22)
+    ctx.restore();
 }
 
 export default drawClock

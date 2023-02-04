@@ -21,6 +21,8 @@ import {
     handleCanvasTouchMove,
     handleCanvasTouchStart
 } from "../../utils/eventHandlers";
+import {BoidsSystem} from "../../entities/BoidEntity";
+import Entity from "../../entities/Entity";
 
 interface ISceneProps {
     store: SimulationStore,
@@ -38,6 +40,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         x: fieldSize.x ,
         y: fieldSize.y
     }), [fieldSize, canvasWidth, canvasHeight]);
+    const boidsSystem = useMemo(() => new BoidsSystem(120, fieldSize), [fieldSize]);
 
     const init = useCallback(() => {
         console.log('Simulation has started with the following constants:',
@@ -57,6 +60,11 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             setAppPhase('FINISHED')
             return
         }
+
+        boidsSystem.follow([new Entity({x: canvasWidth / 2, y: canvasHeight / 2})], 50000.0, true);
+        boidsSystem.steerAwayFrom(store.getAnimals, 1.0, true);
+        boidsSystem.update(0.1 * store.simulationSpeed);
+
         store.clearAnimalCorpses()
         store.gatherStatistics()
         if (!getRandomInRange(0, store.getSimulationConstants.foodSpawnChanceK / store.simulationSpeed)) {
@@ -133,6 +141,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             }
         })
 
+        renderer.drawButterflies(boidsSystem.boids, timestamp);
         renderer.drawClouds(timestamp);
     }, [context, canvasWidth, canvasHeight]);
 

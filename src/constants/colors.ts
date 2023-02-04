@@ -14,8 +14,8 @@ export const areaChartColors = [
 ]
 
 export const clockColors = [
-    '#546DEB',
-    '#83EB98',
-    '#EB405B',
-    '#EBCC6C',
+    '#63D6EE',
+    '#00DB98',
+    '#EA85F7',
+    '#F7DA80',
 ]
