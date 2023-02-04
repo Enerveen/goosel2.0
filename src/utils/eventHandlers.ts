@@ -64,7 +64,7 @@ export const handleCanvasMouseRelease = () => {
 export const handleCanvasMouseMove = (
     event: React.MouseEvent<HTMLCanvasElement>,
     camera: Camera) => {
-    mouseCameraController.moveUpdate(camera, {x: event.clientX, y: event.clientY});
+    mouseCameraController.moveUpdate(camera, {x: event.clientX, y: event.clientY}, 2);
 }
 
 export const handleCanvasMouseWheel = (
@@ -95,7 +95,7 @@ export const handleCanvasTouchMove = (
     touchRef: { start: number, end: number },
 ) => {
     if (event.touches.length === 1) {
-        mouseCameraController.moveUpdate(camera, {x: event.touches[0].clientX, y: event.touches[0].clientY});
+        mouseCameraController.moveUpdate(camera, {x: event.touches[0].clientX, y: event.touches[0].clientY}, 4);
     }
     if (event.touches.length === 2) {
         const end = findDistance(

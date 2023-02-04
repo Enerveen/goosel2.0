@@ -10,7 +10,7 @@
 
 html, body {
     margin: 0;
-    background-color: #222222;
+    background-color: #111111;
     touch-action: pan-y pan-x;
     overflow: hidden;
 }

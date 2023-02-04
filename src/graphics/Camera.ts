@@ -100,10 +100,10 @@ class MouseCameraController {
     }
 
 
-    public moveUpdate(camera: Camera, mousePosition: Position) {
+    public moveUpdate(camera: Camera, mousePosition: Position, cameraSpeedMultiplier: number) {
         if (this.state === MouseCameraControllerState.Moving) {
-            camera.position.x -= (mousePosition.x - this.prevPosition.x) / camera.getFovScale();
-            camera.position.y -= (mousePosition.y - this.prevPosition.y) / camera.getFovScale();
+            camera.position.x -= (mousePosition.x - this.prevPosition.x) * cameraSpeedMultiplier / camera.getFovScale();
+            camera.position.y -= (mousePosition.y - this.prevPosition.y) * cameraSpeedMultiplier / camera.getFovScale();
 
             this.prevPosition = mousePosition;
         }

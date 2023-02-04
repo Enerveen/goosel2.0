@@ -1,5 +1,5 @@
 import Entity from "./Entity";
-import {Activity, Age, Energy, FieldDimensions, gender, Position, Stats} from "../types";
+import {Activity, Age, BoundingBox, Energy, FieldDimensions, gender, Position, Stats} from "../types";
 import {coinFlip} from "../utils/utils";
 import Plant from "./Plant";
 import {generateAnimalName} from "../utils/nameGen";
@@ -10,8 +10,9 @@ import {
     getChild,
     getRandomPosition
 } from "../utils/helpers";
-import {timeConstants, simulationValuesMultipliers} from "../constants/simulation";
+import {timeConstants, simulationValuesMultipliers, fieldSize} from "../constants/simulation";
 import simulationStore from "../stores/simulationStore";
+import {Quadtree} from "../dataStructures/quadtree";
 
 interface IAnimalProps {
     id: string
@@ -145,7 +146,7 @@ class Animal extends Entity {
                     }
                 }
                 if (this.energy.current < this.energy.max * 0.75 && this.currentActivity.activity === 'walking') {
-                    const nearestFoodPiece = this.lookForFood(plants)
+                    const nearestFoodPiece = this.lookForFoodQT(plants)
                     if (nearestFoodPiece) {
                         this.reachFood(nearestFoodPiece, removePlant, simulationSpeed)
                     } else {
@@ -161,6 +162,22 @@ class Animal extends Entity {
         } else if (timestamp >= this.age.birthTimestamp) {
             this.age.current = 0
         }
+    }
+
+    private lookForFoodQT (plants: Plant[]) {
+        const quadtree = new Quadtree({x: 0, y: 0}, Math.max(fieldSize.x, fieldSize.y))
+        const foodSenseRange = this.stats.foodSensitivity * simulationValuesMultipliers.foodSensitivity
+        const searchObb = new BoundingBox(
+            this.position.x - foodSenseRange,
+            this.position.x + foodSenseRange,
+            this.position.y - foodSenseRange,
+            this.position.y + foodSenseRange,
+        )
+        plants.forEach(animal => {
+            quadtree.push(animal);
+        })
+        const possiblePlants = quadtree.get(searchObb)
+        return this.lookForFood(possiblePlants as Plant[])
     }
 
     private lookForFood(plants: Plant[]) {
