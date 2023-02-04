@@ -1,8 +1,8 @@
 import {FieldDimensions, gender, Position, Stats} from "../types";
 import Animal from "../entities/Animal";
-import {coinFlip, rollFivePercentChance} from "./utils";
+import {coinFlip, getRandomInRange, rollFivePercentChance} from "./utils";
 import {generateAnimalFirstName} from "./nameGen";
-import {simulationValuesMultipliers} from "../constants/simulation";
+import {fieldSize, simulationValuesMultipliers} from "../constants/simulation";
 import Plant from "../entities/Plant";
 
 export const findDistance = (pos1: Position, pos2: Position) =>
@@ -11,6 +11,11 @@ export const findDistance = (pos1: Position, pos2: Position) =>
 export const getRandomPosition = (edgeX: number, edgeY: number) => ({
     x: Math.random() * edgeX,
     y: Math.random() * edgeY
+})
+
+export const getRandomPositionInRect = ({x,y}: Position, delta: number) => ({
+    x: getRandomInRange(Math.max(x - delta / 2, 0), Math.min(x + delta / 2, fieldSize.x - 1)),
+    y: getRandomInRange(Math.max(y - delta / 2, 0), Math.min(y + delta / 2, fieldSize.y - 1))
 })
 
 export const getChild = (
@@ -59,8 +64,8 @@ export const getChild = (
 }
 
 export const calculateEnergyLoss = (stats: Stats) => {
-    const {speed, foodSensitivity, breedingSensitivity, breedingCD, hatchingTime} = stats
-    return speed * foodSensitivity * breedingSensitivity / breedingCD / hatchingTime
+    const {speed, foodSensitivity, breedingSensitivity, breedingCD} = stats
+    return speed * foodSensitivity * breedingSensitivity / breedingCD
     // Alternative formula:
     // (speed * 1.3 + foodSensitivity * 0.8 + breedingSensitivity * 0.8 - breedingCD * 0.7 - hatchingTime * 0.2) / 2
 }
