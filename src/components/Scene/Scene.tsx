@@ -134,23 +134,6 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         })
 
         renderer.drawClouds(timestamp);
-
-        // Plants example
-        // const searchObb = new BoundingBox(500, 1000, 500, 1000);
-        //
-        // context.strokeStyle = 'blue';
-        // context.strokeRect(searchObb.left, searchObb.top, 500, 500);
-        //
-        // const quadtree = new Quadtree({x: 100, y: 100}, 2000);
-        // store.getPlants.forEach(animal => {
-        //     quadtree.push(animal);
-        // })
-        // const result = quadtree.get(searchObb);
-        // result.forEach(entity => {
-        //     context.fillRect(entity.position.x, entity.position.y, 10, 10);
-        // })
-        //
-        // quadtree.dbgDraw(context);
     }, [context, canvasWidth, canvasHeight]);
 
     useEffect(() => {
