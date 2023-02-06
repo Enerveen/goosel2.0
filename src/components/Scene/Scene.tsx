@@ -133,7 +133,9 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             }
         })
 
-        renderer.drawLogs(timestamp, store.getLog)
+        if (!store.log.hidden) {
+            renderer.drawLogs(timestamp, store.getLog)
+        }
         renderer.drawClouds(timestamp);
     }, [context, canvasWidth, canvasHeight]);
 

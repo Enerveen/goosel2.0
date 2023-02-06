@@ -30,7 +30,7 @@ export class SimulationStore {
         animalCount: number[]
     } = {age: [], gender: [], averageStats: [], populationChange:[], animalCount: [], plantStats: []}
     simulationConstants: SimulationConstants = defaultSimConstants
-    log: LogItem[] = [{message: 'Simulation has started!', timestamp:0}]
+    log: {logs: LogItem[], hidden: boolean} = {logs:[{message: 'Simulation has started!', timestamp:0}], hidden: false}
 
     constructor() {
         makeObservable(this, {
@@ -55,6 +55,8 @@ export class SimulationStore {
             getWindowSize: computed,
             getSimulationConstants: computed,
             getLog: computed,
+            getLogHidden: computed,
+            toggleLogHidden: action,
             addLogItem: action,
             addAnimal: action,
             removeAnimal: action,
@@ -108,7 +110,11 @@ export class SimulationStore {
     }
 
     get getLog() {
-        return this.log.slice(0, 10)
+        return this.log.logs.slice(0, 10)
+    }
+
+    get getLogHidden() {
+        return this.log.hidden
     }
 
     getId = () => {
@@ -116,7 +122,11 @@ export class SimulationStore {
     }
 
     addLogItem = (logItem:LogItem) => {
-        this.log.unshift(logItem)
+        this.log.logs.unshift(logItem)
+    }
+
+    toggleLogHidden = () => {
+        this.log.hidden = !this.log.hidden
     }
 
     addAnimal = (animal: Animal | Animal[]) => {

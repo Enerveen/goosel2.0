@@ -33,12 +33,14 @@ const Simulation = observer(({store, setAppPhase}: ISimulationProps) => {
         <Drawer open={drawerOpen} onClose={onDrawerClose}>
             <div className={classes.aside}>
                 <Controls
+                    getId={() => store.getId}
                     simulationSpeed={store.simulationSpeed}
                     setSimulationSpeed={store.setSimulationSpeed}
                     timestamp={store.getTimestamp}
                     setAppPhase={setAppPhase}
                     addAnimal={store.addAnimal}
                     animalMaxEnergy={store.getSimulationConstants.animalMaxEnergy}
+                    logHidden={store.getLogHidden}
                 />
             </div>
         </Drawer>

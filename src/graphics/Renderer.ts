@@ -188,15 +188,18 @@ class Renderer {
 
     public drawLogs(timestamp:number, logs: LogItem[]) {
         if (this.context) {
-            this.context.font = "bold 50px Amastic"
+            this.context.save()
+            this.context.resetTransform()
+            this.context.font = "bold 24px Amastic"
             this.context.textAlign = 'left';
             logs.filter(({timestamp: messageTimestamp}) => timestamp - messageTimestamp < 1300)
                 .reverse()
                 .forEach(({message, timestamp: messageTimestamp}, index) => {
                     // @ts-ignore
                     this.context.fillStyle = `rgba(250, 250, 250, ${1 - (timestamp - messageTimestamp - 300) / 1000})`
-                    this.context?.fillText(message, 10,  50 + index * 50)
+                    this.context?.fillText(message, 10,  50 + index * 24)
                 })
+            this.context.restore()
         }
     }
 

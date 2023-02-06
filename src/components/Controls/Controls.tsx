@@ -3,20 +3,23 @@ import {observer} from "mobx-react-lite";
 import classes from "./Controls.module.scss";
 import {appPhase} from "../../types";
 import Animal from "../../entities/Animal";
-import {getRandomInRange} from "../../utils/utils";
 import {getRandomPosition} from "../../utils/helpers";
 import Slider from "../Slider/Slider";
 import Clock from "../Clock/Clock";
 import {fieldSize} from "../../constants/simulation";
 import Button from "../Button/Button";
+import Checkbox from "../Checkbox/Checkbox";
+import simulationStore from "../../stores/simulationStore";
 
 interface IControlsProps {
     simulationSpeed: number
-    setSimulationSpeed: (speed: number) => void,
-    timestamp: number,
+    setSimulationSpeed: (speed: number) => void
+    timestamp: number
     setAppPhase: (state: appPhase) => void
-    addAnimal: (animal: Animal) => void,
+    addAnimal: (animal: Animal) => void
     animalMaxEnergy: number
+    getId: () => () => number
+    logHidden: boolean
 }
 
 const Controls = observer(({
@@ -25,14 +28,16 @@ const Controls = observer(({
                                timestamp,
                                setAppPhase,
                                addAnimal,
-                               animalMaxEnergy
+                               animalMaxEnergy,
+                               getId,
+                               logHidden
                            }: IControlsProps) => {
     const [value, setValue] = useState(simulationSpeed)
 
     const createNewAnimal = () => {
         addAnimal(
             new Animal({
-                id: `A${getRandomInRange(1, 10000)}`,
+                id: `A${getId()}`,
                 position: getRandomPosition(fieldSize.x, fieldSize.y),
                 age: {current: 0, birthTimestamp: timestamp, deathTimestamp: undefined},
                 energy: {current: animalMaxEnergy, max: animalMaxEnergy, breedingCD: 0}
@@ -64,6 +69,11 @@ const Controls = observer(({
             <Button className={classes.button} onClick={() => setAppPhase('FINISHED')}>
                 Fin
             </Button>
+            <Checkbox
+                label={'Hide logs'}
+                onChange={simulationStore.toggleLogHidden}
+                checked={logHidden}
+            />
         </div>
     </div>
 })
