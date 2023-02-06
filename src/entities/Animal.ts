@@ -10,7 +10,7 @@ import {
     getChild,
     getRandomPosition, getRandomPositionInRect
 } from "../utils/helpers";
-import {timeConstants, simulationValuesMultipliers, fieldSize} from "../constants/simulation";
+import {timeConstants, simulationValuesMultipliers} from "../constants/simulation";
 import simulationStore from "../stores/simulationStore";
 import {Quadtree} from "../dataStructures/quadtree";
 
@@ -94,20 +94,22 @@ class Animal extends Entity {
         this.moveTo({x: deltaX, y: deltaY})
     }
 
-    private walk(edgeX: number, edgeY: number, simulationSpeed: number, breedingMinAge: number, breedingMaxAge: number) {
+    private walk(edgeX: number, edgeY: number, simulationSpeed: number, breedingMinAge: number, breedingMaxAge: number, fieldSize: FieldDimensions) {
         if (this.isOnWalkTarget) {
             this.isOnWalkTarget = false;
             if (checkBreedingPossibility(this, breedingMinAge, breedingMaxAge) && this.lastBreedingCoordinates) {
                 this.walkDestination = getRandomPositionInRect(
                     this.lastBreedingCoordinates,
-                    this.stats.breedingSensitivity * simulationValuesMultipliers.breedingSensitivity * 2
+                    this.stats.breedingSensitivity * simulationValuesMultipliers.breedingSensitivity * 2,
+                    fieldSize
                 )
                 return
             }
             if (this.lastMealCoordinates) {
                 this.walkDestination = getRandomPositionInRect(
                     this.lastMealCoordinates,
-                    this.stats.foodSensitivity * simulationValuesMultipliers.foodSensitivity * 2
+                    this.stats.foodSensitivity * simulationValuesMultipliers.foodSensitivity * 2,
+                    fieldSize
                 )
                 return;
             }
@@ -157,23 +159,23 @@ class Animal extends Entity {
                     }
                 }
                 if (checkBreedingPossibility(this, breedingMinAge, breedingMaxAge)) {
-                    const partner = this.lookForPairQT(animals, breedingMinAge, breedingMaxAge)
+                    const partner = this.lookForPairQT(animals, breedingMinAge, breedingMaxAge, fieldDimensions)
                     if (partner) {
                         this.reachBreedingPartner(partner, simulationSpeed, breedingMaxProgress)
                         return
                     }
                 }
                 if (this.energy.current < this.energy.max * 0.75 && this.currentActivity.activity === 'walking') {
-                    const nearestFoodPiece = this.lookForFoodQT(plants)
+                    const nearestFoodPiece = this.lookForFoodQT(plants, fieldDimensions)
                     if (nearestFoodPiece) {
                         this.reachFood(nearestFoodPiece, removePlant, simulationSpeed)
                     } else {
-                        this.walk(fieldWidth, fieldHeight, simulationSpeed, breedingMinAge, breedingMaxAge)
+                        this.walk(fieldWidth, fieldHeight, simulationSpeed, breedingMinAge, breedingMaxAge, fieldDimensions)
                     }
                     return;
                 }
                 if (this.currentActivity.activity === 'walking') {
-                    this.walk(fieldWidth, fieldHeight, simulationSpeed, breedingMinAge, breedingMaxAge)
+                    this.walk(fieldWidth, fieldHeight, simulationSpeed, breedingMinAge, breedingMaxAge, fieldDimensions)
                 }
                 this.applyAging(timestamp)
             }
@@ -182,8 +184,8 @@ class Animal extends Entity {
         }
     }
 
-    private lookForFoodQT(plants: Plant[]) {
-        const quadtree = new Quadtree({x: 0, y: 0}, Math.max(fieldSize.x, fieldSize.y))
+    private lookForFoodQT(plants: Plant[], fieldSize: FieldDimensions) {
+        const quadtree = new Quadtree({x: 0, y: 0}, Math.max(fieldSize.width, fieldSize.height))
         const foodSenseRange = this.stats.foodSensitivity * simulationValuesMultipliers.foodSensitivity
         const searchObb = new BoundingBox(
             this.position.x - foodSenseRange,
@@ -216,8 +218,8 @@ class Animal extends Entity {
         return null
     }
 
-    private lookForPairQT(animals: Animal[], breedingMinAge: number, breedingMaxAge: number) {
-        const quadtree = new Quadtree({x: 0, y: 0}, Math.max(fieldSize.x, fieldSize.y))
+    private lookForPairQT(animals: Animal[], breedingMinAge: number, breedingMaxAge: number, fieldSize: FieldDimensions) {
+        const quadtree = new Quadtree({x: 0, y: 0}, Math.max(fieldSize.width, fieldSize.height))
         const breedingSenseRange = this.stats.breedingSensitivity * simulationValuesMultipliers.breedingSensitivity
         const searchObb = new BoundingBox(
             this.position.x - breedingSenseRange,

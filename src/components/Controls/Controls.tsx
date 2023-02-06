@@ -1,12 +1,11 @@
 import React, {ChangeEvent, useEffect, useState} from "react";
 import {observer} from "mobx-react-lite";
 import classes from "./Controls.module.scss";
-import {appPhase} from "../../types";
+import {appPhase, SimulationConstants} from "../../types";
 import Animal from "../../entities/Animal";
 import {getRandomPosition} from "../../utils/helpers";
 import Slider from "../Slider/Slider";
 import Clock from "../Clock/Clock";
-import {fieldSize} from "../../constants/simulation";
 import Button from "../Button/Button";
 import Checkbox from "../Checkbox/Checkbox";
 import simulationStore from "../../stores/simulationStore";
@@ -19,7 +18,8 @@ interface IControlsProps {
     addAnimal: (animal: Animal) => void
     animalMaxEnergy: number
     getId: () => () => number
-    logHidden: boolean
+    logHidden: boolean,
+    simulationConstants: SimulationConstants
 }
 
 const Controls = observer(({
@@ -30,15 +30,17 @@ const Controls = observer(({
                                addAnimal,
                                animalMaxEnergy,
                                getId,
-                               logHidden
+                               logHidden,
+                               simulationConstants
                            }: IControlsProps) => {
+    const {fieldSize} = simulationConstants
     const [value, setValue] = useState(simulationSpeed)
 
     const createNewAnimal = () => {
         addAnimal(
             new Animal({
                 id: `A${getId()}`,
-                position: getRandomPosition(fieldSize.x, fieldSize.y),
+                position: getRandomPosition(fieldSize.width, fieldSize.height),
                 age: {current: 0, birthTimestamp: timestamp, deathTimestamp: undefined},
                 energy: {current: animalMaxEnergy, max: animalMaxEnergy, breedingCD: 0}
             })

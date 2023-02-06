@@ -30,7 +30,7 @@ export class SimulationStore {
         animalCount: number[]
     } = {age: [], gender: [], averageStats: [], populationChange:[], animalCount: [], plantStats: []}
     simulationConstants: SimulationConstants = defaultSimConstants
-    log: {logs: LogItem[], hidden: boolean} = {logs:[{message: 'Simulation has started!', timestamp:0}], hidden: false}
+    log: {logs: LogItem[], hidden: boolean} = {logs:[{message: 'Simulation has started!', timestamp:0}], hidden: true}
 
     constructor() {
         makeObservable(this, {
@@ -90,7 +90,7 @@ export class SimulationStore {
     }
 
     get getSimulationSpeed() {
-        return this.timestamp
+        return this.simulationSpeed
     }
 
     get getCurrentYear() {

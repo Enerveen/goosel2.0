@@ -27,10 +27,6 @@ export const defaultSimConstants = {
     animalMaxEnergy: 1200,
     foodSpawnChanceK: 20,
     initialFoodCount: 200,
-    initialAnimalCount: 24
-}
-
-export const fieldSize = {
-    x: 3200,
-    y: 1800
+    initialAnimalCount: 24,
+    fieldSize: {width: 3200, height: 1800}
 }

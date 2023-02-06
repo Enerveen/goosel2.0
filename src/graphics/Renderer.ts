@@ -1,5 +1,5 @@
 import {FieldDimensions, gender, LogItem, Position, Texture, TextureAtlas} from "../types";
-import {appConstants, fieldSize} from "../constants/simulation";
+import {appConstants} from "../constants/simulation";
 
 
 const loadTexture = (image: HTMLImageElement, params: {width?: number, height?: number, offsetX?: number, offsetY?: number}={}) => {
@@ -97,7 +97,7 @@ class Renderer {
     }
 
 
-    public drawClouds(timestamp: number) {
+    public drawClouds(timestamp: number, fieldSize: FieldDimensions) {
         if (this.context) {
             const width = 10.0 * this.cloudsTexture.width;
             const height = 10.0 * this.cloudsTexture.height;
@@ -106,7 +106,7 @@ class Renderer {
 
             // Uncomment to adjust brightness
             this.context.fillStyle = 'rgba(244, 233, 155, 0.05)';
-            this.context.fillRect(0, 0, fieldSize.x, fieldSize.y)
+            this.context.fillRect(0, 0, fieldSize.width, fieldSize.height)
             //
             this.context.globalAlpha = 0.45;
             this.context.globalCompositeOperation = 'source-atop';

@@ -108,7 +108,8 @@ export type SimulationConstants = {
     initialFoodCount: number,
     initialAnimalCount: number,
     foodNutritionMin: number,
-    foodNutritionMax: number
+    foodNutritionMax: number,
+    fieldSize: FieldDimensions
 }
 
 export type LogItem = {

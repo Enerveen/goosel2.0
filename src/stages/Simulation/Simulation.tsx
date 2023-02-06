@@ -41,6 +41,7 @@ const Simulation = observer(({store, setAppPhase}: ISimulationProps) => {
                     addAnimal={store.addAnimal}
                     animalMaxEnergy={store.getSimulationConstants.animalMaxEnergy}
                     logHidden={store.getLogHidden}
+                    simulationConstants={store.getSimulationConstants}
                 />
             </div>
         </Drawer>
