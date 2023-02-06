@@ -9,7 +9,6 @@ import Drawer from "../../components/Drawer/Drawer";
 import Controls from "../../components/Controls/Controls";
 import ActiveEntityInfo from "../../components/ActiveEntityInfo/ActiveEntityInfo";
 import {appPhase} from "../../types";
-import Log from "../../components/Log/Log";
 
 interface ISimulationProps {
     store: SimulationStore
@@ -28,7 +27,6 @@ const Simulation = observer(({store, setAppPhase}: ISimulationProps) => {
 
     return <div className={classes.container}>
         <Scene store={simulationStore} setAppPhase={setAppPhase}/>
-        <Log logs={simulationStore.getLog} timestamp={simulationStore.getTimestamp}/>
         <div className={clsSum(classes.menuOpenBtn, drawerOpen ? classes.active : null)} onClick={onDrawerOpen}>
             <Menu/>
         </div>

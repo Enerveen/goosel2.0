@@ -8,6 +8,7 @@ import {getRandomPosition} from "../../utils/helpers";
 import Slider from "../Slider/Slider";
 import Clock from "../Clock/Clock";
 import {fieldSize} from "../../constants/simulation";
+import Button from "../Button/Button";
 
 interface IControlsProps {
     simulationSpeed: number
@@ -57,12 +58,12 @@ const Controls = observer(({
             />
         </div>
         <div>
-            <button onClick={createNewAnimal}>
+            <Button className={classes.button} onClick={createNewAnimal}>
                 Goose!
-            </button>
-            <button onClick={() => setAppPhase('FINISHED')}>
+            </Button>
+            <Button className={classes.button} onClick={() => setAppPhase('FINISHED')}>
                 Fin
-            </button>
+            </Button>
         </div>
     </div>
 })
