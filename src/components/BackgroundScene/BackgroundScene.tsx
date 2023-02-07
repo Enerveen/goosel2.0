@@ -45,7 +45,7 @@ const BackgroundScene = () => {
                 )
             })
 
-            renderer.drawClouds(timestamp);
+            renderer.drawClouds(timestamp, {width: canvasWidth, height: canvasHeight});
         }
     }
 

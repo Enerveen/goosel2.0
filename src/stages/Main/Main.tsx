@@ -5,6 +5,8 @@ import SimulationSettings from "../../components/SimulationSettings/SimulationSe
 import simulationStore from "../../stores/simulationStore";
 import {appConstants, defaultSimConstants} from "../../constants/simulation";
 import BackgroundScene from "../../components/BackgroundScene/BackgroundScene";
+import Checkbox from "../../components/Checkbox/Checkbox";
+import Button from "../../components/Button/Button";
 
 interface IMainProps {
     setAppPhase: (phase: appPhase) => void
@@ -40,13 +42,14 @@ const Main = ({setAppPhase}: IMainProps) => {
             <h1>
                 MAIN
             </h1>
-            <button onClick={onSimStart}>
+            <Button onClick={onSimStart} className={classes.button}>
                 Go To Sim
-            </button>
-            <div className={classes.settingsSectionCheckbox}>
-                <span>Start with default settings</span>
-                <input type={'checkbox'} onChange={toggleSettingsCheckbox} checked={isDefaultSettings}/>
-            </div>
+            </Button>
+            <Checkbox
+                label={'Start with default settings'}
+                onChange={toggleSettingsCheckbox}
+                checked={isDefaultSettings}
+            />
             {!isDefaultSettings ?
                 <SimulationSettings constantsValues={constantsValues} setConstantsValues={setConstantsValues}/> : <></>}
         </div>

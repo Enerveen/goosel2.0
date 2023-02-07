@@ -15,6 +15,11 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
         useCallback((key: string, value: number) =>
             setConstantsValues(prevValue => ({...prevValue, [key]: value})), [setConstantsValues])
 
+    const updateFieldDimensions =
+        useCallback((key: 'width' | 'height', value: number) =>
+            setConstantsValues(prevValue => ({...prevValue, fieldSize: {...prevValue.fieldSize, [key]: value}})),
+            [setConstantsValues])
+
     const updateBreedingRange = useCallback((values: number[]) =>
         setConstantsValues(prevValue =>
             ({...prevValue, breedingMinAge: values[0], breedingMaxAge: values[1]})), [setConstantsValues])
@@ -85,6 +90,28 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
             value={constantsValues.initialAnimalCount}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 updateSettingsValues('initialAnimalCount', +e.target.value)}
+        />
+        <Slider
+            label={'Field width'}
+            className={classes.slider}
+            id={'fieldWidth'}
+            min={200}
+            max={4200}
+            step={100}
+            value={constantsValues.fieldSize.width}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                updateFieldDimensions('width', +e.target.value)}
+        />
+        <Slider
+            label={'Field height'}
+            className={classes.slider}
+            id={'fieldHeight'}
+            min={200}
+            max={2000}
+            step={100}
+            value={constantsValues.fieldSize.height}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                updateFieldDimensions('height', +e.target.value)}
         />
         <Slider
             label={'Food spawn Coef'}

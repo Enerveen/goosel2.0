@@ -12,7 +12,6 @@ import {
 import Renderer from "../../graphics/Renderer";
 import {appPhase, BoundingBox, Vector2} from "../../types";
 import useWindowSize from "../../hooks/useWindowSize";
-import {fieldSize} from "../../constants/simulation";
 import {Camera} from "../../graphics/Camera";
 import ImageContext from "../../stores/ImageContext";
 import {
@@ -34,18 +33,32 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     const {width: canvasWidth, height: canvasHeight} = useWindowSize(store)
     const images = useContext(ImageContext)
     const renderer = useMemo(() => new Renderer(context, images), [context])
-    const mainCamera = useMemo(() => new Camera({x: fieldSize.x / 2, y: fieldSize.y / 2}, new Vector2(
-        fieldSize.x ,
-        fieldSize.y
-    )), [fieldSize, canvasWidth, canvasHeight]);
+    const mainCamera = useMemo(() => new Camera(
+        {x: store.getSimulationConstants.fieldSize.width / 2,
+            y: store.getSimulationConstants.fieldSize.height / 2
+        }, {
+        x: store.getSimulationConstants.fieldSize.width,
+        y: store.getSimulationConstants.fieldSize.height
+    }), [
+        store.getSimulationConstants.fieldSize.width,
+        store.getSimulationConstants.fieldSize.height,
+        canvasWidth,
+        canvasHeight
+    ]);
 
     const init = useCallback(() => {
         console.log('Simulation has started with the following constants:',
             JSON.stringify(store.getSimulationConstants, null, 4))
         store.addAnimal(generateAnimals(store.getSimulationConstants.initialAnimalCount,
-            {width: fieldSize.x, height: fieldSize.y}, store.getSimulationConstants.animalMaxEnergy))
+            {
+                width: store.getSimulationConstants.fieldSize.width,
+                height: store.getSimulationConstants.fieldSize.height
+            }, store.getSimulationConstants.animalMaxEnergy))
         store.addPlant(generateFood(store.getSimulationConstants.initialFoodCount,
-            {width: fieldSize.x, height: fieldSize.y}))
+            {
+                width: store.getSimulationConstants.fieldSize.width,
+                height: store.getSimulationConstants.fieldSize.height
+            }))
     }, [canvasWidth, canvasHeight])
 
 
@@ -59,14 +72,17 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         }
         store.clearAnimalCorpses()
         store.gatherStatistics()
-        if (!getRandomInRange(0, store.getSimulationConstants.foodSpawnChanceK / store.simulationSpeed)) {
+        if (!getRandomInRange(0, store.getSimulationConstants.foodSpawnChanceK / store.getSimulationSpeed)) {
             store.addPlant(new Plant({
                 id: `P${store.getId()}`,
                 nutritionValue: getRandomInRange(
                     store.getSimulationConstants.foodNutritionMin,
                     store.getSimulationConstants.foodNutritionMax
                 ),
-                position: getRandomPosition(fieldSize.x, fieldSize.y)
+                position: getRandomPosition(
+                    store.getSimulationConstants.fieldSize.width,
+                    store.getSimulationConstants.fieldSize.height
+                )
             }))
         }
         store.getAnimals.forEach(animal => animal.live(
@@ -76,10 +92,10 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             store.removePlant,
             store.addAnimal,
             {
-                width: fieldSize.x,
-                height: fieldSize.y
+                width: store.getSimulationConstants.fieldSize.width,
+                height: store.getSimulationConstants.fieldSize.height
             },
-            store.simulationSpeed,
+            store.getSimulationSpeed,
             store.getSimulationConstants.breedingMinAge,
             store.getSimulationConstants.breedingMaxAge,
             store.getSimulationConstants.breedingMaxProgress,
@@ -97,14 +113,17 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         context.resetTransform();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
-        mainCamera.checkBounds(new BoundingBox(0, fieldSize.x, 0, fieldSize.y));
+        mainCamera.checkBounds(new BoundingBox(0, store.getSimulationConstants.fieldSize.width,
+            0, store.getSimulationConstants.fieldSize.height));
         {
             const scale = Math.min(canvasWidth / mainCamera.fov.x, canvasHeight / mainCamera.fov.y);
             context.translate(canvasWidth / 2 - mainCamera.position.x * scale, canvasHeight / 2 - mainCamera.position.y * scale);
             context.scale(scale, scale);
         }
 
-        renderer.drawSeamlessBackground({width: fieldSize.x, height: fieldSize.y})
+        renderer.drawSeamlessBackground({
+            width: store.getSimulationConstants.fieldSize.width,
+            height: store.getSimulationConstants.fieldSize.height})
         store.getPlants.forEach(entity => {
             renderer.drawPlant(entity.position)
         })
@@ -133,7 +152,10 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             }
         })
 
-        renderer.drawClouds(timestamp);
+        if (!store.getLogHidden) {
+            renderer.drawLogs(timestamp, store.getLog)
+        }
+        renderer.drawClouds(timestamp, store.getSimulationConstants.fieldSize);
     }, [context, canvasWidth, canvasHeight]);
 
     useEffect(() => {
@@ -146,10 +168,9 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
 
     useEffect(() => {
         let animationFrameId: number;
-
         if (context) {
             const render = () => {
-                const timestamp = store.timestamp
+                const timestamp = store.getTimestamp
                 calculateStep(timestamp);
                 drawStep(timestamp);
                 store.updateTimestamp()
@@ -171,7 +192,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         onMouseUp={handleCanvasMouseRelease}
         onMouseMove={event => handleCanvasMouseMove(event, mainCamera)}
         onWheel={event => handleCanvasMouseWheel(event, mainCamera)}
-        onTouchStart = {event => handleCanvasTouchStart(event, mainCamera, touchRef.current)}
+        onTouchStart={event => handleCanvasTouchStart(event, mainCamera, touchRef.current)}
         onTouchMove={event => handleCanvasTouchMove(event, mainCamera, touchRef.current)}
         onTouchEnd={event => handleCanvasTouchEnd(event)}
         onClick={event => handleCanvasClick(

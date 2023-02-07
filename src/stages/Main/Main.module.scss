@@ -10,31 +10,6 @@
     color: #fafafa
   }
 
-  button {
-    width: 200px;
-    height: 100px;
-    font-size: 38px;
-    margin-bottom: 20px;
-  }
-}
-
-.settingsSectionCheckbox {
-  display: flex;
-  align-items: center;
-
-  span {
-    color: #fafafa;
-    line-height: 30px;
-    font-size: 20px;
-  }
-
-  input[type="checkbox"] {
-    height: 30px;
-    width: 30px;
-    margin-left: 10px;
-    accent-color: #5fa35c;
-    cursor: pointer;
-  }
 }
 
 .version {
@@ -43,5 +18,12 @@
   top: 10px;
   right: 20px;
   z-index: 100;
+}
+
+.button {
+  width: 200px;
+  height: 100px;
+  font-size: 38px;
+  margin-bottom: 20px;
 }
 

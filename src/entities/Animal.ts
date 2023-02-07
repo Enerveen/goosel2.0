@@ -10,7 +10,7 @@ import {
     getChild,
     getRandomPosition, getRandomPositionInRect
 } from "../utils/helpers";
-import {timeConstants, simulationValuesMultipliers, fieldSize} from "../constants/simulation";
+import {timeConstants, simulationValuesMultipliers} from "../constants/simulation";
 import simulationStore from "../stores/simulationStore";
 import {Quadtree} from "../dataStructures/quadtree";
 import {Movable} from "./Movable";
@@ -202,23 +202,23 @@ class Animal extends Entity implements Movable {
                     }
                 }
                 if (checkBreedingPossibility(this, breedingMinAge, breedingMaxAge)) {
-                    const partner = this.lookForPairQT(animals, breedingMinAge, breedingMaxAge)
+                    const partner = this.lookForPairQT(animals, breedingMinAge, breedingMaxAge, fieldDimensions)
                     if (partner) {
                         this.reachBreedingPartner(partner, simulationSpeed, breedingMaxProgress)
                         return
                     }
                 }
                 if (this.energy.current < this.energy.max * 0.75 && this.currentActivity.activity === 'walking') {
-                    const nearestFoodPiece = this.lookForFoodQT(plants)
+                    const nearestFoodPiece = this.lookForFoodQT(plants, fieldDimensions)
                     if (nearestFoodPiece) {
                         this.reachFood(nearestFoodPiece, removePlant, simulationSpeed)
                     } else {
-                        this.walk(fieldWidth, fieldHeight, simulationSpeed, breedingMinAge, breedingMaxAge)
+                        this.walk(fieldWidth, fieldHeight, simulationSpeed, breedingMinAge, breedingMaxAge, fieldDimensions)
                     }
                     return;
                 }
                 if (this.currentActivity.activity === 'walking') {
-                    this.walk(fieldWidth, fieldHeight, simulationSpeed, breedingMinAge, breedingMaxAge)
+                    this.walk(fieldWidth, fieldHeight, simulationSpeed, breedingMinAge, breedingMaxAge, fieldDimensions)
                 }
                 this.applyAging(timestamp)
             }
@@ -227,8 +227,8 @@ class Animal extends Entity implements Movable {
         }
     }
 
-    private lookForFoodQT(plants: Plant[]) {
-        const quadtree = new Quadtree({x: 0, y: 0}, Math.max(fieldSize.x, fieldSize.y))
+    private lookForFoodQT(plants: Plant[], fieldSize: FieldDimensions) {
+        const quadtree = new Quadtree({x: 0, y: 0}, Math.max(fieldSize.width, fieldSize.height))
         const foodSenseRange = this.stats.foodSensitivity * simulationValuesMultipliers.foodSensitivity
         const searchObb = new BoundingBox(
             this.position.x - foodSenseRange,
@@ -261,8 +261,8 @@ class Animal extends Entity implements Movable {
         return null
     }
 
-    private lookForPairQT(animals: Animal[], breedingMinAge: number, breedingMaxAge: number) {
-        const quadtree = new Quadtree({x: 0, y: 0}, Math.max(fieldSize.x, fieldSize.y))
+    private lookForPairQT(animals: Animal[], breedingMinAge: number, breedingMaxAge: number, fieldSize: FieldDimensions) {
+        const quadtree = new Quadtree({x: 0, y: 0}, Math.max(fieldSize.width, fieldSize.height))
         const breedingSenseRange = this.stats.breedingSensitivity * simulationValuesMultipliers.breedingSensitivity
         const searchObb = new BoundingBox(
             this.position.x - breedingSenseRange,
@@ -334,7 +334,7 @@ class Animal extends Entity implements Movable {
                 y: nearestFoodPiece.position.y
             }
             const energyAfterFood = this.energy.current + nearestFoodPiece.nutritionValue
-            this.energy.current = 1000000;//Math.min(energyAfterFood, this.energy.max)
+            this.energy.current = Math.min(energyAfterFood, this.energy.max)
             this.lastMealCoordinates = {
                 x: nearestFoodPiece.position.x,
                 y: nearestFoodPiece.position.y
