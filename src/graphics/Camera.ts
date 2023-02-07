@@ -71,7 +71,7 @@ export class Camera {
         this.position.y += Math.max(0, topLeftOffset.y) - Math.max(0, bottomRightOffset.y);
 
         this.scale *= Number((this.fov.x / newFov.x).toFixed(9));
-        this.fov = newFov;
+        this.fov = new Vector2(newFov.x, newFov.y);
     }
 }
 

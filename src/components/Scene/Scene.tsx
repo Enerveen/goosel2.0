@@ -10,7 +10,7 @@ import {
     getRandomPosition
 } from "../../utils/helpers";
 import Renderer from "../../graphics/Renderer";
-import {appPhase, BoundingBox} from "../../types";
+import {appPhase, BoundingBox, Vector2} from "../../types";
 import useWindowSize from "../../hooks/useWindowSize";
 import {fieldSize} from "../../constants/simulation";
 import {Camera} from "../../graphics/Camera";
@@ -34,10 +34,10 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     const {width: canvasWidth, height: canvasHeight} = useWindowSize(store)
     const images = useContext(ImageContext)
     const renderer = useMemo(() => new Renderer(context, images), [context])
-    const mainCamera = useMemo(() => new Camera({x: fieldSize.x / 2, y: fieldSize.y / 2}, {
-        x: fieldSize.x ,
-        y: fieldSize.y
-    }), [fieldSize, canvasWidth, canvasHeight]);
+    const mainCamera = useMemo(() => new Camera({x: fieldSize.x / 2, y: fieldSize.y / 2}, new Vector2(
+        fieldSize.x ,
+        fieldSize.y
+    )), [fieldSize, canvasWidth, canvasHeight]);
 
     const init = useCallback(() => {
         console.log('Simulation has started with the following constants:',

@@ -1,5 +1,6 @@
 import {FieldDimensions, gender, Position, Texture, TextureAtlas} from "../types";
 import {appConstants, fieldSize} from "../constants/simulation";
+import Animal from "../entities/Animal";
 
 
 const loadTexture = (image: HTMLImageElement, params: {width?: number, height?: number, offsetX?: number, offsetY?: number}={}) => {
@@ -105,8 +106,12 @@ class Renderer {
             this.context.save();
 
             // Uncomment to adjust brightness
-            this.context.fillStyle = 'rgba(244, 233, 155, 0.05)';
-            this.context.fillRect(0, 0, fieldSize.x, fieldSize.y)
+            // this.context.fillStyle = 'rgba(100, 100, 150, 1)';
+            // this.context.globalCompositeOperation = 'multiply';
+            // this.context.fillRect(0, 0, fieldSize.x, fieldSize.y)
+            // this.context.fillStyle = 'rgba(100, 100, 255, 0.1)';
+            // this.context.globalCompositeOperation = 'overlay';
+            // this.context.fillRect(0, 0, fieldSize.x, fieldSize.y)
             //
             this.context.globalAlpha = 0.45;
             this.context.globalCompositeOperation = 'source-atop';
