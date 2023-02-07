@@ -6,9 +6,50 @@ export type Position = {
 }
 
 
-export type Vector2 = {
-    x: number,
-    y: number
+export class Vector2 {
+    x: number = 0
+    y: number = 0
+
+
+    constructor(x: number, y: number) {
+        this.x = x;
+        this.y = y;
+    }
+
+
+    normalize() {
+        const norm = this.norm();
+        this.x /= norm;
+        this.y /= norm;
+
+        return this;
+    }
+
+
+    normalized() {
+        return new Vector2(this.x, this.y).normalize();
+    }
+
+
+    clamp(magnitude: number) {
+        const length = this.norm();
+
+        this.normalize();
+        this.x *= Math.min(length, magnitude);
+        this.y *= Math.min(length, magnitude);
+
+        return this;
+    }
+
+
+    clamped(magnitude: number) {
+        return new Vector2(this.x, this.y).clamp(magnitude);
+    }
+
+
+    norm() {
+        return Math.sqrt(this.x ** 2 + this.y ** 2);
+    }
 }
 
 

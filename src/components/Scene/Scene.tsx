@@ -10,7 +10,7 @@ import {
     getRandomPosition
 } from "../../utils/helpers";
 import Renderer from "../../graphics/Renderer";
-import {appPhase, BoundingBox} from "../../types";
+import {appPhase, BoundingBox, Vector2} from "../../types";
 import useWindowSize from "../../hooks/useWindowSize";
 import {Camera} from "../../graphics/Camera";
 import ImageContext from "../../stores/ImageContext";
@@ -36,17 +36,19 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     const images = useContext(ImageContext)
     const renderer = useMemo(() => new Renderer(context, images), [context])
     const mainCamera = useMemo(() => new Camera(
-        {x: store.getSimulationConstants.fieldSize.width / 2,
+        { x: store.getSimulationConstants.fieldSize.width / 2,
             y: store.getSimulationConstants.fieldSize.height / 2
-        }, {
-        x: store.getSimulationConstants.fieldSize.width,
-        y: store.getSimulationConstants.fieldSize.height
-    }), [
-        store.getSimulationConstants.fieldSize.width,
-        store.getSimulationConstants.fieldSize.height,
-        canvasWidth,
-        canvasHeight
-    ]);
+        },
+        new Vector2(
+            store.getSimulationConstants.fieldSize.width,
+            store.getSimulationConstants.fieldSize.height
+        )),
+        [
+            store.getSimulationConstants.fieldSize.width,
+            store.getSimulationConstants.fieldSize.height,
+            canvasWidth,
+            canvasHeight
+        ]);
 
     const boidsSystem = useMemo(() => new BoidsSystem(120, { x: store.getSimulationConstants.fieldSize.width, y: store.getSimulationConstants.fieldSize.height }), [store.getSimulationConstants.fieldSize]);
 
