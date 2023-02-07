@@ -24,15 +24,3 @@ html, body {
 h1 {
     font-size: 50px;
 }
-
-button {
-    color: #222222;
-    background: #fafafa;
-    border-radius: 10px;
-    border: 2px solid #5fa35c;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #e6e6e6
-}

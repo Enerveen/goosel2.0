@@ -1,5 +1,5 @@
-import {FieldDimensions, gender, Position, Texture, TextureAtlas} from "../types";
-import {appConstants, fieldSize} from "../constants/simulation";
+import {FieldDimensions, gender, LogItem, Position, Texture, TextureAtlas} from "../types";
+import {appConstants} from "../constants/simulation";
 import {BoidEntity} from "../entities/BoidEntity";
 
 
@@ -105,7 +105,7 @@ class Renderer {
     }
 
 
-    public drawClouds(timestamp: number) {
+    public drawClouds(timestamp: number, fieldSize: FieldDimensions) {
         if (this.context) {
             const width = 10.0 * this.cloudsTexture.width;
             const height = 10.0 * this.cloudsTexture.height;
@@ -114,7 +114,7 @@ class Renderer {
 
             // Uncomment to adjust brightness
             this.context.fillStyle = 'rgba(244, 233, 155, 0.05)';
-            this.context.fillRect(0, 0, fieldSize.x, fieldSize.y)
+            this.context.fillRect(0, 0, fieldSize.width, fieldSize.height)
             //
             this.context.globalAlpha = 0.45;
             this.context.globalCompositeOperation = 'source-atop';
@@ -247,7 +247,7 @@ class Renderer {
         this.context.textAlign = 'center';
         this.context.font = "bold 18px AmasticBold"
         const styles = [
-            'rgba(0, 0, 0, 1.0)',
+            'rgba(0, 0, 0)',
             `rgba(${gender === 'male' ? '0,180,255' : '255,100,255'},1.0)`
         ]
 
@@ -260,12 +260,29 @@ class Renderer {
             if (this.context) {
                 this.context.fillStyle = style;
                 this.context.fillText(name, textPos.x - originOffset.x + width / 2, textPos.y - originOffset.y - 26)
-                this.context?.fillText(isAlive ? age >= 0 ? `${age} y.o.` : 'Egg' : 'Corpse',
+                this.context.fillText(isAlive ? age >= 0 ? `${age} y.o.` : 'Egg' : 'Corpse',
                     textPos.x - originOffset.x + width / 2, textPos.y - originOffset.y - 6)
             }
         })
         if (currentActivity === 'breeding') {
             this.drawBreeding({x: x + 30 - offsetX * width, y: y - 90})
+        }
+    }
+
+    public drawLogs(timestamp:number, logs: LogItem[]) {
+        if (this.context) {
+            this.context.save()
+            this.context.resetTransform()
+            this.context.font = "bold 24px Amastic"
+            this.context.textAlign = 'left';
+            logs.filter(({timestamp: messageTimestamp}) => timestamp - messageTimestamp < 1300)
+                .reverse()
+                .forEach(({message, timestamp: messageTimestamp}, index) => {
+                    // @ts-ignore
+                    this.context.fillStyle = `rgba(250, 250, 250, ${1 - (timestamp - messageTimestamp - 300) / 1000})`
+                    this.context?.fillText(message, 10,  50 + index * 24)
+                })
+            this.context.restore()
         }
     }
 
