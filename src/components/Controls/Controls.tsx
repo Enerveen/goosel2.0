@@ -1,21 +1,25 @@
 import React, {ChangeEvent, useEffect, useState} from "react";
 import {observer} from "mobx-react-lite";
 import classes from "./Controls.module.scss";
-import {appPhase} from "../../types";
+import {appPhase, SimulationConstants} from "../../types";
 import Animal from "../../entities/Animal";
-import {getRandomInRange} from "../../utils/utils";
 import {getRandomPosition} from "../../utils/helpers";
 import Slider from "../Slider/Slider";
 import Clock from "../Clock/Clock";
-import {fieldSize} from "../../constants/simulation";
+import Button from "../Button/Button";
+import Checkbox from "../Checkbox/Checkbox";
+import simulationStore from "../../stores/simulationStore";
 
 interface IControlsProps {
     simulationSpeed: number
-    setSimulationSpeed: (speed: number) => void,
-    timestamp: number,
+    setSimulationSpeed: (speed: number) => void
+    timestamp: number
     setAppPhase: (state: appPhase) => void
-    addAnimal: (animal: Animal) => void,
+    addAnimal: (animal: Animal) => void
     animalMaxEnergy: number
+    getId: () => () => number
+    logHidden: boolean,
+    simulationConstants: SimulationConstants
 }
 
 const Controls = observer(({
@@ -24,15 +28,19 @@ const Controls = observer(({
                                timestamp,
                                setAppPhase,
                                addAnimal,
-                               animalMaxEnergy
+                               animalMaxEnergy,
+                               getId,
+                               logHidden,
+                               simulationConstants
                            }: IControlsProps) => {
+    const {fieldSize} = simulationConstants
     const [value, setValue] = useState(simulationSpeed)
 
     const createNewAnimal = () => {
         addAnimal(
             new Animal({
-                id: `A${getRandomInRange(1, 10000)}`,
-                position: getRandomPosition(fieldSize.x, fieldSize.y),
+                id: `A${getId()}`,
+                position: getRandomPosition(fieldSize.width, fieldSize.height),
                 age: {current: 0, birthTimestamp: timestamp, deathTimestamp: undefined},
                 energy: {current: animalMaxEnergy, max: animalMaxEnergy, breedingCD: 0}
             })
@@ -57,12 +65,17 @@ const Controls = observer(({
             />
         </div>
         <div>
-            <button onClick={createNewAnimal}>
+            <Button className={classes.button} onClick={createNewAnimal}>
                 Goose!
-            </button>
-            <button onClick={() => setAppPhase('FINISHED')}>
+            </Button>
+            <Button className={classes.button} onClick={() => setAppPhase('FINISHED')}>
                 Fin
-            </button>
+            </Button>
+            <Checkbox
+                label={'Hide logs'}
+                onChange={simulationStore.toggleLogHidden}
+                checked={logHidden}
+            />
         </div>
     </div>
 })
