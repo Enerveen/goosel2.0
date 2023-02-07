@@ -119,7 +119,7 @@ class Renderer {
             // this.context.globalCompositeOperation = 'overlay';
             // this.context.fillRect(0, 0, fieldSize.x, fieldSize.y)
             //
-            this.context.globalAlpha = 0.45;
+            this.context.globalAlpha = 0.25;
             this.context.globalCompositeOperation = 'source-atop';
             this.context.drawImage(this.cloudsTexture.image,
                 -500 - height / 4 * (0.5 * Math.cos(0.0002 * timestamp) + 0.5),
