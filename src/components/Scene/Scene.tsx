@@ -48,7 +48,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         canvasHeight
     ]);
 
-    const boidsSystem = useMemo(() => new BoidsSystem(120, fieldSize), [fieldSize]);
+    const boidsSystem = useMemo(() => new BoidsSystem(120, { x: store.getSimulationConstants.fieldSize.width, y: store.getSimulationConstants.fieldSize.height }), [store.getSimulationConstants.fieldSize]);
 
     const init = useCallback(() => {
         console.log('Simulation has started with the following constants:',
