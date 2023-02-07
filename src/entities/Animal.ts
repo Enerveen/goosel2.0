@@ -213,12 +213,12 @@ class Animal extends Entity implements Movable {
                     if (nearestFoodPiece) {
                         this.reachFood(nearestFoodPiece, removePlant, simulationSpeed)
                     } else {
-                        this.walk(fieldWidth, fieldHeight, simulationSpeed, breedingMinAge, breedingMaxAge, fieldDimensions)
+                        this.walk(fieldWidth, fieldHeight, simulationSpeed, breedingMinAge, breedingMaxAge)
                     }
                     return;
                 }
                 if (this.currentActivity.activity === 'walking') {
-                    this.walk(fieldWidth, fieldHeight, simulationSpeed, breedingMinAge, breedingMaxAge, fieldDimensions)
+                    this.walk(fieldWidth, fieldHeight, simulationSpeed, breedingMinAge, breedingMaxAge)
                 }
                 this.applyAging(timestamp)
             }

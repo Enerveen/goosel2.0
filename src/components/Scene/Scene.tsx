@@ -34,17 +34,19 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     const images = useContext(ImageContext)
     const renderer = useMemo(() => new Renderer(context, images), [context])
     const mainCamera = useMemo(() => new Camera(
-        {x: store.getSimulationConstants.fieldSize.width / 2,
+        { x: store.getSimulationConstants.fieldSize.width / 2,
             y: store.getSimulationConstants.fieldSize.height / 2
-        }, {
-        x: store.getSimulationConstants.fieldSize.width,
-        y: store.getSimulationConstants.fieldSize.height
-    }), [
-        store.getSimulationConstants.fieldSize.width,
-        store.getSimulationConstants.fieldSize.height,
-        canvasWidth,
-        canvasHeight
-    ]);
+        },
+        new Vector2(
+            store.getSimulationConstants.fieldSize.width,
+            store.getSimulationConstants.fieldSize.height
+        )),
+        [
+            store.getSimulationConstants.fieldSize.width,
+            store.getSimulationConstants.fieldSize.height,
+            canvasWidth,
+            canvasHeight
+        ]);
 
     const init = useCallback(() => {
         console.log('Simulation has started with the following constants:',
