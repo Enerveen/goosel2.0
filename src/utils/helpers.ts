@@ -23,7 +23,8 @@ export const getChild = (
     parents: { mother: Animal, father: Animal },
     id: string,
     breedingMaxProgress: number,
-    animalMaxEnergy: number
+    animalMaxEnergy: number,
+    mutationChance: number
 ) => {
     const {mother, father} = parents
     const statsDelta = Math.random() * 0.3
@@ -37,17 +38,17 @@ export const getChild = (
     const gender: gender = coinFlip() ? 'male' : 'female'
 
     const stats = {
-        speed: Math.max(0.1, +((rollNPercentChance(0.2) ? baseStats.speed : coinFlip() ? baseStats.speed + statsDelta : baseStats.speed - statsDelta).toFixed(3))),
-        foodSensitivity: Math.max(0.1, +((rollNPercentChance(0.2) ? baseStats.foodSensitivity : coinFlip() ? baseStats.foodSensitivity + statsDelta : baseStats.foodSensitivity - statsDelta).toFixed(3))),
-        breedingSensitivity: Math.max(0.1, +((rollNPercentChance(0.2) ? baseStats.breedingSensitivity : coinFlip() ? baseStats.breedingSensitivity + statsDelta : baseStats.breedingSensitivity - statsDelta).toFixed(3))),
-        breedingCD: Math.max(0.1, +((rollNPercentChance(0.2) ? baseStats.breedingCD : coinFlip() ? baseStats.breedingCD + statsDelta : baseStats.breedingCD - statsDelta).toFixed(3))),
-        hatchingTime: Math.max(0.1, +((rollNPercentChance(0.2) ? baseStats.hatchingTime : coinFlip() ? baseStats.hatchingTime + statsDelta : baseStats.hatchingTime - statsDelta).toFixed(3)))
+        speed: Math.max(0.1, +((rollNPercentChance(mutationChance) ? baseStats.speed : coinFlip() ? baseStats.speed + statsDelta : baseStats.speed - statsDelta).toFixed(3))),
+        foodSensitivity: Math.max(0.1, +((rollNPercentChance(mutationChance) ? baseStats.foodSensitivity : coinFlip() ? baseStats.foodSensitivity + statsDelta : baseStats.foodSensitivity - statsDelta).toFixed(3))),
+        breedingSensitivity: Math.max(0.1, +((rollNPercentChance(mutationChance) ? baseStats.breedingSensitivity : coinFlip() ? baseStats.breedingSensitivity + statsDelta : baseStats.breedingSensitivity - statsDelta).toFixed(3))),
+        breedingCD: Math.max(0.1, +((rollNPercentChance(mutationChance) ? baseStats.breedingCD : coinFlip() ? baseStats.breedingCD + statsDelta : baseStats.breedingCD - statsDelta).toFixed(3))),
+        hatchingTime: Math.max(0.1, +((rollNPercentChance(mutationChance) ? baseStats.hatchingTime : coinFlip() ? baseStats.hatchingTime + statsDelta : baseStats.hatchingTime - statsDelta).toFixed(3)))
     }
 
     const genes = {
-        gay: rollNPercentChance(0.1),
-        scavenger: rollNPercentChance(0.1) ? !(mother.genes.scavenger || father.genes.scavenger) : (mother.genes.scavenger || father.genes.scavenger),
-        predator: rollNPercentChance(0.1) ? !(mother.genes.predator || father.genes.predator) : (mother.genes.predator || father.genes.predator)
+        gay: rollNPercentChance(mutationChance / 2),
+        scavenger: rollNPercentChance(mutationChance / 2) ? !(mother.genes.scavenger || father.genes.scavenger) : (mother.genes.scavenger || father.genes.scavenger),
+        predator: rollNPercentChance(mutationChance / 2) ? !(mother.genes.predator || father.genes.predator) : (mother.genes.predator || father.genes.predator)
     }
     return new Animal({
         id,

@@ -99,7 +99,8 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             store.getSimulationConstants.breedingMinAge,
             store.getSimulationConstants.breedingMaxAge,
             store.getSimulationConstants.breedingMaxProgress,
-            store.getId
+            store.getId,
+            store.getSimulationConstants.mutationChance
         ))
     }, [context, canvasWidth, canvasHeight])
 

@@ -136,7 +136,8 @@ class Animal extends Entity {
         breedingMinAge: number,
         breedingMaxAge: number,
         breedingMaxProgress: number,
-        getId: () => number
+        getId: () => number,
+        mutationChance: number
     ) {
         if (this.age.current >= 0) {
             const {width: fieldWidth, height: fieldHeight} = fieldDimensions
@@ -154,7 +155,7 @@ class Animal extends Entity {
                     this.energy.breedingCD -= simulationSpeed
                 }
                 if (this.currentActivity.activity === 'breeding' && this.currentActivity.partner?.isAlive) {
-                    this.breed(this.currentActivity.partner, addAnimal, timestamp, simulationSpeed, breedingMaxProgress, getId)
+                    this.breed(this.currentActivity.partner, addAnimal, timestamp, simulationSpeed, breedingMaxProgress, getId, mutationChance)
                 } else {
                     this.currentActivity = {
                         activity: "walking",
@@ -322,7 +323,8 @@ class Animal extends Entity {
         timestamp: number,
         simulationSpeed: number,
         breedingMaxProgress: number,
-        getId: () => number
+        getId: () => number,
+        mutationChance: number
     ) {
         const {progress, maxProgress} = this.currentActivity
         this.energy.current -= +((simulationSpeed * calculateEnergyLoss(this.stats)).toFixed(3));
@@ -335,7 +337,8 @@ class Animal extends Entity {
                     {father, mother},
                     `A${getId()}`,
                     breedingMaxProgress,
-                    this.energy.max
+                    this.energy.max,
+                    mutationChance
                 )
                 addAnimal(child)
             }

@@ -100,6 +100,7 @@ export type gender = 'male' | 'female'
 export type appPhase = 'NOT_STARTED' | 'STARTED' | 'FINISHED'
 
 export type SimulationConstants = {
+    mutationChance: number
     breedingMinAge: number,
     breedingMaxAge: number,
     breedingMaxProgress: number,

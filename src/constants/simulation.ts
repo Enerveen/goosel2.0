@@ -1,3 +1,5 @@
+import {SimulationConstants} from "../types";
+
 export const simulationValuesMultipliers = {
     foodSensitivity: 200,
     breedingCD: 1000,
@@ -18,7 +20,8 @@ export const appConstants = {
     version: '0.0.1'
 }
 
-export const defaultSimConstants = {
+export const defaultSimConstants:SimulationConstants = {
+    mutationChance: 0.2,
     breedingMinAge: 5,
     breedingMaxAge: 15,
     foodNutritionMin: 300,
