@@ -1,6 +1,6 @@
 import {FieldDimensions, gender, Position, Stats} from "../types";
 import Animal from "../entities/Animal";
-import {coinFlip, getRandomInRange, rollFivePercentChance} from "./utils";
+import {coinFlip, getRandomInRange, rollNPercentChance} from "./utils";
 import {generateAnimalFirstName} from "./nameGen";
 import {simulationValuesMultipliers} from "../constants/simulation";
 import Plant from "../entities/Plant";
@@ -37,16 +37,23 @@ export const getChild = (
     const gender: gender = coinFlip() ? 'male' : 'female'
 
     const stats = {
-        speed: Math.max(0.1, +((rollFivePercentChance() ? baseStats.speed : coinFlip() ? baseStats.speed + statsDelta : baseStats.speed - statsDelta).toFixed(3))),
-        foodSensitivity: Math.max(0.1, +((rollFivePercentChance() ? baseStats.foodSensitivity : coinFlip() ? baseStats.foodSensitivity + statsDelta : baseStats.foodSensitivity - statsDelta).toFixed(3))),
-        breedingSensitivity: Math.max(0.1, +((rollFivePercentChance() ? baseStats.breedingSensitivity : coinFlip() ? baseStats.breedingSensitivity + statsDelta : baseStats.breedingSensitivity - statsDelta).toFixed(3))),
-        breedingCD: Math.max(0.1, +((rollFivePercentChance() ? baseStats.breedingCD : coinFlip() ? baseStats.breedingCD + statsDelta : baseStats.breedingCD - statsDelta).toFixed(3))),
-        hatchingTime: Math.max(0.1, +((rollFivePercentChance() ? baseStats.hatchingTime : coinFlip() ? baseStats.hatchingTime + statsDelta : baseStats.hatchingTime - statsDelta).toFixed(3)))
+        speed: Math.max(0.1, +((rollNPercentChance(0.2) ? baseStats.speed : coinFlip() ? baseStats.speed + statsDelta : baseStats.speed - statsDelta).toFixed(3))),
+        foodSensitivity: Math.max(0.1, +((rollNPercentChance(0.2) ? baseStats.foodSensitivity : coinFlip() ? baseStats.foodSensitivity + statsDelta : baseStats.foodSensitivity - statsDelta).toFixed(3))),
+        breedingSensitivity: Math.max(0.1, +((rollNPercentChance(0.2) ? baseStats.breedingSensitivity : coinFlip() ? baseStats.breedingSensitivity + statsDelta : baseStats.breedingSensitivity - statsDelta).toFixed(3))),
+        breedingCD: Math.max(0.1, +((rollNPercentChance(0.2) ? baseStats.breedingCD : coinFlip() ? baseStats.breedingCD + statsDelta : baseStats.breedingCD - statsDelta).toFixed(3))),
+        hatchingTime: Math.max(0.1, +((rollNPercentChance(0.2) ? baseStats.hatchingTime : coinFlip() ? baseStats.hatchingTime + statsDelta : baseStats.hatchingTime - statsDelta).toFixed(3)))
+    }
+
+    const genes = {
+        gay: rollNPercentChance(0.1),
+        scavenger: rollNPercentChance(0.1) ? !(mother.genes.scavenger || father.genes.scavenger) : (mother.genes.scavenger || father.genes.scavenger),
+        predator: rollNPercentChance(0.1) ? !(mother.genes.predator || father.genes.predator) : (mother.genes.predator || father.genes.predator)
     }
     return new Animal({
         id,
         parents,
         gender,
+        genes,
         name: `${generateAnimalFirstName(gender)} ${father.name.split(' ').slice(1).join(' ')}`,
         position: mother.position,
         energy: {

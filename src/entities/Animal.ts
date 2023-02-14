@@ -1,5 +1,5 @@
 import Entity from "./Entity";
-import {Activity, Age, BoundingBox, Energy, FieldDimensions, gender, Position, Stats} from "../types";
+import {Activity, Age, BoundingBox, Energy, FieldDimensions, gender, Genes, Position, Stats} from "../types";
 import {coinFlip} from "../utils/utils";
 import Plant from "./Plant";
 import {generateAnimalName} from "../utils/nameGen";
@@ -23,6 +23,7 @@ interface IAnimalProps {
     energy: Energy
     isAlive?: boolean,
     stats?: Stats,
+    genes?: Genes
     parents?: {
         mother: Animal,
         father: Animal
@@ -36,6 +37,7 @@ class Animal extends Entity {
     isOnWalkTarget: boolean
     gender: gender
     stats: Stats
+    genes: Genes
     age: Age
     energy: Energy
     isAlive: boolean
@@ -57,7 +59,8 @@ class Animal extends Entity {
             isAlive = true,
             name,
             stats = {foodSensitivity: 1, speed: 1, breedingCD: 1, hatchingTime: 1, breedingSensitivity: 1},
-            parents = null
+            parents = null,
+            genes = {gay: false, predator: false, scavenger: false}
         } = props
 
         super(position);
@@ -70,6 +73,7 @@ class Animal extends Entity {
         this.gender = gender
         this.isAlive = isAlive
         this.stats = stats
+        this.genes = genes
         this.id = id
         this.name = name || generateAnimalName(gender)
         this.currentActivity = {activity: "walking", progress: 0, maxProgress: 0}
@@ -238,7 +242,7 @@ class Animal extends Entity {
         const nearestPair = [...animals].filter(animal =>
             animal.id !== this.id &&
             checkBreedingPossibility(animal, breedingMinAge, breedingMaxAge) &&
-            animal.gender !== this.gender &&
+            (this.genes.gay ? animal.gender === this.gender && animal.genes.gay : animal.gender !== this.gender) &&
             animal.isAlive)
             .sort((a, b) => {
                 const distanceToA = findDistance(this.position, a.position)
@@ -323,16 +327,18 @@ class Animal extends Entity {
         const {progress, maxProgress} = this.currentActivity
         this.energy.current -= +((simulationSpeed * calculateEnergyLoss(this.stats)).toFixed(3));
         if (progress >= maxProgress) {
-            const father = this.gender === 'male' ? this : partner
-            const mother = this.gender === 'female' ? this : partner
-            const child = getChild(
-                timestamp,
-                {father, mother},
-                `A${getId()}`,
-                breedingMaxProgress,
-                this.energy.max
-            )
-            addAnimal(child)
+            if (!this.genes.gay) {
+                const father = this.gender === 'male' ? this : partner
+                const mother = this.gender === 'female' ? this : partner
+                const child = getChild(
+                    timestamp,
+                    {father, mother},
+                    `A${getId()}`,
+                    breedingMaxProgress,
+                    this.energy.max
+                )
+                addAnimal(child)
+            }
             this.currentActivity = {
                 activity: 'walking',
                 progress: 0,

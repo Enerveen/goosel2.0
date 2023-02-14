@@ -116,3 +116,9 @@ export type LogItem = {
     message: string,
     timestamp: number
 }
+
+export type Genes = {
+    gay: boolean,
+    scavenger: boolean,
+    predator: boolean
+}
