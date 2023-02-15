@@ -1,5 +1,5 @@
 import Entity from "./Entity";
-import {Activity, Age, BoundingBox, Energy, FieldDimensions, gender, Genes, Position, Stats} from "../types";
+import {Activity, Age, BoundingBox, Energy, gender, Genes, Position, Stats} from "../types";
 import {coinFlip} from "../utils/utils";
 import Plant from "./Plant";
 import {generateAnimalName} from "../utils/nameGen";
@@ -11,8 +11,8 @@ import {
     getRandomPosition, getRandomPositionInRect
 } from "../utils/helpers";
 import {timeConstants, simulationValuesMultipliers} from "../constants/simulation";
-import simulationStore from "../stores/simulationStore";
 import {Quadtree} from "../dataStructures/quadtree";
+import store from "../stores/simulationStore";
 
 interface IAnimalProps {
     id: string
@@ -80,7 +80,7 @@ class Animal extends Entity {
         this.lastMealCoordinates = null
         this.lastBreedingCoordinates = null
 
-        simulationStore.addLogItem({
+        store.addLogItem({
             message: `${this.name} arrived!`,
             timestamp: parents ?
                 age.birthTimestamp - stats.hatchingTime * simulationValuesMultipliers.hatchingTime : age.birthTimestamp
@@ -91,17 +91,20 @@ class Animal extends Entity {
         this.position = position
     }
 
-    private headTo(targetPosition: Position, simulationSpeed: number) {
+    private headTo(targetPosition: Position) {
+        const simulationSpeed = store.getSimulationSpeed
         const distance = findDistance(this.position, targetPosition)
         const deltaX = this.position.x + (targetPosition.x - this.position.x) * this.stats.speed * simulationSpeed / distance;
         const deltaY = this.position.y + (targetPosition.y - this.position.y) * this.stats.speed * simulationSpeed / distance;
         this.moveTo({x: deltaX, y: deltaY})
     }
 
-    private walk(edgeX: number, edgeY: number, simulationSpeed: number, breedingMinAge: number, breedingMaxAge: number, fieldSize: FieldDimensions) {
+    private walk(demo: boolean) {
+        const fieldSize = demo ? store.getWindowSize : store.getSimulationConstants.fieldSize
+        const simulationSpeed = store.getSimulationSpeed
         if (this.isOnWalkTarget) {
             this.isOnWalkTarget = false;
-            if (checkBreedingPossibility(this, breedingMinAge, breedingMaxAge) && this.lastBreedingCoordinates) {
+            if (checkBreedingPossibility(this) && this.lastBreedingCoordinates) {
                 this.walkDestination = getRandomPositionInRect(
                     this.lastBreedingCoordinates,
                     this.stats.breedingSensitivity * simulationValuesMultipliers.breedingSensitivity * 2,
@@ -117,34 +120,24 @@ class Animal extends Entity {
                 )
                 return;
             }
-            this.walkDestination = getRandomPosition(edgeX, edgeY)
+            this.walkDestination = getRandomPosition(fieldSize.width, fieldSize.height)
         }
-        this.headTo(this.walkDestination, simulationSpeed);
+        this.headTo(this.walkDestination);
         if (findDistance(this.position, this.walkDestination) < 3 * simulationSpeed * this.stats.speed) {
             this.isOnWalkTarget = true;
         }
     }
 
-    public live(
-        timestamp: number,
-        plants: Plant[],
-        animals: Animal[],
-        removePlant: (idToRemove: string) => void,
-        addAnimal: (animal: Animal) => void,
-        fieldDimensions: FieldDimensions,
-        simulationSpeed: number,
-        breedingMinAge: number,
-        breedingMaxAge: number,
-        breedingMaxProgress: number,
-        getId: () => number,
-        mutationChance: number
-    ) {
+    public live(demo: boolean = false) {
+        const timestamp = store.getTimestamp
+        const simulationSpeed = store.getSimulationSpeed
+        const {addLogItem} = store
+
         if (this.age.current >= 0) {
-            const {width: fieldWidth, height: fieldHeight} = fieldDimensions
             if (this.energy.current <= 1 && this.isAlive) {
                 this.energy.current = 0
                 this.die(timestamp)
-                simulationStore.addLogItem({
+                addLogItem({
                     message: `${this.name} died from malnutrition. That is so sad, can we hit ${this.age.current} like${this.age.current % 10 === 1 && this.age.current !== 11 ? '' : 's'}?`,
                     timestamp
                 })
@@ -155,7 +148,7 @@ class Animal extends Entity {
                     this.energy.breedingCD -= simulationSpeed
                 }
                 if (this.currentActivity.activity === 'breeding' && this.currentActivity.partner?.isAlive) {
-                    this.breed(this.currentActivity.partner, addAnimal, timestamp, simulationSpeed, breedingMaxProgress, getId, mutationChance)
+                    this.breed(this.currentActivity.partner)
                 } else {
                     this.currentActivity = {
                         activity: "walking",
@@ -163,33 +156,35 @@ class Animal extends Entity {
                         maxProgress: 0
                     }
                 }
-                if (checkBreedingPossibility(this, breedingMinAge, breedingMaxAge)) {
-                    const partner = this.lookForPairQT(animals, breedingMinAge, breedingMaxAge, fieldDimensions)
+                if (checkBreedingPossibility(this)) {
+                    const partner = this.lookForPairQT()
                     if (partner) {
-                        this.reachBreedingPartner(partner, simulationSpeed, breedingMaxProgress)
+                        this.reachBreedingPartner(partner)
                         return
                     }
                 }
                 if (this.energy.current < this.energy.max * 0.75 && this.currentActivity.activity === 'walking') {
-                    const nearestFoodPiece = this.lookForFoodQT(plants, fieldDimensions)
+                    const nearestFoodPiece = this.lookForFoodQT()
                     if (nearestFoodPiece) {
-                        this.reachFood(nearestFoodPiece, removePlant, simulationSpeed)
+                        this.reachFood(nearestFoodPiece)
                     } else {
-                        this.walk(fieldWidth, fieldHeight, simulationSpeed, breedingMinAge, breedingMaxAge, fieldDimensions)
+                        this.walk(demo)
                     }
                     return;
                 }
                 if (this.currentActivity.activity === 'walking') {
-                    this.walk(fieldWidth, fieldHeight, simulationSpeed, breedingMinAge, breedingMaxAge, fieldDimensions)
+                    this.walk(demo)
                 }
-                this.applyAging(timestamp)
+                this.applyAging()
             }
         } else if (timestamp >= this.age.birthTimestamp) {
             this.age.current = 0
         }
     }
 
-    private lookForFoodQT(plants: Plant[], fieldSize: FieldDimensions) {
+    private lookForFoodQT() {
+        const plants = store.getPlants as Plant[]
+        const {fieldSize} = store.getSimulationConstants
         const quadtree = new Quadtree({x: 0, y: 0}, Math.max(fieldSize.width, fieldSize.height))
         const foodSenseRange = this.stats.foodSensitivity * simulationValuesMultipliers.foodSensitivity
         const searchObb = new BoundingBox(
@@ -223,7 +218,9 @@ class Animal extends Entity {
         return null
     }
 
-    private lookForPairQT(animals: Animal[], breedingMinAge: number, breedingMaxAge: number, fieldSize: FieldDimensions) {
+    private lookForPairQT() {
+        const animals = store.getAnimals as Animal[]
+        const { fieldSize } = store.getSimulationConstants
         const quadtree = new Quadtree({x: 0, y: 0}, Math.max(fieldSize.width, fieldSize.height))
         const breedingSenseRange = this.stats.breedingSensitivity * simulationValuesMultipliers.breedingSensitivity
         const searchObb = new BoundingBox(
@@ -236,13 +233,13 @@ class Animal extends Entity {
             quadtree.push(animal);
         })
         const possiblePairs = quadtree.get(searchObb)
-        return this.lookForPair(possiblePairs as Animal[], breedingMinAge, breedingMaxAge)
+        return this.lookForPair(possiblePairs as Animal[])
     }
 
-    private lookForPair(animals: Animal[], breedingMinAge: number, breedingMaxAge: number) {
+    private lookForPair(animals: Animal[]) {
         const nearestPair = [...animals].filter(animal =>
             animal.id !== this.id &&
-            checkBreedingPossibility(animal, breedingMinAge, breedingMaxAge) &&
+            checkBreedingPossibility(animal) &&
             (this.genes.gay ? animal.gender === this.gender && animal.genes.gay : animal.gender !== this.gender) &&
             animal.isAlive)
             .sort((a, b) => {
@@ -262,7 +259,8 @@ class Animal extends Entity {
         return null
     }
 
-    private applyAging(timestamp: number) {
+    private applyAging() {
+        const timestamp = store.getTimestamp
         if (this.age.current >= 0) {
             const isBirthday: boolean = Math.floor((timestamp - this.age.birthTimestamp) / timeConstants.yearLength) > this.age.current
             if (isBirthday) {
@@ -271,7 +269,7 @@ class Animal extends Entity {
                     const isDead = (Math.random() * this.age.current) > 15
                     if (isDead) {
                         this.die(timestamp)
-                        simulationStore.addLogItem({
+                        store.addLogItem({
                             message: `${this.name} died from aging. RIP legend`,
                             timestamp
                         })
@@ -281,7 +279,9 @@ class Animal extends Entity {
         }
     }
 
-    private reachFood(nearestFoodPiece: Plant, removePlant: (id: string) => void, simulationSpeed: number) {
+    private reachFood(nearestFoodPiece: Plant) {
+        const simulationSpeed = store.getSimulationSpeed
+        const {removePlant} = store
         if (findDistance(nearestFoodPiece.position, this.position) < 3 * simulationSpeed * this.stats.speed) {
             this.position = nearestFoodPiece.position
             const energyAfterFood = this.energy.current + nearestFoodPiece.nutritionValue
@@ -289,11 +289,13 @@ class Animal extends Entity {
             this.lastMealCoordinates = nearestFoodPiece.position
             removePlant(nearestFoodPiece.id)
         } else {
-            this.headTo(nearestFoodPiece.position, simulationSpeed)
+            this.headTo(nearestFoodPiece.position)
         }
     }
 
-    private reachBreedingPartner(partner: Animal, simulationSpeed: number, breedingMaxProgress: number) {
+    private reachBreedingPartner(partner: Animal) {
+        const simulationSpeed = store.getSimulationSpeed
+        const {breedingMaxProgress} = store.getSimulationConstants
         if (findDistance(partner.position, this.position) < 3 * simulationSpeed * this.stats.speed) {
             this.currentActivity = {
                 activity: "breeding",
@@ -308,7 +310,7 @@ class Animal extends Entity {
                 partner: this
             }
         } else {
-            this.headTo(partner.position, simulationSpeed)
+            this.headTo({x: partner.position.x, y: partner.position.y})
         }
     }
 
@@ -317,29 +319,16 @@ class Animal extends Entity {
         this.age.deathTimestamp = timestamp
     }
 
-    private breed(
-        partner: Animal,
-        addAnimal: (animal: Animal) => void,
-        timestamp: number,
-        simulationSpeed: number,
-        breedingMaxProgress: number,
-        getId: () => number,
-        mutationChance: number
-    ) {
+    private breed(partner: Animal) {
+        const simulationSpeed = store.getSimulationSpeed
+        const {addAnimal} = store
         const {progress, maxProgress} = this.currentActivity
         this.energy.current -= +((simulationSpeed * calculateEnergyLoss(this.stats)).toFixed(3));
         if (progress >= maxProgress) {
             if (!this.genes.gay) {
                 const father = this.gender === 'male' ? this : partner
                 const mother = this.gender === 'female' ? this : partner
-                const child = getChild(
-                    timestamp,
-                    {father, mother},
-                    `A${getId()}`,
-                    breedingMaxProgress,
-                    this.energy.max,
-                    mutationChance
-                )
+                const child = getChild({father, mother})
                 addAnimal(child)
             }
             this.currentActivity = {

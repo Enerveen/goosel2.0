@@ -1,5 +1,6 @@
-import {FieldDimensions, gender, LogItem, Position, Texture, TextureAtlas} from "../types";
+import {FieldDimensions, gender, Position, Texture, TextureAtlas} from "../types";
 import {appConstants} from "../constants/simulation";
+import simulationStore from "../stores/simulationStore";
 
 
 const loadTexture = (image: HTMLImageElement, params: {width?: number, height?: number, offsetX?: number, offsetY?: number}={}) => {
@@ -97,7 +98,9 @@ class Renderer {
     }
 
 
-    public drawClouds(timestamp: number, fieldSize: FieldDimensions) {
+    public drawClouds() {
+        const timestamp = simulationStore.getTimestamp
+        const {fieldSize: {width: fieldWidth, height: fieldHeight}} = simulationStore.getSimulationConstants
         if (this.context) {
             const width = 10.0 * this.cloudsTexture.width;
             const height = 10.0 * this.cloudsTexture.height;
@@ -106,7 +109,7 @@ class Renderer {
 
             // Uncomment to adjust brightness
             this.context.fillStyle = 'rgba(244, 233, 155, 0.05)';
-            this.context.fillRect(0, 0, fieldSize.width, fieldSize.height)
+            this.context.fillRect(0, 0, fieldWidth, fieldHeight)
             //
             this.context.globalAlpha = 0.45;
             this.context.globalCompositeOperation = 'source-atop';
@@ -129,9 +132,9 @@ class Renderer {
 
     public drawAnimal(
         position: Position,
-        animationFrameId: number,
-        entity: { gender: gender, name: string, isAlive: boolean, age: number, currentActivity: string }) {
+        entity: { gender: gender, name: string, isAlive: boolean, age: number, currentActivity: string, birthTimestamp: number }) {
         if (this.context) {
+            const animationFrameId = simulationStore.getTimestamp - entity.birthTimestamp
             const [{image, width, height, frameWidth, frameHeight, offsetX, offsetY}, {x, y}]
                 = [this.calculateAnimalTexture(entity), position]
 
@@ -186,7 +189,9 @@ class Renderer {
         }
     }
 
-    public drawLogs(timestamp:number, logs: LogItem[]) {
+    public drawLogs() {
+        const timestamp = simulationStore.getTimestamp
+        const logs = simulationStore.getLog
         if (this.context) {
             this.context.save()
             this.context.resetTransform()

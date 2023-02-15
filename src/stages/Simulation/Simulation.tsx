@@ -1,7 +1,6 @@
 import React, {useCallback, useState} from "react";
 import classes from './Simulation.module.scss'
-import simulationStore, {SimulationStore} from "../../stores/simulationStore";
-import {observer} from "mobx-react-lite";
+import simulationStore from "../../stores/simulationStore";
 import Scene from "../../components/Scene/Scene";
 import {clsSum} from "../../utils/utils";
 import Menu from "../../icons/Menu";
@@ -11,11 +10,10 @@ import ActiveEntityInfo from "../../components/ActiveEntityInfo/ActiveEntityInfo
 import {appPhase} from "../../types";
 
 interface ISimulationProps {
-    store: SimulationStore
     setAppPhase: (phase: appPhase) => void
 }
 
-const Simulation = observer(({store, setAppPhase}: ISimulationProps) => {
+const Simulation = ({setAppPhase}: ISimulationProps) => {
     const [drawerOpen, setDrawerOpen] = useState(false)
     const onDrawerClose = useCallback(() => {
         setDrawerOpen(false)
@@ -32,24 +30,11 @@ const Simulation = observer(({store, setAppPhase}: ISimulationProps) => {
         </div>
         <Drawer open={drawerOpen} onClose={onDrawerClose}>
             <div className={classes.aside}>
-                <Controls
-                    getId={() => store.getId}
-                    simulationSpeed={store.simulationSpeed}
-                    setSimulationSpeed={store.setSimulationSpeed}
-                    timestamp={store.getTimestamp}
-                    setAppPhase={setAppPhase}
-                    addAnimal={store.addAnimal}
-                    animalMaxEnergy={store.getSimulationConstants.animalMaxEnergy}
-                    logHidden={store.getLogHidden}
-                    simulationConstants={store.getSimulationConstants}
-                />
+                <Controls setAppPhase={setAppPhase}/>
             </div>
         </Drawer>
-        <ActiveEntityInfo
-            activeEntity={store.getActiveEntity}
-            energy={store.getActiveEntity?.energy.current}
-        />
+        <ActiveEntityInfo/>
     </div>
-})
+}
 
 export default Simulation

@@ -12,7 +12,7 @@ export class SimulationStore {
     windowSize: FieldDimensions = {width:0, height: 0}
     timestamp: number = 0
     idCounter: number = 0
-    simulationSpeed: number = 10
+    simulationSpeed: number = 2
     currentYear: number = -1
     statistics: {
         age: { child: number, teen: number, mature: number, elder: number, year: number }[],
@@ -48,6 +48,7 @@ export class SimulationStore {
             getPlants: computed,
             getSimulationSpeed: computed,
             getActiveEntity: computed,
+            getActiveEntityEnergy: computed,
             getId: action,
             getTimestamp: computed,
             getCurrentYear: computed,
@@ -83,6 +84,10 @@ export class SimulationStore {
 
     get getActiveEntity() {
         return this.activeEntity
+    }
+
+    get getActiveEntityEnergy() {
+        return this.activeEntity?.energy.current
     }
 
     get getTimestamp() {
