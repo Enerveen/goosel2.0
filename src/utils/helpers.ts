@@ -54,7 +54,7 @@ export const getChild = (
         gender,
         genes,
         name: `${generateAnimalFirstName(gender)} ${father.name.split(' ').slice(1).join(' ')}`,
-        position: mother.position,
+        position: { x: mother.position.x, y: mother.position.y },
         energy: {
             current: (calculateEnergyLoss(father.stats) + calculateEnergyLoss(mother.stats)) * breedingMaxProgress * 0.8,
             max: animalMaxEnergy,

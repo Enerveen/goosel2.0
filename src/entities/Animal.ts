@@ -1,5 +1,5 @@
 import Entity from "./Entity";
-import {Activity, Age, BoundingBox, Energy, gender, Genes, Position, Stats} from "../types";
+import {Activity, Age, BoundingBox, Energy, gender, Genes, Vector2, Position, Stats} from "../types";
 import {coinFlip} from "../utils/utils";
 import Plant from "./Plant";
 import {generateAnimalName} from "../utils/nameGen";
@@ -13,6 +13,7 @@ import {
 import {timeConstants, simulationValuesMultipliers} from "../constants/simulation";
 import {Quadtree} from "../dataStructures/quadtree";
 import store from "../stores/simulationStore";
+import {Movable} from "./Movable";
 
 interface IAnimalProps {
     id: string
@@ -30,11 +31,16 @@ interface IAnimalProps {
     } | null
 }
 
-class Animal extends Entity {
+class Animal extends Entity implements Movable {
+
+    steerFactor: number = 0.02
+    maxVelocity: number
+    speed: Vector2 = new Vector2(0, 0)
+    targetDirection: Vector2 = new Vector2(0, 0)
+
+
     id: string
     name: string
-    walkDestination: Position
-    isOnWalkTarget: boolean
     gender: gender
     stats: Stats
     genes: Genes
@@ -68,8 +74,6 @@ class Animal extends Entity {
         this.parents = parents
         this.age = age
         this.energy = energy
-        this.isOnWalkTarget = false
-        this.walkDestination = {x: position.x + 10, y: position.y + 10}
         this.gender = gender
         this.isAlive = isAlive
         this.stats = stats
@@ -85,50 +89,132 @@ class Animal extends Entity {
             timestamp: parents ?
                 age.birthTimestamp - stats.hatchingTime * simulationValuesMultipliers.hatchingTime : age.birthTimestamp
         })
+
+        this.maxVelocity = this.stats.speed;
     }
+
+
+    update(elapsedTime: number) {
+        this.targetDirection.normalize();
+
+        const desiredDirection = new Vector2(
+            this.targetDirection.x * this.maxVelocity,
+            this.targetDirection.y * this.maxVelocity
+        );
+        const steeringDirection = new Vector2(
+            (desiredDirection.x - this.speed.x) * this.steerFactor,
+            (desiredDirection.y - this.speed.y) * this.steerFactor
+        ).clamped(this.steerFactor);
+
+        this.speed = new Vector2(
+            (this.speed.x + steeringDirection.x * elapsedTime),
+            (this.speed.y + steeringDirection.y * elapsedTime)
+        ).clamped(this.maxVelocity);
+
+        this.position.x += this.speed.x * elapsedTime;
+        this.position.y += this.speed.y * elapsedTime;
+    }
+
+
+    setTargetDirection(direction: Vector2) {
+        this.targetDirection = direction;
+    }
+
+
+    addRandomForce(strength: number=1) {
+        this.addForce(new Vector2(2 * Math.random() - 1, 2 * Math.random() - 1), strength);
+    }
+
+
+    addForce(force: Vector2, strength: number=1) {
+        this.targetDirection.x += strength * force.x;
+        this.targetDirection.y += strength * force.y;
+    }
+
 
     private moveTo(position: Position) {
         this.position = position
     }
 
     private headTo(targetPosition: Position) {
-        const simulationSpeed = store.getSimulationSpeed
-        const distance = findDistance(this.position, targetPosition)
-        const deltaX = this.position.x + (targetPosition.x - this.position.x) * this.stats.speed * simulationSpeed / distance;
-        const deltaY = this.position.y + (targetPosition.y - this.position.y) * this.stats.speed * simulationSpeed / distance;
-        this.moveTo({x: deltaX, y: deltaY})
+        this.setTargetDirection(new Vector2(
+            targetPosition.x - this.position.x,
+            targetPosition.y - this.position.y
+        ))
+        this.checkMapBounds()
+        this.update(store.getSimulationSpeed);
     }
 
-    private walk(demo: boolean) {
-        const fieldSize = demo ? store.getWindowSize : store.getSimulationConstants.fieldSize
-        const simulationSpeed = store.getSimulationSpeed
-        if (this.isOnWalkTarget) {
-            this.isOnWalkTarget = false;
-            if (checkBreedingPossibility(this) && this.lastBreedingCoordinates) {
-                this.walkDestination = getRandomPositionInRect(
-                    this.lastBreedingCoordinates,
-                    this.stats.breedingSensitivity * simulationValuesMultipliers.breedingSensitivity * 2,
-                    fieldSize
-                )
-                return
+    private walk(isDemo: boolean) {
+        this.addRandomForce(0.05 * store.getSimulationSpeed);
+
+        if (checkBreedingPossibility(this) && this.lastBreedingCoordinates) {
+            const lastBreedingVector = new Vector2(this.lastBreedingCoordinates.x - this.position.x, this.lastBreedingCoordinates.y - this.position.y);
+            const lastBreedingDistance = lastBreedingVector.norm();
+
+            if (lastBreedingDistance) {
+                this.addForce(new Vector2(lastBreedingVector.x / lastBreedingDistance, lastBreedingVector.y / lastBreedingDistance),
+                    0.01 * (lastBreedingDistance / (this.stats.breedingSensitivity * simulationValuesMultipliers.breedingSensitivity)) ** 2);
             }
-            if (this.lastMealCoordinates) {
-                this.walkDestination = getRandomPositionInRect(
-                    this.lastMealCoordinates,
-                    this.stats.foodSensitivity * simulationValuesMultipliers.foodSensitivity * 2,
-                    fieldSize
-                )
-                return;
+        } else if (this.lastMealCoordinates) {
+            const lastMealVector = new Vector2(this.lastMealCoordinates.x - this.position.x, this.lastMealCoordinates.y - this.position.y);
+            const lastMealDistance = lastMealVector.norm();
+
+            if (lastMealDistance > 0) {
+                this.addForce(new Vector2(lastMealVector.x / lastMealDistance, lastMealVector.y / lastMealDistance),
+                    0.01 * (lastMealDistance / (this.stats.foodSensitivity * simulationValuesMultipliers.foodSensitivity)) ** 2);
             }
-            this.walkDestination = getRandomPosition(fieldSize.width, fieldSize.height)
         }
-        this.headTo(this.walkDestination);
-        if (findDistance(this.position, this.walkDestination) < 3 * simulationSpeed * this.stats.speed) {
-            this.isOnWalkTarget = true;
+
+        this.checkMapBounds()
+        this.update(store.getSimulationSpeed);
+    }
+
+
+    private checkMapBounds() {
+        const {fieldSize: {width, height}} = store.getSimulationConstants
+
+        const offset = 50;
+        const offsetLeft = Math.max(0, this.position.x);
+        const offsetRight = Math.max(0, width - this.position.x);
+        const offsetTop = Math.max(0, this.position.y);
+        const offsetBottom = Math.max(0, height - this.position.y);
+
+        if (offsetLeft <= offset) {
+            const dot = Math.max(0.0, Vector2.dot(new Vector2(-1, 0).normalized(), this.speed))
+
+            this.addForce(new Vector2(
+                5.0 * this.maxVelocity * dot * (1.0 - Math.min(1.0, offsetLeft / offset) ** 4),
+                0.0
+            ))
+        }
+        if (offsetRight <= offset) {
+            const dot = Math.max(0.0, Vector2.dot(new Vector2(1, 0).normalized(), this.speed))
+
+            this.addForce(new Vector2(
+                -5.0 * this.maxVelocity * dot * (1.0 - Math.min(1.0, offsetRight / offset) ** 4),
+                0.0
+            ))
+        }
+        if (offsetTop <= offset) {
+            const dot = Math.max(0.0, Vector2.dot(new Vector2(0, -1).normalized(), this.speed))
+
+            this.addForce(new Vector2(
+                0,
+                5.0 * this.maxVelocity * dot * (1.0 - Math.min(1.0, offsetTop / offset) ** 4)
+            ))
+        }
+        if (offsetBottom <= offset) {
+            const dot = Math.max(0.0, Vector2.dot(new Vector2(0, 1).normalized(), this.speed))
+
+            this.addForce(new Vector2(
+                0,
+                -5.0 * this.maxVelocity * dot * (1.0 - Math.min(1.0, offsetBottom / offset) ** 4)
+            ))
         }
     }
 
-    public live(demo: boolean = false) {
+    public live(isDemo: boolean = false) {
         const timestamp = store.getTimestamp
         const simulationSpeed = store.getSimulationSpeed
         const {addLogItem} = store
@@ -168,12 +254,12 @@ class Animal extends Entity {
                     if (nearestFoodPiece) {
                         this.reachFood(nearestFoodPiece)
                     } else {
-                        this.walk(demo)
+                        this.walk(isDemo)
                     }
                     return;
                 }
                 if (this.currentActivity.activity === 'walking') {
-                    this.walk(demo)
+                    this.walk(isDemo)
                 }
                 this.applyAging()
             }
@@ -260,33 +346,48 @@ class Animal extends Entity {
     }
 
     private applyAging() {
-        const timestamp = store.getTimestamp
-        if (this.age.current >= 0) {
-            const isBirthday: boolean = Math.floor((timestamp - this.age.birthTimestamp) / timeConstants.yearLength) > this.age.current
-            if (isBirthday) {
-                this.age.current += 1
-                if (this.age.current > 15) {
-                    const isDead = (Math.random() * this.age.current) > 15
-                    if (isDead) {
-                        this.die(timestamp)
-                        store.addLogItem({
-                            message: `${this.name} died from aging. RIP legend`,
-                            timestamp
-                        })
-                    }
-                }
-            }
+        const timestamp = store.getTimestamp;
+
+        if (this.age.current < 0) {
+            return;
         }
+
+        const isBirthday: boolean = Math.floor((timestamp - this.age.birthTimestamp) / timeConstants.yearLength) > this.age.current
+        if (!isBirthday) {
+            return;
+        }
+
+        this.age.current += 1
+        if (this.age.current <= 15) {
+            return;
+        }
+
+        const isDead = (Math.random() * this.age.current) > 15
+        if (!isDead) {
+            return;
+        }
+
+        this.die(timestamp)
+        store.addLogItem({
+            message: `${this.name} died from aging. RIP legend`,
+            timestamp
+        })
     }
 
     private reachFood(nearestFoodPiece: Plant) {
         const simulationSpeed = store.getSimulationSpeed
         const {removePlant} = store
         if (findDistance(nearestFoodPiece.position, this.position) < 3 * simulationSpeed * this.stats.speed) {
-            this.position = nearestFoodPiece.position
+            this.position = {
+                x: nearestFoodPiece.position.x,
+                y: nearestFoodPiece.position.y
+            }
             const energyAfterFood = this.energy.current + nearestFoodPiece.nutritionValue
             this.energy.current = Math.min(energyAfterFood, this.energy.max)
-            this.lastMealCoordinates = nearestFoodPiece.position
+            this.lastMealCoordinates = {
+                x: nearestFoodPiece.position.x,
+                y: nearestFoodPiece.position.y
+            }
             removePlant(nearestFoodPiece.id)
         } else {
             this.headTo(nearestFoodPiece.position)
