@@ -37,6 +37,7 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
             label={'Breeding period (years)'}
             className={classes.rangeSlider}
             onValuesChange={updateBreedingRange}
+            tooltipContent={'Life span, on which geese may be engaged in sexual activity'}
         />
         <RangeSlider
             minGap={50}
@@ -44,9 +45,10 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
             min={100}
             step={50}
             initialValues={[constantsValues.foodNutritionMin, constantsValues.foodNutritionMax]}
-            label={'Food nutrition range'}
+            label={'Plants nutrition range'}
             className={classes.rangeSlider}
             onValuesChange={updateFoodNutritionRange}
+            tooltipContent={'Range in which plants nutrition value may lie, plants nutrition defines how much energy will a goose receive after consuming a plant. It assigns randomly on plant generation'}
         />
         <Slider
             label={'Days to finish breeding'}

@@ -18,7 +18,7 @@ interface ISliderProps {
 const Slider = ({label, id, min, max, className, value, tooltipContent, ...props}: ISliderProps) =>
     <div className={clsSum(className, classes.sliderContainer)}>
         <div className={classes.labelContainer}>
-            {label ? <label htmlFor={id} className={classes.label}>
+            {label || tooltipContent ? <label htmlFor={id} className={classes.label}>
                 {label}
                 {tooltipContent ? <Tooltip tooltipContent={tooltipContent}>
                     <span className={classes.tooltipIcon}>?</span>
