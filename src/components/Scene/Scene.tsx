@@ -2,7 +2,7 @@ import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} fr
 import classes from './Scene.module.scss'
 import {observer} from "mobx-react-lite";
 import {SimulationStore} from "../../stores/simulationStore";
-import {getRandomInRange, rollNPercentChance} from "../../utils/utils";
+import {rollNPercentChance} from "../../utils/utils";
 import Plant from "../../entities/Plant";
 import {
     generateAnimals,
