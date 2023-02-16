@@ -29,7 +29,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const touchRef = useRef({start: 0, end: 0})
     const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
-    const {width: canvasWidth, height: canvasHeight} = useWindowSize(store)
+    const {width: canvasWidth, height: canvasHeight} = useWindowSize()
     const images = useContext(ImageContext)
     const renderer = useMemo(() => new Renderer(context, images), [context])
     const mainCamera = useMemo(() => new Camera(
@@ -77,8 +77,8 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         context.resetTransform();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
-        mainCamera.checkBounds(new BoundingBox(0, store.getSimulationConstants.fieldSize.width,
-            0, store.getSimulationConstants.fieldSize.height));
+        //mainCamera.checkBounds(new BoundingBox(0, store.getSimulationConstants.fieldSize.width,
+        //    0, store.getSimulationConstants.fieldSize.height));
         {
             const scale = Math.min(canvasWidth / mainCamera.fov.x, canvasHeight / mainCamera.fov.y);
             context.translate(canvasWidth / 2 - mainCamera.position.x * scale, canvasHeight / 2 - mainCamera.position.y * scale);

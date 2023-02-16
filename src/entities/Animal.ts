@@ -141,6 +141,7 @@ class Animal extends Entity implements Movable {
             targetPosition.x - this.position.x,
             targetPosition.y - this.position.y
         ))
+        this.checkMapBounds()
         this.update(store.getSimulationSpeed);
     }
 
@@ -165,7 +166,52 @@ class Animal extends Entity implements Movable {
             }
         }
 
+        this.checkMapBounds()
         this.update(store.getSimulationSpeed);
+    }
+
+
+    private checkMapBounds() {
+        const {fieldSize: {width, height}} = store.getSimulationConstants
+
+        const offset = 50;
+        const offsetLeft = Math.max(0, this.position.x);
+        const offsetRight = Math.max(0, width - this.position.x);
+        const offsetTop = Math.max(0, this.position.y);
+        const offsetBottom = Math.max(0, height - this.position.y);
+
+        if (offsetLeft <= offset) {
+            const dot = Math.max(0.0, Vector2.dot(new Vector2(-1, 0).normalized(), this.speed))
+
+            this.addForce(new Vector2(
+                5.0 * this.maxVelocity * dot * (1.0 - Math.min(1.0, offsetLeft / offset) ** 4),
+                0.0
+            ))
+        }
+        if (offsetRight <= offset) {
+            const dot = Math.max(0.0, Vector2.dot(new Vector2(1, 0).normalized(), this.speed))
+
+            this.addForce(new Vector2(
+                -5.0 * this.maxVelocity * dot * (1.0 - Math.min(1.0, offsetRight / offset) ** 4),
+                0.0
+            ))
+        }
+        if (offsetTop <= offset) {
+            const dot = Math.max(0.0, Vector2.dot(new Vector2(0, -1).normalized(), this.speed))
+
+            this.addForce(new Vector2(
+                0,
+                5.0 * this.maxVelocity * dot * (1.0 - Math.min(1.0, offsetTop / offset) ** 4)
+            ))
+        }
+        if (offsetBottom <= offset) {
+            const dot = Math.max(0.0, Vector2.dot(new Vector2(0, 1).normalized(), this.speed))
+
+            this.addForce(new Vector2(
+                0,
+                -5.0 * this.maxVelocity * dot * (1.0 - Math.min(1.0, offsetBottom / offset) ** 4)
+            ))
+        }
     }
 
     public live(isDemo: boolean = false) {
@@ -299,7 +345,9 @@ class Animal extends Entity implements Movable {
         return null
     }
 
-    private applyAging(timestamp: number) {
+    private applyAging() {
+        const timestamp = store.getTimestamp;
+
         if (this.age.current < 0) {
             return;
         }

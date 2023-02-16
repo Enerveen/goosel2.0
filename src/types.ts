@@ -50,6 +50,11 @@ export class Vector2 {
     norm() {
         return Math.sqrt(this.x ** 2 + this.y ** 2);
     }
+
+
+    static dot(v1: Vector2, v2: Vector2) {
+        return v1.x * v2.x + v1.y * v2.y;
+    }
 }
 
 
