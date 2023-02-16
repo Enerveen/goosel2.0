@@ -1,6 +1,6 @@
-import {FieldDimensions, gender, Position, Stats} from "../types";
+import {gender, Position, Stats} from "../types";
 import Animal from "../entities/Animal";
-import {coinFlip, getRandomInRange, rollNPercentChance} from "./utils";
+import {coinFlip, rollNPercentChance} from "./utils";
 import {generateAnimalFirstName} from "./nameGen";
 import {simulationValuesMultipliers} from "../constants/simulation";
 import Plant from "../entities/Plant";
@@ -12,11 +12,6 @@ export const findDistance = (pos1: Position, pos2: Position) =>
 export const getRandomPosition = (edgeX: number, edgeY: number) => ({
     x: Math.random() * edgeX,
     y: Math.random() * edgeY
-})
-
-export const getRandomPositionInRect = ({x, y}: Position, delta: number, fieldSize: FieldDimensions) => ({
-    x: getRandomInRange(Math.max(x - delta / 2, 0), Math.min(x + delta / 2, fieldSize.width - 1)),
-    y: getRandomInRange(Math.max(y - delta / 2, 0), Math.min(y + delta / 2, fieldSize.height - 1))
 })
 
 export const getChild = (

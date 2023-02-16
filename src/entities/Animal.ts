@@ -1,5 +1,5 @@
 import Entity from "./Entity";
-import {Activity, Age, BoundingBox, Energy, gender, Genes, Vector2, Position, Stats} from "../types";
+import {Activity, Age, BoundingBox, Energy, gender, Genes, Position, Stats} from "../types";
 import {coinFlip} from "../utils/utils";
 import Plant from "./Plant";
 import {generateAnimalName} from "../utils/nameGen";
@@ -7,13 +7,13 @@ import {
     calculateEnergyLoss,
     checkBreedingPossibility,
     findDistance,
-    getChild,
-    getRandomPosition, getRandomPositionInRect
+    getChild
 } from "../utils/helpers";
 import {timeConstants, simulationValuesMultipliers} from "../constants/simulation";
-import {Quadtree} from "../dataStructures/quadtree";
+import Quadtree from "../dataStructures/Quadtree";
 import store from "../stores/simulationStore";
 import {Movable} from "./Movable";
+import Vector2 from "../dataStructures/Vector2";
 
 interface IAnimalProps {
     id: string
@@ -131,11 +131,6 @@ class Animal extends Entity implements Movable {
         this.targetDirection.y += strength * force.y;
     }
 
-
-    private moveTo(position: Position) {
-        this.position = position
-    }
-
     private headTo(targetPosition: Position) {
         this.setTargetDirection(new Vector2(
             targetPosition.x - this.position.x,
@@ -166,13 +161,13 @@ class Animal extends Entity implements Movable {
             }
         }
 
-        this.checkMapBounds()
+        this.checkMapBounds(isDemo)
         this.update(store.getSimulationSpeed);
     }
 
 
-    private checkMapBounds() {
-        const {fieldSize: {width, height}} = store.getSimulationConstants
+    private checkMapBounds(isDemo: boolean = false) {
+        const {width, height} = isDemo ? store.getWindowSize : store.getSimulationConstants.fieldSize
 
         const offset = 50;
         const offsetLeft = Math.max(0, this.position.x);

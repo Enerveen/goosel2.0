@@ -28,7 +28,7 @@ export const defaultSimConstants:SimulationConstants = {
     foodNutritionMax: 800,
     breedingMaxProgress: 200,
     animalMaxEnergy: 1200,
-    foodSpawnChanceK: 20,
+    foodSpawnChanceK: 3,
     initialFoodCount: 200,
     initialAnimalCount: 24,
     fieldSize: {width: 3200, height: 1800}

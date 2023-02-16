@@ -9,7 +9,7 @@ import {
     generateFood
 } from "../../utils/helpers";
 import Renderer from "../../graphics/Renderer";
-import {appPhase, BoundingBox, Vector2} from "../../types";
+import {appPhase, BoundingBox} from "../../types";
 import useWindowSize from "../../hooks/useWindowSize";
 import {Camera} from "../../graphics/Camera";
 import ImageContext from "../../stores/ImageContext";
@@ -19,6 +19,7 @@ import {
     handleCanvasTouchMove,
     handleCanvasTouchStart
 } from "../../utils/eventHandlers";
+import Vector2 from "../../dataStructures/Vector2";
 
 interface ISceneProps {
     store: SimulationStore,
@@ -77,8 +78,8 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         context.resetTransform();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
-        //mainCamera.checkBounds(new BoundingBox(0, store.getSimulationConstants.fieldSize.width,
-        //    0, store.getSimulationConstants.fieldSize.height));
+        mainCamera.checkBounds(new BoundingBox(0, store.getSimulationConstants.fieldSize.width,
+           0, store.getSimulationConstants.fieldSize.height));
         {
             const scale = Math.min(canvasWidth / mainCamera.fov.x, canvasHeight / mainCamera.fov.y);
             context.translate(canvasWidth / 2 - mainCamera.position.x * scale, canvasHeight / 2 - mainCamera.position.y * scale);

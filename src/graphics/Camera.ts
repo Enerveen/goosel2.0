@@ -1,6 +1,6 @@
-import {Position, Vector2} from "../types";
+import {Position} from "../types";
 import {BoundingBox} from "../types";
-import {cameraConstants} from "../constants/view";
+import Vector2 from "../dataStructures/Vector2";
 
 
 export class Camera {

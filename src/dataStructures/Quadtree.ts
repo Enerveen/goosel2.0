@@ -149,7 +149,7 @@ class Node {
 }
 
 
-export class Quadtree {
+class Quadtree {
     node: Node
 
 
@@ -174,3 +174,5 @@ export class Quadtree {
         this.node.dbgDraw(ctx);
     }
 }
+
+export default Quadtree
