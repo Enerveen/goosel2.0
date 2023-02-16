@@ -3,6 +3,7 @@ import classes from './SimulationSettings.module.scss'
 import Slider from "../Slider/Slider";
 import RangeSlider from "../RangeSlider/RangeSlider";
 import {SimulationConstants} from "../../types";
+import {simConstantsRanges} from "../../constants/simulation";
 
 interface ISimulationSettingsProps {
     constantsValues: SimulationConstants,
@@ -31,8 +32,8 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
     return <div className={classes.container}>
         <RangeSlider
             minGap={1}
-            max={30}
-            min={0}
+            max={simConstantsRanges.breedingAge.max}
+            min={simConstantsRanges.breedingAge.min}
             initialValues={[constantsValues.breedingMinAge, constantsValues.breedingMaxAge]}
             label={'Breeding period (years)'}
             className={classes.rangeSlider}
@@ -40,10 +41,10 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
             tooltipContent={'Life span, on which geese may be engaged in sexual activity'}
         />
         <RangeSlider
-            minGap={50}
-            max={3600}
-            min={100}
-            step={50}
+            minGap={simConstantsRanges.foodNutrition.step}
+            max={simConstantsRanges.foodNutrition.max}
+            min={simConstantsRanges.foodNutrition.min}
+            step={simConstantsRanges.foodNutrition.step}
             initialValues={[constantsValues.foodNutritionMin, constantsValues.foodNutritionMax]}
             label={'Plants nutrition range'}
             className={classes.rangeSlider}
@@ -54,20 +55,20 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
             label={'Days to finish breeding'}
             className={classes.slider}
             id={'breedingMaxProgress'}
-            min={2}
-            max={120}
-            step={2}
-            value={constantsValues.breedingMaxProgress / 10}
+            min={simConstantsRanges.breedingMaxProgress.min * simConstantsRanges.breedingMaxProgress.multiplier}
+            max={simConstantsRanges.breedingMaxProgress.max * simConstantsRanges.breedingMaxProgress.multiplier}
+            step={simConstantsRanges.breedingMaxProgress.step * simConstantsRanges.breedingMaxProgress.multiplier}
+            value={constantsValues.breedingMaxProgress * simConstantsRanges.breedingMaxProgress.multiplier}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                updateSettingsValues('breedingMaxProgress', +e.target.value * 10)}
+                updateSettingsValues('breedingMaxProgress', +e.target.value / simConstantsRanges.breedingMaxProgress.multiplier)}
         />
         <Slider
             label={'Maximum Energy of Animals'}
             className={classes.slider}
             id={'animalMaxEnergy'}
-            min={100}
-            max={4800}
-            step={100}
+            min={simConstantsRanges.animalMaxEnergy.min}
+            max={simConstantsRanges.animalMaxEnergy.max}
+            step={simConstantsRanges.animalMaxEnergy.step}
             value={constantsValues.animalMaxEnergy}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 updateSettingsValues('animalMaxEnergy', +e.target.value)}
@@ -76,9 +77,9 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
             label={'Initial food pieces count'}
             className={classes.slider}
             id={'initialFoodCount'}
-            min={0}
-            max={400}
-            step={2}
+            min={simConstantsRanges.initialFoodCount.min}
+            max={simConstantsRanges.initialFoodCount.max}
+            step={simConstantsRanges.initialFoodCount.step}
             value={constantsValues.initialFoodCount}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 updateSettingsValues('initialFoodCount', +e.target.value)}
@@ -87,8 +88,9 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
             label={'Initial animals count'}
             className={classes.slider}
             id={'initialAnimalCount'}
-            min={0}
-            max={100}
+            min={simConstantsRanges.initialAnimalCount.min}
+            max={simConstantsRanges.initialAnimalCount.max}
+            step={simConstantsRanges.initialAnimalCount.step}
             value={constantsValues.initialAnimalCount}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 updateSettingsValues('initialAnimalCount', +e.target.value)}
@@ -97,9 +99,9 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
             label={'Field width'}
             className={classes.slider}
             id={'fieldWidth'}
-            min={200}
-            max={4200}
-            step={100}
+            min={simConstantsRanges.fieldWidth.min}
+            max={simConstantsRanges.fieldWidth.max}
+            step={simConstantsRanges.fieldWidth.step}
             value={constantsValues.fieldSize.width}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 updateFieldDimensions('width', +e.target.value)}
@@ -108,33 +110,34 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
             label={'Field height'}
             className={classes.slider}
             id={'fieldHeight'}
-            min={200}
-            max={2000}
-            step={100}
+            min={simConstantsRanges.fieldHeight.min}
+            max={simConstantsRanges.fieldHeight.max}
+            step={simConstantsRanges.fieldHeight.step}
             value={constantsValues.fieldSize.height}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 updateFieldDimensions('height', +e.target.value)}
         />
         <Slider
-            label={'Plant spawn Coef'}
+            label={'Plant spawn chance'}
             className={classes.slider}
             id={'foodSpawnChanceK'}
-            min={1}
-            max={5}
-            value={constantsValues.foodSpawnChanceK}
+            min={simConstantsRanges.foodSpawnChance.min * simConstantsRanges.foodSpawnChance.multiplier}
+            max={simConstantsRanges.foodSpawnChance.max * simConstantsRanges.foodSpawnChance.multiplier}
+            step={simConstantsRanges.foodSpawnChance.step * simConstantsRanges.foodSpawnChance.multiplier}
+            value={Math.round(constantsValues.foodSpawnChanceK * simConstantsRanges.foodSpawnChance.multiplier)}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                updateSettingsValues('foodSpawnChanceK', +e.target.value)}
+                updateSettingsValues('foodSpawnChanceK', +e.target.value / simConstantsRanges.foodSpawnChance.multiplier)}
         />
         <Slider
             label={'Mutation chance'}
             className={classes.slider}
             id={'mutationChance'}
-            min={2}
-            max={100}
-            step={2}
-            value={Math.round(constantsValues.mutationChance * 100)}
+            min={simConstantsRanges.mutationChance.min * simConstantsRanges.mutationChance.multiplier}
+            max={simConstantsRanges.mutationChance.max * simConstantsRanges.mutationChance.multiplier}
+            step={simConstantsRanges.mutationChance.step * simConstantsRanges.mutationChance.multiplier}
+            value={Math.round(constantsValues.mutationChance * simConstantsRanges.mutationChance.multiplier)}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                updateSettingsValues('mutationChance', +e.target.value / 100)}
+                updateSettingsValues('mutationChance', +e.target.value / simConstantsRanges.mutationChance.multiplier)}
         />
     </div>
 }

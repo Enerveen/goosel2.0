@@ -33,3 +33,59 @@ export const defaultSimConstants:SimulationConstants = {
     initialAnimalCount: 24,
     fieldSize: {width: 3200, height: 1800}
 }
+
+export const simConstantsRanges = {
+    breedingAge: {
+        min: 0,
+        max: 30
+    },
+    foodNutrition: {
+        min: 100,
+        max: 3600,
+        step: 50
+    },
+    animalMaxEnergy: {
+        min: 100,
+        max: 4800,
+        step: 100
+    },
+    breedingMaxProgress: {
+        min: 20,
+        max: 1200,
+        step: 20,
+        multiplier: 0.1
+    },
+    foodSpawnChance: {
+        min: 0.01,
+        max: 0.05,
+        multiplier: 100,
+        step: 0.01
+    },
+    mutationChance: {
+        min: 0.02,
+        max: 1,
+        step: 0.02,
+        multiplier: 100
+    },
+    initialAnimalCount: {
+        min: 0,
+        max: 100,
+        step:2
+    },
+    initialFoodCount: {
+        min: 0,
+        max: 400,
+        step: 2
+    },
+    fieldWidth: {
+        min: 200,
+        max: 4200,
+        step: 100
+    },
+    fieldHeight: {
+        min: 200,
+        max: 2000,
+        step: 100
+    }
+
+}
