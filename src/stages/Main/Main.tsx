@@ -7,6 +7,7 @@ import {appConstants, defaultSimConstants} from "../../constants/simulation";
 import BackgroundScene from "../../components/BackgroundScene/BackgroundScene";
 import Checkbox from "../../components/Checkbox/Checkbox";
 import Button from "../../components/Button/Button";
+import Tooltip from "../../components/Tooltip/Tooltip";
 
 interface IMainProps {
     setAppPhase: (phase: appPhase) => void

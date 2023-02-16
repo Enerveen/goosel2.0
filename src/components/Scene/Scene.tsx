@@ -2,7 +2,7 @@ import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} fr
 import classes from './Scene.module.scss'
 import {observer} from "mobx-react-lite";
 import {SimulationStore} from "../../stores/simulationStore";
-import {getRandomInRange} from "../../utils/utils";
+import {getRandomInRange, rollNPercentChance} from "../../utils/utils";
 import Plant from "../../entities/Plant";
 import {
     generateAnimals,
@@ -29,7 +29,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const touchRef = useRef({start: 0, end: 0})
     const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
-    const {width: canvasWidth, height: canvasHeight} = useWindowSize(store)
+    const {width: canvasWidth, height: canvasHeight} = useWindowSize()
     const images = useContext(ImageContext)
     const renderer = useMemo(() => new Renderer(context, images), [context])
     const mainCamera = useMemo(() => new Camera(
@@ -61,7 +61,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         }
         store.clearAnimalCorpses()
         store.gatherStatistics()
-        if (!getRandomInRange(0, store.getSimulationConstants.foodSpawnChanceK / store.getSimulationSpeed)) {
+        if (rollNPercentChance(store.getSimulationConstants.foodSpawnChanceK * store.getSimulationSpeed)) {
             store.addPlant(new Plant())
         }
         store.getAnimals.forEach(animal => animal.live())
