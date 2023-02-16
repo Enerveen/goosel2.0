@@ -124,6 +124,17 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 updateSettingsValues('foodSpawnChanceK', +e.target.value)}
         />
+        <Slider
+            label={'Mutation chance'}
+            className={classes.slider}
+            id={'mutationChance'}
+            min={2}
+            max={100}
+            step={2}
+            value={Math.round(constantsValues.mutationChance * 100)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                updateSettingsValues('mutationChance', +e.target.value / 100)}
+        />
     </div>
 }
 

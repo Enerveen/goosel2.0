@@ -1,7 +1,6 @@
 import React, {ChangeEvent, useEffect, useState} from "react";
-import {observer} from "mobx-react-lite";
 import classes from "./Controls.module.scss";
-import {appPhase, SimulationConstants} from "../../types";
+import {appPhase} from "../../types";
 import Animal from "../../entities/Animal";
 import {getRandomPosition} from "../../utils/helpers";
 import Slider from "../Slider/Slider";
@@ -11,29 +10,15 @@ import Checkbox from "../Checkbox/Checkbox";
 import simulationStore from "../../stores/simulationStore";
 
 interface IControlsProps {
-    simulationSpeed: number
-    setSimulationSpeed: (speed: number) => void
-    timestamp: number
     setAppPhase: (state: appPhase) => void
-    addAnimal: (animal: Animal) => void
-    animalMaxEnergy: number
-    getId: () => () => number
-    logHidden: boolean,
-    simulationConstants: SimulationConstants
 }
 
-const Controls = observer(({
-                               simulationSpeed,
-                               setSimulationSpeed,
-                               timestamp,
-                               setAppPhase,
-                               addAnimal,
-                               animalMaxEnergy,
-                               getId,
-                               logHidden,
-                               simulationConstants
-                           }: IControlsProps) => {
-    const {fieldSize} = simulationConstants
+const Controls = ({setAppPhase}: IControlsProps) => {
+    const {fieldSize, animalMaxEnergy} = simulationStore.getSimulationConstants
+    const timestamp = simulationStore.getTimestamp
+    const simulationSpeed = simulationStore.getSimulationSpeed
+    const {getId, addAnimal, setSimulationSpeed} = simulationStore
+    const logHidden = simulationStore.getLogHidden
     const [value, setValue] = useState(simulationSpeed)
 
     const createNewAnimal = () => {
@@ -53,7 +38,7 @@ const Controls = observer(({
 
     return <div className={classes.container}>
         <div className={classes.timeBlock}>
-            <Clock timestamp={timestamp}/>
+            <Clock/>
             <Slider
                 label={'Speed'}
                 id={'simulationSpeed'}
@@ -78,6 +63,6 @@ const Controls = observer(({
             />
         </div>
     </div>
-})
+}
 
 export default Controls

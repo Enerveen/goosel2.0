@@ -1,16 +1,16 @@
 import React from "react";
-import Renderer from "../graphics/Renderer";
-import Animal from "../entities/Animal";
+import Renderer from "../graphics/Renderer"
 import {Camera, mouseCameraController} from "../graphics/Camera";
 import {cameraConstants} from "../constants/view";
 import {findDistance} from "./helpers";
+import simulationStore from "../stores/simulationStore";
 
 export const handleCanvasClick = (
     event: React.MouseEvent<HTMLCanvasElement>,
     renderer: Renderer,
-    entities: Animal[],
-    setActiveEntity: (entity: Animal) => void,
-    removeActiveEntity: () => void) => {
+) => {
+    const entities = simulationStore.getAnimals
+    const {setActiveEntity, removeActiveEntity} = simulationStore
     const activeEntity = entities.find(animal => {
         const {width, height, offsetX, offsetY} = renderer.calculateAnimalTexture({
             gender: animal.gender,

@@ -141,6 +141,7 @@ export type gender = 'male' | 'female'
 export type appPhase = 'NOT_STARTED' | 'STARTED' | 'FINISHED'
 
 export type SimulationConstants = {
+    mutationChance: number
     breedingMinAge: number,
     breedingMaxAge: number,
     breedingMaxProgress: number,
@@ -156,4 +157,10 @@ export type SimulationConstants = {
 export type LogItem = {
     message: string,
     timestamp: number
+}
+
+export type Genes = {
+    gay: boolean,
+    scavenger: boolean,
+    predator: boolean
 }

@@ -13,9 +13,7 @@ interface ISliderProps {
     className?: string
 }
 
-const Slider = ({label, id, min, max, className, value, ...props}: ISliderProps) => {
-
-    return <div className={clsSum(className, classes.sliderContainer)}>
+const Slider = ({label, id, min, max, className, value, ...props}: ISliderProps) => <div className={clsSum(className, classes.sliderContainer)}>
             <div className={classes.labelContainer}>
                 {label ? <label htmlFor={id} className={classes.label}>{label}</label> : <div/>}
                 {value}
@@ -26,6 +24,5 @@ const Slider = ({label, id, min, max, className, value, ...props}: ISliderProps)
                 <span>{max}</span>
             </div>
         </div>
-}
 
 export default Slider

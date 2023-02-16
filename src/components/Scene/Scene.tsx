@@ -6,8 +6,7 @@ import {getRandomInRange} from "../../utils/utils";
 import Plant from "../../entities/Plant";
 import {
     generateAnimals,
-    generateFood,
-    getRandomPosition
+    generateFood
 } from "../../utils/helpers";
 import Renderer from "../../graphics/Renderer";
 import {appPhase, BoundingBox, Vector2} from "../../types";
@@ -34,40 +33,29 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     const images = useContext(ImageContext)
     const renderer = useMemo(() => new Renderer(context, images), [context])
     const mainCamera = useMemo(() => new Camera(
-        { x: store.getSimulationConstants.fieldSize.width / 2,
+        {
+            x: store.getSimulationConstants.fieldSize.width / 2,
             y: store.getSimulationConstants.fieldSize.height / 2
         },
         new Vector2(
             store.getSimulationConstants.fieldSize.width,
             store.getSimulationConstants.fieldSize.height
-        )),
-        [
-            store.getSimulationConstants.fieldSize.width,
-            store.getSimulationConstants.fieldSize.height,
-            canvasWidth,
-            canvasHeight
-        ]);
+        )), [
+        store.getSimulationConstants.fieldSize.width,
+        store.getSimulationConstants.fieldSize.height,
+        canvasWidth,
+        canvasHeight
+    ]);
 
     const init = useCallback(() => {
         console.log('Simulation has started with the following constants:',
             JSON.stringify(store.getSimulationConstants, null, 4))
-        store.addAnimal(generateAnimals(store.getSimulationConstants.initialAnimalCount,
-            {
-                width: store.getSimulationConstants.fieldSize.width,
-                height: store.getSimulationConstants.fieldSize.height
-            }, store.getSimulationConstants.animalMaxEnergy))
-        store.addPlant(generateFood(store.getSimulationConstants.initialFoodCount,
-            {
-                width: store.getSimulationConstants.fieldSize.width,
-                height: store.getSimulationConstants.fieldSize.height
-            }))
+        store.addAnimal(generateAnimals(store.getSimulationConstants.initialAnimalCount))
+        store.addPlant(generateFood(store.getSimulationConstants.initialFoodCount))
     }, [canvasWidth, canvasHeight])
 
 
-    const calculateStep = useCallback((timestamp: number) => {
-        if (timestamp === 0) {
-            init()
-        }
+    const calculateStep = useCallback(() => {
         if (!store.getAnimals.length) {
             setAppPhase('FINISHED')
             return
@@ -75,39 +63,13 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         store.clearAnimalCorpses()
         store.gatherStatistics()
         if (!getRandomInRange(0, store.getSimulationConstants.foodSpawnChanceK / store.getSimulationSpeed)) {
-            store.addPlant(new Plant({
-                id: `P${store.getId()}`,
-                nutritionValue: getRandomInRange(
-                    store.getSimulationConstants.foodNutritionMin,
-                    store.getSimulationConstants.foodNutritionMax
-                ),
-                position: getRandomPosition(
-                    store.getSimulationConstants.fieldSize.width,
-                    store.getSimulationConstants.fieldSize.height
-                )
-            }))
+            store.addPlant(new Plant())
         }
-        store.getAnimals.forEach(animal => animal.live(
-            timestamp,
-            store.getPlants,
-            store.getAnimals,
-            store.removePlant,
-            store.addAnimal,
-            {
-                width: store.getSimulationConstants.fieldSize.width,
-                height: store.getSimulationConstants.fieldSize.height
-            },
-            store.getSimulationSpeed,
-            store.getSimulationConstants.breedingMinAge,
-            store.getSimulationConstants.breedingMaxAge,
-            store.getSimulationConstants.breedingMaxProgress,
-            store.getId
-        ))
+        store.getAnimals.forEach(animal => animal.live())
     }, [context, canvasWidth, canvasHeight])
 
 
-    const drawStep = useCallback((timestamp: number) => {
-
+    const drawStep = useCallback(() => {
         if (!context) {
             return;
         }
@@ -125,19 +87,21 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
 
         renderer.drawSeamlessBackground({
             width: store.getSimulationConstants.fieldSize.width,
-            height: store.getSimulationConstants.fieldSize.height})
+            height: store.getSimulationConstants.fieldSize.height
+        })
         store.getPlants.forEach(entity => {
             renderer.drawPlant(entity.position)
         })
         store.getAnimals.forEach(entity => {
-            renderer.drawAnimal(entity.position,
-                timestamp - entity.age.birthTimestamp,
+            renderer.drawAnimal(
+                entity.position,
                 {
                     gender: entity.gender,
                     age: entity.age.current,
                     isAlive: entity.isAlive,
                     name: entity.name,
-                    currentActivity: entity.currentActivity.activity
+                    currentActivity: entity.currentActivity.activity,
+                    birthTimestamp: entity.age.birthTimestamp
                 }
             )
             renderer.drawLabels(entity.position,
@@ -155,9 +119,9 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         })
 
         if (!store.getLogHidden) {
-            renderer.drawLogs(timestamp, store.getLog)
+            renderer.drawLogs()
         }
-        renderer.drawClouds(timestamp, store.getSimulationConstants.fieldSize);
+        renderer.drawClouds();
     }, [context, canvasWidth, canvasHeight]);
 
     useEffect(() => {
@@ -173,8 +137,11 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         if (context) {
             const render = () => {
                 const timestamp = store.getTimestamp
-                calculateStep(timestamp);
-                drawStep(timestamp);
+                if (timestamp === 0) {
+                    init()
+                }
+                calculateStep();
+                drawStep();
                 store.updateTimestamp()
                 animationFrameId = window.requestAnimationFrame(render);
             };
@@ -199,10 +166,8 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         onTouchEnd={event => handleCanvasTouchEnd(event)}
         onClick={event => handleCanvasClick(
             event,
-            renderer,
-            store.getAnimals,
-            store.setActiveEntity,
-            store.removeActiveEntity)}/>;
+            renderer
+        )}/>;
 })
 
 export default Scene;

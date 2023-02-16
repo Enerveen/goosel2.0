@@ -12,13 +12,14 @@ interface IMainProps {
     setAppPhase: (phase: appPhase) => void
 }
 
+const localConstants = localStorage.getItem('simConstants')
+
 const MemoizedBackground = memo(BackgroundScene)
 
 const Version = () => <span className={classes.version}>v. {appConstants.version}</span>
 
 const Main = ({setAppPhase}: IMainProps) => {
     const [isDefaultSettings, setIsDefaultSettings] = useState(true)
-    const localConstants = localStorage.getItem('simConstants')
     const [constantsValues, setConstantsValues] = useState(localConstants ?
         JSON.parse(localConstants) : defaultSimConstants
     )

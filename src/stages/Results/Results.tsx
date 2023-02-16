@@ -5,8 +5,10 @@ import BarChart from "../../components/Charts/BarChart";
 import DynamicsChart from "../../components/Charts/DynamicsChart";
 import ComposedChart from "../../components/Charts/ComposedChart";
 import LineChart from "../../components/Charts/LineChart";
+import simulationStore from "../../stores/simulationStore";
 
-const Results = ({statistics}: any) => {
+const Results = () => {
+    const statistics = simulationStore.getStatistics
     return <div className={classes.container}>
         <h1>
             FIN!
