@@ -55,7 +55,6 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
             min={2}
             max={120}
             step={2}
-            tooltipContent={'Time, required to finish breeding process and lay eggs'}
             value={constantsValues.breedingMaxProgress / 10}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 updateSettingsValues('breedingMaxProgress', +e.target.value * 10)}
@@ -118,11 +117,9 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
             label={'Plant spawn Coef'}
             className={classes.slider}
             id={'foodSpawnChanceK'}
-            min={2}
-            max={200}
-            step={2}
+            min={1}
+            max={5}
             value={constantsValues.foodSpawnChanceK}
-            tooltipContent={'Chance of spawning a plant on a single tick (1/10 of a day).'}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 updateSettingsValues('foodSpawnChanceK', +e.target.value)}
         />
@@ -130,9 +127,9 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
             label={'Mutation chance'}
             className={classes.slider}
             id={'mutationChance'}
-            tooltipContent={'Chance of each new animal to slightly change their stats. Chance to change a gene is half percent lower than that value'}
-            min={1}
-            max={5}
+            min={2}
+            max={100}
+            step={2}
             value={Math.round(constantsValues.mutationChance * 100)}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 updateSettingsValues('mutationChance', +e.target.value / 100)}
