@@ -413,7 +413,7 @@ class Animal extends Entity implements Movable {
         }
     }
 
-    private die(timestamp: number) {
+    public die(timestamp: number) {
         this.isAlive = false
         this.age.deathTimestamp = timestamp
     }
