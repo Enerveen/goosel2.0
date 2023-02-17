@@ -39,7 +39,7 @@ const Results = () => {
                 <h2>Average population stats</h2>
                 <LineChart
                     data={statistics.averageStats}
-                    dataKeys={['speed', 'breedingSensitivity', 'foodSensitivity', 'breedingCD', 'hatchingTime']}
+                    dataKeys={['speed', 'breedingSensitivity', 'foodSensitivity', 'breedingCD', 'hatchingTime', 'curiosity', 'immunity']}
                     xAxisDataKey={'year'}/>
             </div>
         </div>

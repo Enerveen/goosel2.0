@@ -27,15 +27,26 @@ export const getChild = (
         breedingSensitivity: (mother.stats.breedingSensitivity + father.stats.breedingSensitivity) / 2,
         breedingCD: (mother.stats.breedingCD + father.stats.breedingCD) / 2,
         hatchingTime: (mother.stats.hatchingTime + father.stats.hatchingTime) / 2,
+        immunity: (mother.stats.immunity + father.stats.immunity) / 2,
+        curiosity: (mother.stats.curiosity + father.stats.curiosity) / 2
     }
     const gender: gender = coinFlip() ? 'male' : 'female'
 
     const stats = {
-        speed: Math.max(0.1, +((rollNPercentChance(mutationChance) ? baseStats.speed : coinFlip() ? baseStats.speed + statsDelta : baseStats.speed - statsDelta).toFixed(3))),
-        foodSensitivity: Math.max(0.1, +((rollNPercentChance(mutationChance) ? baseStats.foodSensitivity : coinFlip() ? baseStats.foodSensitivity + statsDelta : baseStats.foodSensitivity - statsDelta).toFixed(3))),
-        breedingSensitivity: Math.max(0.1, +((rollNPercentChance(mutationChance) ? baseStats.breedingSensitivity : coinFlip() ? baseStats.breedingSensitivity + statsDelta : baseStats.breedingSensitivity - statsDelta).toFixed(3))),
-        breedingCD: Math.max(0.1, +((rollNPercentChance(mutationChance) ? baseStats.breedingCD : coinFlip() ? baseStats.breedingCD + statsDelta : baseStats.breedingCD - statsDelta).toFixed(3))),
-        hatchingTime: Math.max(0.1, +((rollNPercentChance(mutationChance) ? baseStats.hatchingTime : coinFlip() ? baseStats.hatchingTime + statsDelta : baseStats.hatchingTime - statsDelta).toFixed(3)))
+        speed: Math.max(0.1, +((!rollNPercentChance(mutationChance) ? baseStats.speed : coinFlip() ?
+            baseStats.speed + statsDelta : baseStats.speed - statsDelta).toFixed(3))),
+        foodSensitivity: Math.max(0.1, +((!rollNPercentChance(mutationChance) ? baseStats.foodSensitivity : coinFlip() ?
+            baseStats.foodSensitivity + statsDelta : baseStats.foodSensitivity - statsDelta).toFixed(3))),
+        breedingSensitivity: Math.max(0.1, +((!rollNPercentChance(mutationChance) ? baseStats.breedingSensitivity : coinFlip() ?
+            baseStats.breedingSensitivity + statsDelta : baseStats.breedingSensitivity - statsDelta).toFixed(3))),
+        breedingCD: Math.max(0.1, +((!rollNPercentChance(mutationChance) ? baseStats.breedingCD : coinFlip() ?
+            baseStats.breedingCD + statsDelta : baseStats.breedingCD - statsDelta).toFixed(3))),
+        hatchingTime: Math.max(0.1, +((!rollNPercentChance(mutationChance) ? baseStats.hatchingTime : coinFlip() ?
+            baseStats.hatchingTime + statsDelta : baseStats.hatchingTime - statsDelta).toFixed(3))),
+        immunity: Math.max(0.1, +((!rollNPercentChance(mutationChance) ? baseStats.immunity : coinFlip() ?
+            baseStats.immunity + statsDelta : baseStats.immunity - statsDelta).toFixed(3))),
+        curiosity: Math.max(0.1, +((!rollNPercentChance(mutationChance) ? baseStats.curiosity : coinFlip() ?
+            baseStats.curiosity + statsDelta : baseStats.curiosity - statsDelta).toFixed(3)))
     }
 
     const genes = {

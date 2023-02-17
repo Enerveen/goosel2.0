@@ -23,6 +23,8 @@ export class SimulationStore {
             hatchingTime: number,
             foodSensitivity: number,
             speed: number,
+            curiosity: number,
+            immunity: number,
             year: number
         }[]
         populationChange: {value: number, year: number}[]

@@ -8,7 +8,9 @@ const generateStatistics = (animals: Animal[], plants: Plant[]) => {
             breedingSensitivity: 0,
             hatchingTime: 0,
             foodSensitivity: 0,
-            speed: 0
+            speed: 0,
+            immunity: 0,
+            curiosity: 0
         },
         gender: {
             male: 0,
@@ -23,7 +25,7 @@ const generateStatistics = (animals: Animal[], plants: Plant[]) => {
     }
 
     const stats = Object.keys(animalStats.averageStats) as
-        ('breedingCD' | 'breedingSensitivity' | 'hatchingTime' | 'foodSensitivity' | 'speed')[]
+        ('breedingCD' | 'breedingSensitivity' | 'hatchingTime' | 'foodSensitivity' | 'speed' | 'immunity' | 'curiosity')[]
 
     animals.forEach(animal => {
         stats.forEach((stat) => {

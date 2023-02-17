@@ -15,13 +15,13 @@ interface IControlsProps {
 
 const Controls = ({setAppPhase}: IControlsProps) => {
     const {fieldSize, animalMaxEnergy} = simulationStore.getSimulationConstants
-    const timestamp = simulationStore.getTimestamp
     const simulationSpeed = simulationStore.getSimulationSpeed
     const {getId, addAnimal, setSimulationSpeed} = simulationStore
     const logHidden = simulationStore.getLogHidden
     const [value, setValue] = useState(simulationSpeed)
 
     const createNewAnimal = () => {
+        const timestamp = simulationStore.getTimestamp
         addAnimal(
             new Animal({
                 id: `A${getId()}`,
