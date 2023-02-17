@@ -63,7 +63,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         }
         store.clearAnimalCorpses()
         store.gatherStatistics()
-        if (rollNPercentChance(store.getSimulationConstants.foodSpawnChanceK * store.getSimulationSpeed)) {
+        if (rollNPercentChance(store.getSimulationConstants.foodSpawnChance * store.getSimulationSpeed)) {
             store.addPlant(new Plant())
         }
         store.getAnimals.forEach(animal => animal.live())

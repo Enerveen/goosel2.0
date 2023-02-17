@@ -90,7 +90,7 @@ export type SimulationConstants = {
     breedingMaxAge: number,
     breedingMaxProgress: number,
     animalMaxEnergy: number,
-    foodSpawnChanceK: number,
+    foodSpawnChance: number,
     initialFoodCount: number,
     initialAnimalCount: number,
     foodNutritionMin: number,

@@ -7,6 +7,7 @@ import {appConstants, defaultSimConstants} from "../../constants/simulation";
 import BackgroundScene from "../../components/BackgroundScene/BackgroundScene";
 import Checkbox from "../../components/Checkbox/Checkbox";
 import Button from "../../components/Button/Button";
+import {validateSimulationConstants} from "../../utils/validators";
 
 interface IMainProps {
     setAppPhase: (phase: appPhase) => void
@@ -20,8 +21,8 @@ const Version = () => <span className={classes.version}>v. {appConstants.version
 
 const Main = ({setAppPhase}: IMainProps) => {
     const [isDefaultSettings, setIsDefaultSettings] = useState(true)
-    const [constantsValues, setConstantsValues] = useState(localConstants ?
-        JSON.parse(localConstants) : defaultSimConstants
+    const [constantsValues, setConstantsValues] = useState(() => localConstants ?
+        validateSimulationConstants(JSON.parse(localConstants)) : defaultSimConstants
     )
 
     const toggleSettingsCheckbox = useCallback(

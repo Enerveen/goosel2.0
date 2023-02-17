@@ -53,6 +53,7 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
         />
         <Slider
             label={'Days to finish breeding'}
+            tooltipContent={'Time, required to finish breeding process and lay eggs'}
             className={classes.slider}
             id={'breedingMaxProgress'}
             min={simConstantsRanges.breedingMaxProgress.min * simConstantsRanges.breedingMaxProgress.multiplier}
@@ -119,17 +120,19 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
         />
         <Slider
             label={'Plant spawn chance'}
+            tooltipContent={'Chance of spawning a plant on a single tick (1/10 of a day).'}
             className={classes.slider}
-            id={'foodSpawnChanceK'}
+            id={'foodSpawnChance'}
             min={simConstantsRanges.foodSpawnChance.min * simConstantsRanges.foodSpawnChance.multiplier}
             max={simConstantsRanges.foodSpawnChance.max * simConstantsRanges.foodSpawnChance.multiplier}
             step={simConstantsRanges.foodSpawnChance.step * simConstantsRanges.foodSpawnChance.multiplier}
-            value={Math.round(constantsValues.foodSpawnChanceK * simConstantsRanges.foodSpawnChance.multiplier)}
+            value={Math.round(constantsValues.foodSpawnChance * simConstantsRanges.foodSpawnChance.multiplier)}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                updateSettingsValues('foodSpawnChanceK', +e.target.value / simConstantsRanges.foodSpawnChance.multiplier)}
+                updateSettingsValues('foodSpawnChance', +e.target.value / simConstantsRanges.foodSpawnChance.multiplier)}
         />
         <Slider
             label={'Mutation chance'}
+            tooltipContent={'Chance of each new animal to slightly change their stats. Chance to change a gene is half percent lower than that value'}
             className={classes.slider}
             id={'mutationChance'}
             min={simConstantsRanges.mutationChance.min * simConstantsRanges.mutationChance.multiplier}
