@@ -1,18 +1,21 @@
 import Entity from "./Entity";
-import {Position} from "../types";
+import {plantKind, Position} from "../types";
 import {getRandomInRange} from "../utils/utils";
 import simulationStore from "../stores/simulationStore";
 import {getRandomPosition} from "../utils/helpers";
+import Animal from "./Animal";
 
 interface IPlantProps {
     id?: string,
     position?: Position,
-    nutritionValue?: number
+    nutritionValue?: number,
+    kind?: plantKind
 }
 
 class Plant extends Entity {
     id: string
     nutritionValue: number
+    kind: plantKind
 
     constructor(props?: IPlantProps) {
         const {foodNutritionMin, foodNutritionMax, fieldSize: {width, height}} = simulationStore.getSimulationConstants
@@ -25,12 +28,39 @@ class Plant extends Entity {
             nutritionValue = getRandomInRange(
                 foodNutritionMin,
                 foodNutritionMax
-            )
+            ),
+            kind = 'common'
         } = props || {}
         super(position);
         this.id = id
         this.nutritionValue = nutritionValue
+        this.kind = kind
     }
+
+    public affect(animal: Animal) {
+        const {addLogItem} = simulationStore
+        const timestamp = simulationStore.getTimestamp
+        switch (this.kind) {
+            case "poisonous":
+                animal.energy.current -=this.nutritionValue * 2
+                break;
+            case "lethal":
+                animal.isAlive = false
+                addLogItem({message:`${animal.name} died after consuming a poisonous food`, timestamp})
+                break;
+            case "lovely":
+                animal.energy.breedingCD = 0
+                break;
+            case "speed":
+                animal.stats.speed += 0.3
+                break;
+            case "gay":
+                animal.genes.gay = true
+                break;
+            default: break;
+        }
+    }
+
 }
 
 export default Plant

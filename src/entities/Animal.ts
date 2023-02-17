@@ -383,6 +383,9 @@ class Animal extends Entity implements Movable {
                 x: nearestFoodPiece.position.x,
                 y: nearestFoodPiece.position.y
             }
+            if(nearestFoodPiece.kind !== 'common') {
+                nearestFoodPiece.affect(this)
+            }
             removePlant(nearestFoodPiece.id)
         } else {
             this.headTo(nearestFoodPiece.position)

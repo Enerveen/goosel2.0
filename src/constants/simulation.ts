@@ -1,5 +1,8 @@
 import {SimulationConstants} from "../types";
 
+export const plantsKinds =
+    ['lovely', 'gay', 'speed', 'poisonous', 'lethal'] as const
+
 export const simulationValuesMultipliers = {
     foodSensitivity: 200,
     breedingCD: 1000,

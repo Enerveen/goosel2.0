@@ -2,14 +2,14 @@ import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} fr
 import classes from './Scene.module.scss'
 import {observer} from "mobx-react-lite";
 import {SimulationStore} from "../../stores/simulationStore";
-import {rollNPercentChance} from "../../utils/utils";
+import {coinFlip, getRandomInRange, rollNPercentChance} from "../../utils/utils";
 import Plant from "../../entities/Plant";
 import {
     generateAnimals,
     generateFood
 } from "../../utils/helpers";
 import Renderer from "../../graphics/Renderer";
-import {appPhase, BoundingBox} from "../../types";
+import {appPhase, BoundingBox, plantKind} from "../../types";
 import useWindowSize from "../../hooks/useWindowSize";
 import {Camera} from "../../graphics/Camera";
 import ImageContext from "../../stores/ImageContext";
@@ -20,6 +20,7 @@ import {
     handleCanvasTouchStart
 } from "../../utils/eventHandlers";
 import Vector2 from "../../dataStructures/Vector2";
+import {plantsKinds} from "../../constants/simulation";
 
 interface ISceneProps {
     store: SimulationStore,
@@ -64,7 +65,10 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         store.clearAnimalCorpses()
         store.gatherStatistics()
         if (rollNPercentChance(store.getSimulationConstants.foodSpawnChance * store.getSimulationSpeed)) {
-            store.addPlant(new Plant())
+            const isSpecial = coinFlip()
+            store.addPlant(new Plant({kind: isSpecial ?
+                    plantsKinds[getRandomInRange(0, 5)] as plantKind : 'common'}
+            ))
         }
         store.getAnimals.forEach(animal => animal.live())
     }, [context, canvasWidth, canvasHeight])

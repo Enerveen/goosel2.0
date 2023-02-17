@@ -1,4 +1,5 @@
 import Animal from "./entities/Animal";
+import {plantsKinds} from "./constants/simulation";
 
 export type Position = {
     x: number
@@ -108,3 +109,5 @@ export type Genes = {
     scavenger: boolean,
     predator: boolean
 }
+
+export type plantKind = typeof plantsKinds[number] | 'common'
