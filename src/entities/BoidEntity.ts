@@ -1,7 +1,8 @@
 import Entity from "./Entity";
-import {BoundingBox, Circle, Position, Vector2} from "../types";
+import {BoundingBox, Circle, Position} from "../types";
 import {findDistance} from "../utils/helpers";
-import {Quadtree} from "../dataStructures/quadtree";
+import Quadtree from "../dataStructures/Quadtree";
+import Vector2 from "../dataStructures/Vector2";
 
 
 const length = function(v: Vector2) {
@@ -28,16 +29,16 @@ export class BoidEntity extends Entity {
     readonly id: number = BoidsSystem.getUniqueBoidId()
 
     direction: Vector2
-    newDirection: Vector2 = {x: 0, y: 0}
+    newDirection: Vector2 = new Vector2(0, 0)
     velocity: number
     senseRadius: number
     senseAngle: number
     centerPoints: Position[] = []
 
-    constructor(position: Position={x: 0, y: 0}, direction: Vector2={x: 1, y: 0}, velocity: number=0, senseRadius: number=1, senseAngle: number=270) {
+    constructor(position: Position={x: 0, y: 0}, direction: Vector2=new Vector2(1, 0), velocity: number=0, senseRadius: number=1, senseAngle: number=270) {
         super(position);
 
-        this.direction = normalized(direction);
+        this.direction = direction.normalized();
         this.newDirection.x = this.direction.x;
         this.newDirection.y = this.direction.y;
         this.velocity = velocity;
@@ -47,20 +48,20 @@ export class BoidEntity extends Entity {
 
 
     hasVisionOf(entity: Entity, senseFactor: number=1.0, ignoreSenseAngle: boolean=false, precalculatedDistance?: number) {
-        const distance = precalculatedDistance || length({
-            x: this.position.x - entity.position.x,
-            y: this.position.y - entity.position.y
-        });
+        const distance = precalculatedDistance || new Vector2(
+            this.position.x - entity.position.x,
+            this.position.y - entity.position.y
+        ).norm()
 
-        return distance < senseFactor * this.senseRadius && (ignoreSenseAngle || Math.acos(dot(normalized(this.direction), normalized({x: entity.position.x - this.position.x, y: entity.position.y - this.position.y}))) * 180 / Math.PI < this.senseAngle / 2);
+        return distance < senseFactor * this.senseRadius && (ignoreSenseAngle || Math.acos(dot(this.direction.normalized(), new Vector2(entity.position.x - this.position.x, entity.position.y - this.position.y).normalized())) * 180 / Math.PI < this.senseAngle / 2);
     }
 
 
     steerAwayFrom(entity: Entity, senseFactor: number=1.0, ignoreSenseAngle: boolean=false, ignoreDistance: boolean=false, precalculatedDistance?: number) {
-        const distance = precalculatedDistance || length({
-            x: this.position.x - entity.position.x,
-            y: this.position.y - entity.position.y
-        });
+        const distance = precalculatedDistance || new Vector2(
+            this.position.x - entity.position.x,
+            this.position.y - entity.position.y
+        ).norm()
 
         if (ignoreDistance || this.hasVisionOf(entity, senseFactor, ignoreSenseAngle, distance)) {
             this.newDirection.x += 0.025 * (this.position.x - entity.position.x) / distance;
@@ -70,10 +71,10 @@ export class BoidEntity extends Entity {
 
 
     follow(entity: Entity, senseFactor: number=1.0, ignoreSenseAngle: boolean=false) {
-        const distance = length({
-            x: this.position.x - entity.position.x,
-            y: this.position.y - entity.position.y
-        });
+        const distance = new Vector2(
+            this.position.x - entity.position.x,
+            this.position.y - entity.position.y
+        ).norm()
 
         if (this.hasVisionOf(entity, senseFactor, ignoreSenseAngle, distance)) {
             this.newDirection.x += 0.25 * (entity.position.x - this.position.x) * distance / (senseFactor * this.senseRadius);
@@ -89,7 +90,10 @@ export class BoidEntity extends Entity {
 
 
     private dodge(entity: Entity, precalculatedDistance?: number) {
-        const distance = precalculatedDistance || length({ x: this.position.x - entity.position.x, y: this.position.y - entity.position.y });
+        const distance = precalculatedDistance || new Vector2(
+            this.position.x - entity.position.x,
+            this.position.y - entity.position.y
+        ).norm()
 
         const normal = {
             x: (entity.position.x - this.position.x) / distance,
@@ -98,10 +102,10 @@ export class BoidEntity extends Entity {
         const dot = this.direction.x * normal.x + this.direction.y * normal.y;
 
         if (dot > 0.8) {
-            const tangent = normalized({
-                x: this.direction.x - dot * normal.x,
-                y: this.direction.y - dot * normal.y
-            })
+            const tangent = new Vector2(
+                this.direction.x - dot * normal.x,
+                this.direction.y - dot * normal.y
+            ).normalized()
 
             this.newDirection.x += 0.025 * tangent.x;
             this.newDirection.y += 0.025 * tangent.y;
@@ -121,7 +125,10 @@ export class BoidEntity extends Entity {
             centerPoint.x /= this.centerPoints.length;
             centerPoint.y /= this.centerPoints.length;
 
-            const unit = normalized({x: centerPoint.x - this.position.x, y: centerPoint.y - this.position.y});
+            const unit = new Vector2(
+                centerPoint.x - this.position.x,
+                centerPoint.y - this.position.y
+            ).normalized();
             this.newDirection.x += 0.2 * unit.x;
             this.newDirection.y += 0.2 * unit.y;
         }
@@ -129,7 +136,7 @@ export class BoidEntity extends Entity {
         this.position.x += elapsedTime * this.velocity * (this.newDirection.x + 2 * Math.random() - 1);
         this.position.y += elapsedTime * this.velocity * (this.newDirection.y + 2 * Math.random() - 1);
 
-        this.direction = normalized(this.newDirection);
+        this.direction = this.newDirection.normalized();
         this.newDirection.x = this.direction.x;
         this.newDirection.y = this.direction.y;
 
@@ -167,10 +174,10 @@ export class BoidsSystem {
 
     constructor(count: number, fieldSize: {x: number, y: number}) {
         for (let i = 0; i < count; i++) {
-            this.boids.push(new BoidEntity({x: Math.random() * fieldSize.x, y: Math.random() * fieldSize.y}, {
-                x: 2 * Math.random() - 1,
-                y: 2 * Math.random() - 1
-            }, 1 + 5 * Math.random(), 50));
+            this.boids.push(new BoidEntity({x: Math.random() * fieldSize.x, y: Math.random() * fieldSize.y}, new Vector2(
+                2 * Math.random() - 1,
+                2 * Math.random() - 1
+        ), 1 + 5 * Math.random(), 50));
         }
     }
 
