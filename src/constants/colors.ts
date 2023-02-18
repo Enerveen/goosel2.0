@@ -3,7 +3,9 @@ export const barChartColors = [
     '#4AD460',
     '#EBD35E',
     '#FF6F4A',
-    '#A749FA'
+    '#A749FA',
+    '#d44aa8',
+    '#4ad4bf',
 ]
 
 export const areaChartColors = [

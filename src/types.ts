@@ -1,13 +1,8 @@
 import Animal from "./entities/Animal";
+import {plantsKinds} from "./constants/simulation";
 
 export type Position = {
     x: number
-    y: number
-}
-
-
-export type Vector2 = {
-    x: number,
     y: number
 }
 
@@ -139,7 +134,9 @@ export type Stats = {
     foodSensitivity: number
     breedingSensitivity: number,
     breedingCD: number,
-    hatchingTime: number
+    hatchingTime: number,
+    immunity: number,
+    curiosity: number
 }
 
 export type Activity = {
@@ -154,11 +151,12 @@ export type gender = 'male' | 'female'
 export type appPhase = 'NOT_STARTED' | 'STARTED' | 'FINISHED'
 
 export type SimulationConstants = {
+    mutationChance: number
     breedingMinAge: number,
     breedingMaxAge: number,
     breedingMaxProgress: number,
     animalMaxEnergy: number,
-    foodSpawnChanceK: number,
+    foodSpawnChance: number,
     initialFoodCount: number,
     initialAnimalCount: number,
     foodNutritionMin: number,
@@ -170,3 +168,11 @@ export type LogItem = {
     message: string,
     timestamp: number
 }
+
+export type Genes = {
+    gay: boolean,
+    scavenger: boolean,
+    predator: boolean
+}
+
+export type plantKind = typeof plantsKinds[number] | 'common'

@@ -1,0 +1,47 @@
+.tooltipWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.targetElement {
+  cursor: pointer;
+}
+
+.tooltip {
+  pointer-events: none;
+  color: #222222;
+  position: absolute;
+  padding: 10px;
+  width: 150px;
+  border-radius: 5px;
+  overflow: hidden;
+  background-color: #fafafa;
+  font-size: 18px;
+  box-sizing: border-box;
+  box-shadow: 1px 1px 10px #777;
+  z-index: 9999;
+
+  &.top {
+    top: -10px;
+    transform: translate(-50%, -100%);
+    left: 50%;
+  }
+
+  &.bottom {
+    bottom: -40px;
+    transform: translateX(-50%);
+    left: 50%;
+  }
+
+  &.right {
+    right: -40px;
+    transform: translateY(-50%);
+    top: 50%;
+  }
+
+  &.left {
+    left: -40px;
+    transform: translateY(-50%);
+    top: 50%;
+  }
+}

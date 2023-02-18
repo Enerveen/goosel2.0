@@ -1,5 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from "react";
 import classes from './RangeSlider.module.scss'
+import Tooltip from "../Tooltip/Tooltip";
 
 interface IRangeSliderProps {
     initialValues: number[]
@@ -10,9 +11,10 @@ interface IRangeSliderProps {
     className?: string,
     onValuesChange: (values: number[], event?: HTMLInputElement) => void,
     step?: number
+    tooltipContent?: string
 }
 
-const RangeSlider = ({initialValues, minGap = 0, max, min, label, className, onValuesChange, step = 1}: IRangeSliderProps) => {
+const RangeSlider = ({initialValues, minGap = 0, max, min, label, className, onValuesChange, step = 1, tooltipContent}: IRangeSliderProps) => {
     const [values, setValues] = useState(initialValues)
     const trackRef = useRef<HTMLDivElement | null>(null)
 
@@ -52,7 +54,12 @@ const RangeSlider = ({initialValues, minGap = 0, max, min, label, className, onV
 
     return <div className={className}>
         <div className={classes.labelContainer}>
-            {label ? <label className={classes.label}>{label}</label> : <div/>}
+            {label || tooltipContent ? <label className={classes.label}>
+                {label}
+                {tooltipContent ? <Tooltip tooltipContent={tooltipContent}>
+                    <span className={classes.tooltipIcon}>?</span>
+                </Tooltip> : <></>}
+            </label> : <div/>}
             <span>{values[0]} - {values[1]}</span>
         </div>
         <div className={classes.sliderContainer}>

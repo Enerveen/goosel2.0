@@ -10,6 +10,8 @@ enum keyNames {
     foodSensitivity = 'Food Sensitivity',
     breedingCD = 'Breeding cooldown',
     hatchingTime = 'Time to hatch',
+    curiosity = 'Curiosity',
+    immunity = 'Immunity',
     male = 'Male',
     female = 'Female',
     count = 'Amount of plants',
