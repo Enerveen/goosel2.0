@@ -21,6 +21,11 @@ const generateStatistics = (animals: Animal[], plants: Plant[]) => {
             teen: 0,
             mature: 0,
             elder: 0
+        },
+        genes: {
+            gay: 0,
+            predator: 0,
+            scavenger: 0
         }
     }
 
@@ -46,6 +51,15 @@ const generateStatistics = (animals: Animal[], plants: Plant[]) => {
 
         if (animal.age.current >= 15) {
             animalStats.age.elder += 1
+        }
+        if (animal.genes.gay) {
+            animalStats.genes.gay += 1
+        }
+        if (animal.genes.predator) {
+            animalStats.genes.predator += 1
+        }
+        if (animal.genes.scavenger) {
+            animalStats.genes.scavenger += 1
         }
     })
 

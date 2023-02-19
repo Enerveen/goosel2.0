@@ -36,6 +36,10 @@ const Results = () => {
                 <BarChart data={statistics.age} dataKeys={['child', 'teen', 'mature', 'elder']} xAxisDataKey={'year'}/>
             </div>
             <div className={classes.chartContainer}>
+                <h2>Animals genes representation</h2>
+                <BarChart data={statistics.genes} dataKeys={['total', 'gay', 'predator', 'scavenger']} xAxisDataKey={'year'}/>
+            </div>
+            <div className={classes.chartContainer}>
                 <h2>Average population stats</h2>
                 <LineChart
                     data={statistics.averageStats}

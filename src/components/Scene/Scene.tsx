@@ -65,7 +65,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         store.clearAnimalCorpses()
         store.gatherStatistics()
         if (rollNPercentChance(store.getSimulationConstants.foodSpawnChance * store.getSimulationSpeed)) {
-            const isSpecial = coinFlip()
+            const isSpecial = rollNPercentChance(0.2)
             store.addPlant(new Plant({kind: isSpecial ?
                     plantsKinds[getRandomInRange(0, 5)] as plantKind : 'common'}
             ))
@@ -123,10 +123,10 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             }
         })
 
+        renderer.drawClouds();
         if (!store.getLogHidden) {
             renderer.drawLogs()
         }
-        renderer.drawClouds();
     }, [context, canvasWidth, canvasHeight]);
 
     useEffect(() => {
