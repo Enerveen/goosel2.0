@@ -64,13 +64,26 @@ export const handleCanvasMouseRelease = () => {
 export const handleCanvasMouseMove = (
     event: React.MouseEvent<HTMLCanvasElement>,
     camera: Camera) => {
-    mouseCameraController.moveUpdate(camera, {x: event.clientX, y: event.clientY}, 2);
+    mouseCameraController.moveUpdate(camera, {x: event.clientX, y: event.clientY}, 1);
 }
 
 export const handleCanvasMouseWheel = (
     event: React.WheelEvent<HTMLCanvasElement>,
+    clientWidth: number,
+    clientHeight: number,
     camera: Camera) => {
-    camera.setZoom(Math.max(cameraConstants.minZoom, Math.min(cameraConstants.maxZoom, camera.getFovScale() * (1 - 0.001 * event.deltaY))));
+    const fovScalePrev = camera.getFovScale();
+    const zoom = 1 - 0.001 * event.deltaY;
+
+    camera.setZoom(Math.max(cameraConstants.minZoom, Math.min(cameraConstants.maxZoom, camera.getFovScale() * zoom)));
+
+    const p = camera.getFovScale() / fovScalePrev - 1.0;
+    const ddx = camera.fov.x / clientWidth;
+    const ddy = camera.fov.y / clientHeight;
+    const dd = Math.max(ddx, ddy);
+
+    camera.position.x += p * dd * (event.clientX - clientWidth / 2.0);
+    camera.position.y += p * dd * (event.clientY - clientHeight / 2.0);
 }
 
 export const handleCanvasTouchStart = (

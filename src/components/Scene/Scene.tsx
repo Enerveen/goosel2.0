@@ -165,7 +165,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         onMouseDown={event => handleCanvasMousePress(event, mainCamera)}
         onMouseUp={handleCanvasMouseRelease}
         onMouseMove={event => handleCanvasMouseMove(event, mainCamera)}
-        onWheel={event => handleCanvasMouseWheel(event, mainCamera)}
+        onWheel={event => handleCanvasMouseWheel(event, canvasWidth, canvasHeight, mainCamera)}
         onTouchStart={event => handleCanvasTouchStart(event, mainCamera, touchRef.current)}
         onTouchMove={event => handleCanvasTouchMove(event, mainCamera, touchRef.current)}
         onTouchEnd={event => handleCanvasTouchEnd(event)}
