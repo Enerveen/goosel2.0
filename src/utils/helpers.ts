@@ -84,7 +84,6 @@ export const calculateEnergyLoss = (stats: Stats) => {
 
 export const checkBreedingPossibility = (animal: Animal) => {
     const {breedingMinAge, breedingMaxAge} = simulationStore.getSimulationConstants
-
     return animal.energy.current > animal.energy.max / 2 &&
         animal.energy.breedingCD <= 0 &&
         animal.age.current >= breedingMinAge &&
