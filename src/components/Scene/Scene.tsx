@@ -2,7 +2,7 @@ import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} fr
 import classes from './Scene.module.scss'
 import {observer} from "mobx-react-lite";
 import {SimulationStore} from "../../stores/simulationStore";
-import {coinFlip, getRandomInRange, rollNPercentChance} from "../../utils/utils";
+import {getRandomInRange, rollNPercentChance} from "../../utils/utils";
 import Plant from "../../entities/Plant";
 import {
     generateAnimals,
@@ -81,7 +81,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         store.clearAnimalCorpses()
         store.gatherStatistics()
         if (rollNPercentChance(store.getSimulationConstants.foodSpawnChance * store.getSimulationSpeed)) {
-            const isSpecial = coinFlip()
+            const isSpecial = rollNPercentChance(0.2)
             store.addPlant(new Plant({kind: isSpecial ?
                     plantsKinds[getRandomInRange(0, 5)] as plantKind : 'common'}
             ))
@@ -111,7 +111,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             height: store.getSimulationConstants.fieldSize.height
         })
         store.getPlants.forEach(entity => {
-            renderer.drawPlant(entity.position)
+            renderer.drawPlant(entity.position, entity.kind)
         })
         store.getAnimals.forEach(entity => {
             renderer.drawAnimal(
@@ -139,6 +139,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             }
         })
 
+        renderer.drawClouds();
         if (!store.getLogHidden) {
             renderer.drawLogs()
         }
@@ -192,7 +193,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             onMouseDown={event => handleCanvasMousePress(event, mainCamera)}
             onMouseUp={handleCanvasMouseRelease}
             onMouseMove={event => handleCanvasMouseMove(event, mainCamera)}
-            onWheel={event => handleCanvasMouseWheel(event, mainCamera)}
+            onWheel={event => handleCanvasMouseWheel(event, canvasWidth, canvasHeight, mainCamera)}
             onTouchStart={event => handleCanvasTouchStart(event, mainCamera, touchRef.current)}
             onTouchMove={event => handleCanvasTouchMove(event, mainCamera, touchRef.current)}
             onTouchEnd={event => handleCanvasTouchEnd(event)}
@@ -206,7 +207,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                 className={classes.secretCanvas}
                 ref={secretCanvasRef}
             />
-        </>;
+        </>
 })
 
 export default Scene;

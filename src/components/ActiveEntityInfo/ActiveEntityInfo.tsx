@@ -22,6 +22,7 @@ const ActiveEntityInfo = observer(() => {
                     <b>Mother: </b>{entity.parents.mother.name}
                 </div>
             </> : <div className={classes.stat}>Homunculus</div>}
+            <div className={classes.stat}>{entity.genes.gay ? 'Gay' : 'Hetero'}</div>
             <div className={classes.stat}>
                 <b>Energy: </b>{energy?.toFixed(2)}/{entity.energy.max}
             </div>
@@ -32,6 +33,14 @@ const ActiveEntityInfo = observer(() => {
             <div className={classes.stat}>
                 <b>Speed: </b>
                 {entity.stats.speed}
+            </div>
+            <div className={classes.stat}>
+                <b>Curiosity: </b>
+                {entity.stats.curiosity}
+            </div>
+            <div className={classes.stat}>
+                <b>Immunity: </b>
+                {entity.stats.immunity}
             </div>
             <div className={classes.stat}>
                 <b>FS: </b>

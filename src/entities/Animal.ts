@@ -1,6 +1,6 @@
 import Entity from "./Entity";
 import {Activity, Age, BoundingBox, Energy, gender, Genes, Position, Stats} from "../types";
-import {coinFlip} from "../utils/utils";
+import {coinFlip, rollNPercentChance} from "../utils/utils";
 import Plant from "./Plant";
 import {generateAnimalName} from "../utils/nameGen";
 import {
@@ -64,7 +64,15 @@ class Animal extends Entity implements Movable {
             energy,
             isAlive = true,
             name,
-            stats = {foodSensitivity: 1, speed: 1, breedingCD: 1, hatchingTime: 1, breedingSensitivity: 1},
+            stats = {
+                foodSensitivity: 1,
+                speed: 1,
+                breedingCD: 1,
+                hatchingTime: 1,
+                breedingSensitivity: 1,
+                curiosity: 1,
+                immunity: 1
+            },
             parents = null,
             genes = {gay: false, predator: false, scavenger: false}
         } = props
@@ -143,7 +151,7 @@ class Animal extends Entity implements Movable {
     private walk(isDemo: boolean) {
         this.addRandomForce(0.05 * store.getSimulationSpeed);
 
-        if (checkBreedingPossibility(this) && this.lastBreedingCoordinates) {
+        if (checkBreedingPossibility(this) && this.lastBreedingCoordinates && !rollNPercentChance(this.stats.curiosity * simulationValuesMultipliers.curiosity)) {
             const lastBreedingVector = new Vector2(this.lastBreedingCoordinates.x - this.position.x, this.lastBreedingCoordinates.y - this.position.y);
             const lastBreedingDistance = lastBreedingVector.norm();
 
@@ -151,7 +159,7 @@ class Animal extends Entity implements Movable {
                 this.addForce(new Vector2(lastBreedingVector.x / lastBreedingDistance, lastBreedingVector.y / lastBreedingDistance),
                     0.01 * (lastBreedingDistance / (this.stats.breedingSensitivity * simulationValuesMultipliers.breedingSensitivity)) ** 2);
             }
-        } else if (this.lastMealCoordinates) {
+        } else if (this.lastMealCoordinates && !rollNPercentChance(this.stats.curiosity * simulationValuesMultipliers.curiosity)) {
             const lastMealVector = new Vector2(this.lastMealCoordinates.x - this.position.x, this.lastMealCoordinates.y - this.position.y);
             const lastMealDistance = lastMealVector.norm();
 
@@ -383,7 +391,7 @@ class Animal extends Entity implements Movable {
                 x: nearestFoodPiece.position.x,
                 y: nearestFoodPiece.position.y
             }
-            if(nearestFoodPiece.kind !== 'common') {
+            if(nearestFoodPiece.kind !== 'common' && !rollNPercentChance(this.stats.immunity * simulationValuesMultipliers.immunity)) {
                 nearestFoodPiece.affect(this)
             }
             removePlant(nearestFoodPiece.id)

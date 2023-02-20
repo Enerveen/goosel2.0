@@ -1,6 +1,10 @@
 import classes from './chartsStyles.module.scss'
 
 enum keyNames {
+    total = 'Total',
+    gay = 'Homosexual',
+    predator = 'Predator',
+    scavenger = 'Scavenger',
     child = 'Children',
     teen = 'Teens',
     mature = 'Adults',
@@ -10,6 +14,8 @@ enum keyNames {
     foodSensitivity = 'Food Sensitivity',
     breedingCD = 'Breeding cooldown',
     hatchingTime = 'Time to hatch',
+    curiosity = 'Curiosity',
+    immunity = 'Immunity',
     male = 'Male',
     female = 'Female',
     count = 'Amount of plants',

@@ -1,5 +1,5 @@
-import {FieldDimensions, gender, Position, Texture, TextureAtlas} from "../types";
-import {appConstants} from "../constants/simulation";
+import {FieldDimensions, gender, plantKind, Position, Texture, TextureAtlas} from "../types";
+import {appConstants, plantsKinds} from "../constants/simulation";
 import simulationStore from "../stores/simulationStore";
 
 
@@ -31,12 +31,15 @@ const loadTextureAtlas = (image: HTMLImageElement, params: {width?: number, heig
 
 class Renderer {
     context: CanvasRenderingContext2D | null
-    plantTexture: Texture
-    eggTexture: Texture
+    plantAtlas: TextureAtlas
+    egg: Texture
     breedingTexture: Texture
     matureAnimalTextureAtlas: TextureAtlas
     teenAnimalTextureAtlas: TextureAtlas
     childAnimalTextureAtlas: TextureAtlas
+    childCorpseTexture: Texture
+    teenCorpseTexture: Texture
+    matureCorpseTexture: Texture
     backgroundTexture: HTMLImageElement
     backgroundSeamlessTexture: HTMLImageElement
     backgroundGladeTexture: HTMLImageElement
@@ -44,19 +47,15 @@ class Renderer {
 
     constructor(ctx: CanvasRenderingContext2D | null, images: any) {
         this.context = ctx || null
-        const animalTextureAtlas = loadTextureAtlas(images.animalTextureAtlas, {
-            frameWidth: 200,
-            frameHeight: 250,
-            offsetX: 0.5,
-            offsetY: 0.8
-        });
-        this.teenAnimalTextureAtlas = {...animalTextureAtlas, width: 60, height: 75};
-        this.childAnimalTextureAtlas = {...animalTextureAtlas, width: 40, height: 50};
-        this.matureAnimalTextureAtlas = {...animalTextureAtlas, width: 80, height: 100};
-
-
-        this.eggTexture = loadTexture(images.egg, {width: 40, height: 40});
-        this.plantTexture = loadTexture(images.plant, {width: 50, height: 45, offsetX: 0.5, offsetY: 0.6});
+        const animalTextureAtlas = loadTextureAtlas(images.animalTextureAtlas, {frameWidth: 350, frameHeight: 370, offsetX: 0.5, offsetY: 0.8});
+        this.teenAnimalTextureAtlas = {...animalTextureAtlas, width: 87.5, height: 92.5};
+        this.childAnimalTextureAtlas = {...animalTextureAtlas, width: 43.75, height: 46.25};
+        this.matureAnimalTextureAtlas = {...animalTextureAtlas, width: 131.5, height: 138.75};
+        this.childCorpseTexture = loadTexture(images.corpse, {width: 46.25, height: 28.7, offsetX: 0.5, offsetY: 0.5})
+        this.teenCorpseTexture = loadTexture(images.corpse, {width: 92.5, height: 57.5, offsetX: 0.5, offsetY: 0.5})
+        this.matureCorpseTexture = loadTexture(images.corpse, {width: 138.75, height: 86.35, offsetX: 0.5, offsetY: 0.5})
+        this.egg = loadTexture(images.egg_slider, {width: 32, height: 40, offsetX: 0.5, offsetY: 0.5});
+        this.plantAtlas = loadTextureAtlas(images.plantAtlas, {frameWidth: 300, frameHeight: 330, offsetY: 0.5, offsetX: 0.5, width: 45, height:49.5})
         this.cloudsTexture = loadTexture(images.clouds);
         this.breedingTexture = loadTexture(images.heart, {width: 20, height: 20, offsetX: 0.5, offsetY: 0.5});
 
@@ -132,11 +131,20 @@ class Renderer {
         }
     }
 
-    public drawPlant(position: Position) {
-        const [{image, width, height}, {x, y}] = [this.plantTexture, position]
+    public drawPlant(position: Position, kind: plantKind) {
+        const [{
+            image,
+            width,
+            height,
+            frameWidth,
+            frameHeight,
+            offsetX,
+            offsetY},
+            {x, y}] = [this.plantAtlas, position]
         if (this.context) {
-            const originOffset = { x: 0.5 * width, y: 0.6 * height };
-            this.context.drawImage(image, x - originOffset.x, y - originOffset.y, width, height);
+            const kindIndex = ['common', ...plantsKinds].indexOf(kind)
+            const originOffset = { x: offsetX * width, y: offsetY * height };
+            this.context.drawImage(image, frameWidth * kindIndex, 0, frameWidth, frameHeight, x - originOffset.x, y - originOffset.y, width, height );
         }
     }
 
@@ -219,9 +227,46 @@ class Renderer {
     }
 
     calculateAnimalTexture(entity: { gender: gender, isAlive: boolean, age: number }) {
-        const {age} = entity
+        const {age, isAlive} = entity
+        if (!isAlive) {
+            if (age >= 0 && age < 5) {
+                return {
+                    ...this.childCorpseTexture,
+                    frameHeight: 0,
+                    frameWidth: 0,
+                    offsetX: this.childCorpseTexture.offsetX,
+                    offsetY: this.childCorpseTexture.offsetY
+                }
+            }
+
+            if (age >= 5 && age < 10) {
+                return {
+                    ...this.teenCorpseTexture,
+                    frameHeight: 0,
+                    frameWidth: 0,
+                    offsetX: this.teenCorpseTexture.offsetX,
+                    offsetY: this.teenCorpseTexture.offsetY
+                }
+            }
+
+            if (age >= 10) {
+                return {
+                    ...this.matureCorpseTexture,
+                    frameHeight: 0,
+                    frameWidth: 0,
+                    offsetX: this.childCorpseTexture.offsetX,
+                    offsetY: this.childCorpseTexture.offsetY
+                }
+            }
+        }
         if (age < 0) {
-            return {...this.eggTexture, frameWidth: 0, frameHeight: 0, offsetX: this.eggTexture.offsetX, offsetY: this.eggTexture.offsetY}
+            return  {
+                ...this.egg,
+                frameHeight: 0,
+                frameWidth: 0,
+                offsetX: this.egg.offsetX,
+                offsetY: this.egg.offsetY
+            }
         }
         if (age >= 0 && age < 5) {
             return this.childAnimalTextureAtlas

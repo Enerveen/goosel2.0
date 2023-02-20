@@ -52,10 +52,10 @@ class Plant extends Entity {
                 animal.energy.breedingCD = 0
                 break;
             case "speed":
-                animal.stats.speed += 0.3
+                animal.stats.speed += 0.1
                 break;
             case "gay":
-                animal.genes.gay = true
+                //animal.genes.gay = !animal.genes.gay
                 break;
             default: break;
         }

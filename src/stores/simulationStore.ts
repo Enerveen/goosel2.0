@@ -16,6 +16,7 @@ export class SimulationStore {
     currentYear: number = -1
     statistics: {
         age: { child: number, teen: number, mature: number, elder: number, year: number }[],
+        genes: {total: number, predator: number, gay:  number, scavenger: number, year: number}[]
         gender: { male: number, female: number, year: number }[]
         averageStats: {
             breedingCD: number,
@@ -23,12 +24,14 @@ export class SimulationStore {
             hatchingTime: number,
             foodSensitivity: number,
             speed: number,
+            curiosity: number,
+            immunity: number,
             year: number
         }[]
         populationChange: {value: number, year: number}[]
         plantStats: {year: number, count: number, totalNutrition: number}[]
         animalCount: number[]
-    } = {age: [], gender: [], averageStats: [], populationChange:[], animalCount: [], plantStats: []}
+    } = {age: [], gender: [], averageStats: [], populationChange:[], animalCount: [], plantStats: [], genes: []}
     simulationConstants: SimulationConstants = defaultSimConstants
     log: {logs: LogItem[], hidden: boolean} = {logs:[{message: 'Simulation has started!', timestamp:0}], hidden: true}
 
@@ -187,7 +190,7 @@ export class SimulationStore {
     gatherStatistics = () => {
         if (Math.round(this.timestamp / timeConstants.yearLength) > this.currentYear || this.timestamp === 0) {
             this.currentYear += 1
-            const {gender, age, averageStats, animalsCount, plantsStats} = generateStatistics(this.animals, this.plants)
+            const {gender, age, averageStats, animalsCount, plantsStats, genes} = generateStatistics(this.animals, this.plants)
             const populationChange = animalsCount - (this.statistics.animalCount.at(-1) || 0)
             this.statistics = {
                 age: [...this.statistics.age, {year: this.currentYear, ...age}],
@@ -196,6 +199,7 @@ export class SimulationStore {
                 populationChange: [...this.statistics.populationChange, {year: this.currentYear, value: populationChange}],
                 animalCount: [...this.statistics.animalCount, animalsCount],
                 plantStats: [...this.statistics.plantStats, {year: this.currentYear, ...plantsStats}],
+                genes: [...this.statistics.genes, {year: this.currentYear, total: animalsCount, ...genes}]
             }
         }
     }

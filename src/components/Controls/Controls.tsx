@@ -8,20 +8,21 @@ import Clock from "../Clock/Clock";
 import Button from "../Button/Button";
 import Checkbox from "../Checkbox/Checkbox";
 import simulationStore from "../../stores/simulationStore";
+import {observer} from "mobx-react-lite";
 
 interface IControlsProps {
     setAppPhase: (state: appPhase) => void
 }
 
-const Controls = ({setAppPhase}: IControlsProps) => {
+const Controls = observer(({setAppPhase}: IControlsProps) => {
     const {fieldSize, animalMaxEnergy} = simulationStore.getSimulationConstants
-    const timestamp = simulationStore.getTimestamp
     const simulationSpeed = simulationStore.getSimulationSpeed
     const {getId, addAnimal, setSimulationSpeed} = simulationStore
     const logHidden = simulationStore.getLogHidden
     const [value, setValue] = useState(simulationSpeed)
 
     const createNewAnimal = () => {
+        const timestamp = simulationStore.getTimestamp
         addAnimal(
             new Animal({
                 id: `A${getId()}`,
@@ -63,6 +64,6 @@ const Controls = ({setAppPhase}: IControlsProps) => {
             />
         </div>
     </div>
-}
+})
 
 export default Controls

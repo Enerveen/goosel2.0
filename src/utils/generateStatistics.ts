@@ -8,7 +8,9 @@ const generateStatistics = (animals: Animal[], plants: Plant[]) => {
             breedingSensitivity: 0,
             hatchingTime: 0,
             foodSensitivity: 0,
-            speed: 0
+            speed: 0,
+            immunity: 0,
+            curiosity: 0
         },
         gender: {
             male: 0,
@@ -19,11 +21,16 @@ const generateStatistics = (animals: Animal[], plants: Plant[]) => {
             teen: 0,
             mature: 0,
             elder: 0
+        },
+        genes: {
+            gay: 0,
+            predator: 0,
+            scavenger: 0
         }
     }
 
     const stats = Object.keys(animalStats.averageStats) as
-        ('breedingCD' | 'breedingSensitivity' | 'hatchingTime' | 'foodSensitivity' | 'speed')[]
+        ('breedingCD' | 'breedingSensitivity' | 'hatchingTime' | 'foodSensitivity' | 'speed' | 'immunity' | 'curiosity')[]
 
     animals.forEach(animal => {
         stats.forEach((stat) => {
@@ -44,6 +51,15 @@ const generateStatistics = (animals: Animal[], plants: Plant[]) => {
 
         if (animal.age.current >= 15) {
             animalStats.age.elder += 1
+        }
+        if (animal.genes.gay) {
+            animalStats.genes.gay += 1
+        }
+        if (animal.genes.predator) {
+            animalStats.genes.predator += 1
+        }
+        if (animal.genes.scavenger) {
+            animalStats.genes.scavenger += 1
         }
     })
 

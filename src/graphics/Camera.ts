@@ -7,7 +7,7 @@ export class Camera {
     position: Position
     fov: Vector2
     private scale: number
-    private readonly aspect: number
+    readonly aspect: number
 
     constructor(position: Position, fov: Vector2) {
         this.position = position;

@@ -7,7 +7,9 @@ export const simulationValuesMultipliers = {
     foodSensitivity: 200,
     breedingCD: 1000,
     breedingSensitivity: 200,
-    hatchingTime: 1000
+    hatchingTime: 1000,
+    immunity: 0.5,
+    curiosity: 0.5
 }
 
 export const timeConstants = {

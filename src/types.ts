@@ -71,7 +71,9 @@ export type Stats = {
     foodSensitivity: number
     breedingSensitivity: number,
     breedingCD: number,
-    hatchingTime: number
+    hatchingTime: number,
+    immunity: number,
+    curiosity: number
 }
 
 export type Activity = {
