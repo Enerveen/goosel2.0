@@ -122,7 +122,8 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                     isAlive: entity.isAlive,
                     name: entity.name,
                     currentActivity: entity.currentActivity.activity,
-                    birthTimestamp: entity.age.birthTimestamp
+                    birthTimestamp: entity.age.birthTimestamp,
+                    targetDirection: entity.targetDirection
                 }
             )
             renderer.drawLabels(entity.position,

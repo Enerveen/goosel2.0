@@ -1,6 +1,7 @@
 import {FieldDimensions, gender, plantKind, Position, Texture, TextureAtlas} from "../types";
 import {appConstants, plantsKinds} from "../constants/simulation";
 import simulationStore from "../stores/simulationStore";
+import Vector2 from "../dataStructures/Vector2";
 
 
 const loadTexture = (image: HTMLImageElement, params: {width?: number, height?: number, offsetX?: number, offsetY?: number}={}) => {
@@ -150,16 +151,17 @@ class Renderer {
 
     public drawAnimal(
         position: Position,
-        entity: { gender: gender, name: string, isAlive: boolean, age: number, currentActivity: string, birthTimestamp: number }) {
+        entity: { gender: gender, name: string, isAlive: boolean, age: number, currentActivity: string, birthTimestamp: number, targetDirection: Vector2 }) {
         if (this.context) {
             const animationFrameId = simulationStore.getTimestamp - entity.birthTimestamp
             const [{image, width, height, frameWidth, frameHeight, offsetX, offsetY}, {x, y}]
                 = [this.calculateAnimalTexture(entity), position]
+            const heading = entity.targetDirection?.x < 0 ? 0 : 1
 
             const currentFrame = Math.floor((animationFrameId % appConstants.fps) / appConstants.fps * 15);
             const originOffset = { x: offsetX * width, y: offsetY * height };
             if (frameWidth) {
-                this.context.drawImage(image, frameWidth * currentFrame, 0, frameWidth, frameHeight, x - originOffset.x, y - originOffset.y, width, height)
+                this.context.drawImage(image, frameWidth * currentFrame, frameHeight * heading, frameWidth, frameHeight, x - originOffset.x, y - originOffset.y, width, height)
             } else {
                 this.context.drawImage(image, x - originOffset.x, y - originOffset.y, width, height)
             }
