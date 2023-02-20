@@ -44,7 +44,12 @@ class Renderer {
 
     constructor(ctx: CanvasRenderingContext2D | null, images: any) {
         this.context = ctx || null
-        const animalTextureAtlas = loadTextureAtlas(images.animalTextureAtlas, {frameWidth: 200, frameHeight: 250, offsetX: 0.5, offsetY: 0.8});
+        const animalTextureAtlas = loadTextureAtlas(images.animalTextureAtlas, {
+            frameWidth: 200,
+            frameHeight: 250,
+            offsetX: 0.5,
+            offsetY: 0.8
+        });
         this.teenAnimalTextureAtlas = {...animalTextureAtlas, width: 60, height: 75};
         this.childAnimalTextureAtlas = {...animalTextureAtlas, width: 40, height: 50};
         this.matureAnimalTextureAtlas = {...animalTextureAtlas, width: 80, height: 100};
@@ -59,6 +64,7 @@ class Renderer {
         this.backgroundSeamlessTexture = images.backgroundSeamless
         this.backgroundGladeTexture = images.backgroundGlade
     }
+
 
     public drawBackground(size: FieldDimensions) {
         const [image, {width, height}] = [this.backgroundTexture, size]

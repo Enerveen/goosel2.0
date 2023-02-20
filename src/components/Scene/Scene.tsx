@@ -22,6 +22,13 @@ import {
 import Vector2 from "../../dataStructures/Vector2";
 import {plantsKinds} from "../../constants/simulation";
 
+
+import {Shader} from "../../graphics/Shader";
+import {defaultShader} from "../../graphics/shaders";
+import {glScene} from "../../graphics/GLScene";
+
+
+
 interface ISceneProps {
     store: SimulationStore,
     setAppPhase: (phase: appPhase) => void
@@ -29,8 +36,11 @@ interface ISceneProps {
 
 const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const secretCanvasRef = useRef<HTMLCanvasElement>(null);
+
     const touchRef = useRef({start: 0, end: 0})
     const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
+    const [glContext, setGlContext] = useState<WebGL2RenderingContext | null>(null);
     const {width: canvasWidth, height: canvasHeight} = useWindowSize()
     const images = useContext(ImageContext)
     const renderer = useMemo(() => new Renderer(context, images), [context])
@@ -48,6 +58,12 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         canvasWidth,
         canvasHeight
     ]);
+
+    useMemo(() => {
+        glScene.nativeCanvasContext = context;
+        glScene.resetTexture();
+    }, [context])
+
 
     const init = useCallback(() => {
         console.log('Simulation has started with the following constants:',
@@ -127,13 +143,19 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             renderer.drawLogs()
         }
         renderer.drawClouds();
-    }, [context, canvasWidth, canvasHeight]);
+
+        glScene.update();
+
+    }, [context, glContext, canvasWidth, canvasHeight]);
 
     useEffect(() => {
-        if (canvasRef.current) {
+        if (canvasRef.current && secretCanvasRef.current) {
             const canvas = canvasRef.current;
-            const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+
+            const ctx = canvas.getContext("2d", {willReadFrequently: true}) as CanvasRenderingContext2D;
             setContext(ctx);
+            const gl = secretCanvasRef.current.getContext('webgl2') as WebGL2RenderingContext;
+            setGlContext(gl);
         }
     }, []);
 
@@ -150,29 +172,41 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                 store.updateTimestamp()
                 animationFrameId = window.requestAnimationFrame(render);
             };
+
+            Shader.initContext(glContext as WebGL2RenderingContext);
+            glScene.init(glContext as WebGL2RenderingContext);
+
             render();
         }
         return () => {
             window.cancelAnimationFrame(animationFrameId);
         };
-    }, [context, drawStep, store]);
+    }, [context, glContext, drawStep, store]);
 
-    return <canvas
-        className={classes.canvas}
-        ref={canvasRef}
-        width={canvasWidth}
-        height={canvasHeight}
-        onMouseDown={event => handleCanvasMousePress(event, mainCamera)}
-        onMouseUp={handleCanvasMouseRelease}
-        onMouseMove={event => handleCanvasMouseMove(event, mainCamera)}
-        onWheel={event => handleCanvasMouseWheel(event, mainCamera)}
-        onTouchStart={event => handleCanvasTouchStart(event, mainCamera, touchRef.current)}
-        onTouchMove={event => handleCanvasTouchMove(event, mainCamera, touchRef.current)}
-        onTouchEnd={event => handleCanvasTouchEnd(event)}
-        onClick={event => handleCanvasClick(
-            event,
-            renderer
-        )}/>;
+    return <>
+            <canvas
+            className={classes.canvas}
+            ref={canvasRef}
+            width={canvasWidth}
+            height={canvasHeight}
+            onMouseDown={event => handleCanvasMousePress(event, mainCamera)}
+            onMouseUp={handleCanvasMouseRelease}
+            onMouseMove={event => handleCanvasMouseMove(event, mainCamera)}
+            onWheel={event => handleCanvasMouseWheel(event, mainCamera)}
+            onTouchStart={event => handleCanvasTouchStart(event, mainCamera, touchRef.current)}
+            onTouchMove={event => handleCanvasTouchMove(event, mainCamera, touchRef.current)}
+            onTouchEnd={event => handleCanvasTouchEnd(event)}
+            onClick={event => handleCanvasClick(
+                event,
+                renderer
+            )}/>
+            <canvas
+                width={canvasWidth}
+                height={canvasHeight}
+                className={classes.secretCanvas}
+                ref={secretCanvasRef}
+            />
+        </>;
 })
 
 export default Scene;
