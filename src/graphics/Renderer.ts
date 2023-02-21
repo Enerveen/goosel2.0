@@ -2,6 +2,8 @@ import {FieldDimensions, gender, plantKind, Position, Texture, TextureAtlas} fro
 import {appConstants, plantsKinds} from "../constants/simulation";
 import simulationStore from "../stores/simulationStore";
 import Vector2 from "../dataStructures/Vector2";
+import {glDriver} from "./GLDriver";
+import {GLTexture} from "./GLTexture";
 
 
 const loadTexture = (image: HTMLImageElement, params: {width?: number, height?: number, offsetX?: number, offsetY?: number}={}) => {
@@ -165,6 +167,10 @@ class Renderer {
             } else {
                 this.context.drawImage(image, x - originOffset.x, y - originOffset.y, width, height)
             }
+
+            if (glDriver.gl) {
+                //glDriver.drawImage(GLTexture.fromImage(image), x, y, this.context.getTransform());
+            }
         }
     }
 
@@ -227,6 +233,7 @@ class Renderer {
             this.context.restore()
         }
     }
+
 
     calculateAnimalTexture(entity: { gender: gender, isAlive: boolean, age: number }) {
         const {age, isAlive} = entity

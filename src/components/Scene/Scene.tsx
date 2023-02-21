@@ -26,6 +26,7 @@ import {plantsKinds} from "../../constants/simulation";
 import {Shader} from "../../graphics/Shader";
 import {defaultShader} from "../../graphics/shaders";
 import {glScene} from "../../graphics/GLScene";
+import {glDriver} from "../../graphics/GLDriver";
 
 
 
@@ -146,7 +147,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         }
         renderer.drawClouds();
 
-        glScene.update();
+        //glScene.update();
 
     }, [context, glContext, canvasWidth, canvasHeight]);
 
@@ -176,6 +177,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             };
 
             Shader.initContext(glContext as WebGL2RenderingContext);
+            glDriver.init(glContext as WebGL2RenderingContext);
             glScene.init(glContext as WebGL2RenderingContext);
 
             render();
