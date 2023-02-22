@@ -18,9 +18,9 @@ export class Shader {
         Shader.gl.compileShader(fragmentShader);
 
 
-        var compiled = Shader.gl.getShaderParameter(fragmentShader, Shader.gl.COMPILE_STATUS);
+        var compiled = Shader.gl.getShaderParameter(vertexShader, Shader.gl.COMPILE_STATUS);
         console.log('Shader compiled successfully: ' + compiled);
-        var compilationLog = Shader.gl.getShaderInfoLog(fragmentShader);
+        var compilationLog = Shader.gl.getShaderInfoLog(vertexShader);
         console.log('Shader compiler log: ' + compilationLog);
 
         console.log('program compiled');

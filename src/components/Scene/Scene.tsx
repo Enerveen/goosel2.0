@@ -1,7 +1,7 @@
 import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import classes from './Scene.module.scss'
 import {observer} from "mobx-react-lite";
-import {SimulationStore} from "../../stores/simulationStore";
+import simulationStore, {SimulationStore} from "../../stores/simulationStore";
 import {getRandomInRange, rollNPercentChance} from "../../utils/utils";
 import Plant from "../../entities/Plant";
 import {
@@ -9,7 +9,7 @@ import {
     generateFood
 } from "../../utils/helpers";
 import Renderer from "../../graphics/Renderer";
-import {appPhase, BoundingBox, plantKind} from "../../types";
+import {appPhase, BoundingBox, plantKind, Position} from "../../types";
 import useWindowSize from "../../hooks/useWindowSize";
 import {Camera} from "../../graphics/Camera";
 import ImageContext from "../../stores/ImageContext";
@@ -83,9 +83,13 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         store.gatherStatistics()
         if (rollNPercentChance(store.getSimulationConstants.foodSpawnChance * store.getSimulationSpeed)) {
             const isSpecial = rollNPercentChance(0.2)
-            store.addPlant(new Plant({kind: isSpecial ?
-                    plantsKinds[getRandomInRange(0, 5)] as plantKind : 'common'}
-            ))
+            for (let i = 0; i < 0; i++) {
+                store.addPlant(new Plant({
+                        kind: isSpecial ?
+                            plantsKinds[getRandomInRange(0, 5)] as plantKind : 'common'
+                    }
+                ))
+            }
         }
         store.getAnimals.forEach(animal => animal.live())
     }, [context, canvasWidth, canvasHeight])
@@ -96,6 +100,8 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             return;
         }
 
+        glDriver.renderPrepare();
+
         context.resetTransform();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
@@ -105,15 +111,31 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             const scale = Math.min(canvasWidth / mainCamera.fov.x, canvasHeight / mainCamera.fov.y);
             context.translate(canvasWidth / 2 - mainCamera.position.x * scale, canvasHeight / 2 - mainCamera.position.y * scale);
             context.scale(scale, scale);
+
+            glDriver.setGlobalTransform(context.getTransform().toFloat32Array());
         }
 
         renderer.drawSeamlessBackground({
             width: store.getSimulationConstants.fieldSize.width,
             height: store.getSimulationConstants.fieldSize.height
         })
-        store.getPlants.forEach(entity => {
-            renderer.drawPlant(entity.position, entity.kind)
-        })
+        {
+            if (glDriver.gl && glDriver.defaultShader) {
+
+                glDriver.defaultShader.bind()
+
+                glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_time'), simulationStore.getTimestamp);
+                glDriver.gl.uniformMatrix4fv(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_transform'), false, glDriver.transform);
+                glDriver.gl.uniform2f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_resolution'), glDriver.gl.canvas.width, glDriver.gl.canvas.height);
+            }
+
+            renderer.drawPlants(store.getPlants);
+
+            // store.getPlants.forEach(entity => {
+            //     renderer.drawPlant(entity.position, entity.kind)
+            // })
+        }
+
         store.getAnimals.forEach(entity => {
             renderer.drawAnimal(
                 entity.position,
@@ -145,7 +167,6 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         if (!store.getLogHidden) {
             renderer.drawLogs()
         }
-        renderer.drawClouds();
 
         //glScene.update();
 
@@ -155,7 +176,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         if (canvasRef.current && secretCanvasRef.current) {
             const canvas = canvasRef.current;
 
-            const ctx = canvas.getContext("2d", {willReadFrequently: true}) as CanvasRenderingContext2D;
+            const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
             setContext(ctx);
             const gl = secretCanvasRef.current.getContext('webgl2') as WebGL2RenderingContext;
             setGlContext(gl);

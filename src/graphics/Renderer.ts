@@ -4,6 +4,7 @@ import simulationStore from "../stores/simulationStore";
 import Vector2 from "../dataStructures/Vector2";
 import {glDriver} from "./GLDriver";
 import {GLTexture} from "./GLTexture";
+import Plant from "../entities/Plant";
 
 
 const loadTexture = (image: HTMLImageElement, params: {width?: number, height?: number, offsetX?: number, offsetY?: number}={}) => {
@@ -134,6 +135,38 @@ class Renderer {
         }
     }
 
+
+    public drawPlants(plants: Plant[]) {
+        const [{
+            image,
+            width,
+            height,
+            frameWidth,
+            frameHeight,
+            offsetX,
+            offsetY}] = [this.plantAtlas]
+
+        const posBuffer: Position[] = []
+        const frameBuffer: Position[] = []
+        const scale = {
+            x: 0.5 * width,
+            y: 0.5 * height
+        }
+
+
+        plants.forEach(plant => {
+            const position = {
+                x: plant.position.x - (offsetX - 0.5) * width,
+                y: plant.position.y - (offsetY - 0.5) * height,
+            }
+
+            posBuffer.push(position)
+        })
+
+        glDriver.drawImage(GLTexture.fromImage(image), posBuffer, scale);
+    }
+
+
     public drawPlant(position: Position, kind: plantKind) {
         const [{
             image,
@@ -148,6 +181,15 @@ class Renderer {
             const kindIndex = ['common', ...plantsKinds].indexOf(kind)
             const originOffset = { x: offsetX * width, y: offsetY * height };
             this.context.drawImage(image, frameWidth * kindIndex, 0, frameWidth, frameHeight, x - originOffset.x, y - originOffset.y, width, height );
+
+            if (glDriver.gl) {
+                const scale = {
+                    x: 0.5 * width,
+                    y: 0.5 * height
+                }
+                //this.context.scale(0.5, 0.5);
+                //glDriver.drawImage(GLTexture.fromImage(image), [{x: x - (offsetX - 0.5) * width, y: y - (offsetY - 0.5) * height}], scale);
+            }
         }
     }
 
@@ -169,7 +211,12 @@ class Renderer {
             }
 
             if (glDriver.gl) {
-                //glDriver.drawImage(GLTexture.fromImage(image), x, y, this.context.getTransform());
+                const scale = {
+                    x: 0.5 * width,
+                    y: 0.5 * height
+                }
+                //this.context.scale(0.5, 0.5);
+                glDriver.drawImage(GLTexture.fromImage(image), [{x: x - (offsetX - 0.5) * width, y: y - (offsetY - 0.5) * height}], scale);
             }
         }
     }
