@@ -3,12 +3,19 @@
 layout (location = 0) in vec3 position;
 
 uniform mat4 u_transform;
-uniform vec2 pos[1000];
+uniform vec3 pos[1024];
+uniform vec2 textureFrame[1024];
+uniform float bendData[1024];
 uniform vec2 scale;
 uniform vec2 u_resolution;
 
 out vec2 uv;
 out vec3 v_frag_position;
+out vec2 frameIdx;
+out float depth;
+
+out float bendAge;
+
 
 void main() {
     mat3 translate = mat3(1.0);
@@ -28,12 +35,14 @@ void main() {
 
     mat3 matTransform = resolutionScale * transform * translate * matScale;
 
-    v_frag_position = (0.5 * vec3(position.x, -position.y, 0) + 0.5);
-    uv = v_frag_position.xy;
-//
+    v_frag_position = position;
+    uv = (0.5 * vec2(position.x, -position.y) + 0.5);
+    frameIdx = textureFrame[gl_InstanceID];
+
     gl_Position = vec4(matTransform * vec3(position.xy, 1.0), 1.0);
+    //gl_Position = vec4(position.xy, 1.0, 1.0);
     gl_Position.xy -= vec2(1.0, -1.0);
-//    gl_Position.xy = 0.1 * position.xy;
-//    gl_Position.z = 1.0;
-//    gl_Position.w = 1.0;
+    depth = 1.0 - pos[gl_InstanceID].z / 5000.0;
+
+    bendAge = bendData[gl_InstanceID];
 }

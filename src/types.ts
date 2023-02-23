@@ -4,7 +4,9 @@ import {plantsKinds} from "./constants/simulation";
 export type Position = {
     x: number
     y: number
+    z?: number
 }
+
 
 export class BoundingBox {
     left: number = 0

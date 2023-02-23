@@ -1,6 +1,6 @@
 import {FieldDimensions, gender, plantKind, Position, Texture, TextureAtlas} from "../types";
 import {appConstants, plantsKinds} from "../constants/simulation";
-import simulationStore from "../stores/simulationStore";
+import simulationStore, {GrassSystem} from "../stores/simulationStore";
 import Vector2 from "../dataStructures/Vector2";
 import {glDriver} from "./GLDriver";
 import {GLTexture} from "./GLTexture";
@@ -51,7 +51,7 @@ class Renderer {
 
     constructor(ctx: CanvasRenderingContext2D | null, images: any) {
         this.context = ctx || null
-        const animalTextureAtlas = loadTextureAtlas(images.animalTextureAtlas, {frameWidth: 350, frameHeight: 370, offsetX: 0.5, offsetY: 0.8});
+        const animalTextureAtlas = loadTextureAtlas(images.animalTextureAtlas, {frameWidth: 350, frameHeight: 370, offsetX: 0.35, offsetY: 0.89});
         this.teenAnimalTextureAtlas = {...animalTextureAtlas, width: 87.5, height: 92.5};
         this.childAnimalTextureAtlas = {...animalTextureAtlas, width: 43.75, height: 46.25};
         this.matureAnimalTextureAtlas = {...animalTextureAtlas, width: 131.5, height: 138.75};
@@ -124,19 +124,41 @@ class Renderer {
             // this.context.globalCompositeOperation = 'overlay';
             // this.context.fillRect(0, 0, fieldSize.x, fieldSize.y)
             //
+            const image = this.cloudsTexture.image;
+            const position = {
+                x: -500 - height / 4 * (0.5 * Math.cos(0.0002 * timestamp) + 0.5),
+                y: -500 - height / 4 * (0.5 * Math.sin(0.0002 * timestamp) + 0.5)
+            }
+
             this.context.globalAlpha = 0.45;
             this.context.globalCompositeOperation = 'source-atop';
             this.context.drawImage(this.cloudsTexture.image,
-                -500 - height / 4 * (0.5 * Math.cos(0.0002 * timestamp) + 0.5),
-                -500 - height / 4 * (0.5 * Math.sin(0.0002 * timestamp) + 0.5),
+                position.x,
+                position.y,
                 width,
                 height);
+
+            if (glDriver.gl && glDriver.defaultShader) {
+                const scale = {
+                    x: 0.5 * width,
+                    y: 0.5 * height
+                }
+
+                glDriver.gl.disable(glDriver.gl.DEPTH_TEST);
+                glDriver.gl.uniform1f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_maxAlpha'), 0.45);
+                glDriver.drawImage(GLTexture.fromImage(image), 1, 1, [{x: position.x, y: position.y, z: 0.1}], [{x: 0, y: 0}], scale);
+            }
+
             this.context.restore();
         }
     }
 
 
     public drawPlants(plants: Plant[]) {
+        if (!glDriver.defaultShader) {
+            return;
+        }
+
         const [{
             image,
             width,
@@ -158,13 +180,69 @@ class Renderer {
             const position = {
                 x: plant.position.x - (offsetX - 0.5) * width,
                 y: plant.position.y - (offsetY - 0.5) * height,
+                z: plant.position.y
+            }
+            const frame = {
+                x: ['common', ...plantsKinds].indexOf(plant.kind),
+                y: 0
             }
 
             posBuffer.push(position)
+            frameBuffer.push(frame);
         })
 
-        glDriver.drawImage(GLTexture.fromImage(image), posBuffer, scale);
+        //glDriver.gl?.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_isSkew'), 1);
+        glDriver.drawImage(GLTexture.fromImage(image), image.width / frameWidth, image.height / frameHeight, posBuffer, frameBuffer, scale);
     }
+
+
+
+    drawGrass(grassSystem: GrassSystem) {
+        if (!glDriver.defaultShader) {
+            return;
+        }
+
+        const [{
+            image,
+            width,
+            height,
+            frameWidth,
+            frameHeight,
+            offsetX,
+            offsetY}] = [this.plantAtlas]
+
+        const posBuffer: Position[] = []
+        const frameBuffer: Position[] = []
+        const buffer: number[] = []
+        const scale = {
+            x: 1.25 * width,
+            y: 1.25 * height
+        }
+
+        grassSystem.positions.forEach(plant => {
+            const position = {
+                x: plant.position.x - (offsetX - 0.5) * width,
+                y: plant.position.y - (offsetY - 0.5) * height,
+                z: plant.position.y
+            }
+            const frame = {
+                x: 0,
+                y: 0
+            }
+
+            posBuffer.push(position)
+            frameBuffer.push(frame);
+        })
+
+        grassSystem.states.forEach(state => {
+            buffer.push(state.age);
+        })
+
+        glDriver.gl?.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_isSkew'), 1);
+        glDriver.drawImage(GLTexture.fromImage(image), image.width / frameWidth, image.height / frameHeight, posBuffer, frameBuffer, scale, buffer);
+    }
+
+
 
 
     public drawPlant(position: Position, kind: plantKind) {
@@ -188,7 +266,7 @@ class Renderer {
                     y: 0.5 * height
                 }
                 //this.context.scale(0.5, 0.5);
-                //glDriver.drawImage(GLTexture.fromImage(image), [{x: x - (offsetX - 0.5) * width, y: y - (offsetY - 0.5) * height}], scale);
+                //glDriver.drawImage(GLTexture.fromImage(image), [{x: x - (offsetX - 0.5) * width, y: y - (offsetY - 0.5) * height, z: y}], scale);
             }
         }
     }
@@ -204,19 +282,35 @@ class Renderer {
 
             const currentFrame = Math.floor((animationFrameId % appConstants.fps) / appConstants.fps * 15);
             const originOffset = { x: offsetX * width, y: offsetY * height };
-            if (frameWidth) {
-                this.context.drawImage(image, frameWidth * currentFrame, frameHeight * heading, frameWidth, frameHeight, x - originOffset.x, y - originOffset.y, width, height)
-            } else {
-                this.context.drawImage(image, x - originOffset.x, y - originOffset.y, width, height)
-            }
+            // if (frameWidth) {
+            //     this.context.drawImage(image, frameWidth * currentFrame, frameHeight * heading, frameWidth, frameHeight, x - originOffset.x, y - originOffset.y, width, height)
+            // } else {
+            //     this.context.drawImage(image, x - originOffset.x, y - originOffset.y, width, height)
+            // }
 
             if (glDriver.gl) {
                 const scale = {
                     x: 0.5 * width,
                     y: 0.5 * height
                 }
-                //this.context.scale(0.5, 0.5);
-                glDriver.drawImage(GLTexture.fromImage(image), [{x: x - (offsetX - 0.5) * width, y: y - (offsetY - 0.5) * height}], scale);
+                const numFrame = {
+                    x: frameWidth > 0 ? image.width / frameWidth : 1,
+                    y: frameHeight > 0 ? image.height / frameHeight : 1
+                }
+
+                if (frameWidth) {
+                    glDriver.drawImage(GLTexture.fromImage(image), numFrame.x, numFrame.y, [{
+                        x: x - (offsetX - 0.5) * width,
+                        y: y - (offsetY - 0.5) * height,
+                        z: y
+                    }], [{x: currentFrame, y: heading}], scale);
+                } else {
+                    glDriver.drawImage(GLTexture.fromImage(image), 1, 1, [{
+                        x: x - (offsetX - 0.5) * width,
+                        y: y - (offsetY - 0.5) * height,
+                        z: y
+                    }], [{x: 0, y: 0}], scale);
+                }
             }
         }
     }

@@ -2,8 +2,82 @@ import Animal from "../entities/Animal";
 import Plant from "../entities/Plant";
 import {action, computed, makeObservable, observable} from "mobx";
 import generateStatistics from "../utils/generateStatistics";
-import {FieldDimensions, LogItem, SimulationConstants} from "../types";
+import {BoundingBox, FieldDimensions, LogItem, Position, SimulationConstants} from "../types";
 import {defaultSimConstants, timeConstants} from "../constants/simulation";
+import {getRandomPosition} from "../utils/helpers";
+import Quadtree from "../dataStructures/Quadtree";
+import quadtree from "../dataStructures/Quadtree";
+import Entity from "../entities/Entity";
+
+
+
+class GrassEntity extends Entity {
+    idx: number
+
+    constructor(position: Position, idx: number) {
+        super(position);
+
+        this.idx = idx;
+    }
+}
+
+
+export class GrassSystem {
+    positions: GrassEntity[] = []
+    states: {
+        age: number,
+        timestamp: number
+    }[] = []
+
+    activeEntities: number[] = []
+
+    quadTree: Quadtree
+
+
+    constructor(count: number) {
+        const width = simulationStore.getSimulationConstants.fieldSize.width;
+        const height = simulationStore.getSimulationConstants.fieldSize.height;
+
+        for (let i = 0; i < count; i++) {
+            this.positions.push(new GrassEntity(getRandomPosition(width, height), i));
+            this.states.push({
+                age: 0.0,
+                timestamp: 0.0
+            });
+        }
+
+        this.quadTree = new Quadtree({x: 0.0, y: 0.0}, Math.max(width, height));
+        this.positions.forEach(entity => {
+            this.quadTree.push(entity);
+        })
+    }
+
+
+    update(entities: Entity[]) {
+        entities.forEach(entity => {
+            const obb = new BoundingBox(
+                entity.position.x - 40.0,
+                entity.position.x + 40.0,
+                entity.position.y - 40.0,
+                entity.position.y + 40.0
+            )
+
+            this.quadTree.get(obb).forEach(grassEntity => {
+                this.states[(grassEntity as GrassEntity).idx].timestamp = simulationStore.getTimestamp;
+            })
+        })
+
+        this.states.forEach(state => {
+            state.age = (simulationStore.getTimestamp - state.timestamp) / 600.0;
+
+            if (state.age >= 1.0) {
+                state.age = 1.0;
+            }
+        })
+    }
+}
+
+
 
 export class SimulationStore {
     animals: Animal[] = []

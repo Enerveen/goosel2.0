@@ -14,6 +14,7 @@ import Quadtree from "../dataStructures/Quadtree";
 import store from "../stores/simulationStore";
 import {Movable} from "./Movable";
 import Vector2 from "../dataStructures/Vector2";
+import simulationStore from "../stores/simulationStore";
 
 interface IAnimalProps {
     id: string

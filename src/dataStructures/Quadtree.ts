@@ -1,7 +1,7 @@
 import Entity from "../entities/Entity";
 import {BoundingBox, Position} from "../types";
 
-const nodeCapacity = 3;
+const nodeCapacity = 30;
 
 
 class Node {

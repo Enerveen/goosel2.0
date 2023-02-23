@@ -1,7 +1,7 @@
 import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import classes from './Scene.module.scss'
 import {observer} from "mobx-react-lite";
-import simulationStore, {SimulationStore} from "../../stores/simulationStore";
+import simulationStore, {GrassSystem, SimulationStore} from "../../stores/simulationStore";
 import {getRandomInRange, rollNPercentChance} from "../../utils/utils";
 import Plant from "../../entities/Plant";
 import {
@@ -9,7 +9,7 @@ import {
     generateFood
 } from "../../utils/helpers";
 import Renderer from "../../graphics/Renderer";
-import {appPhase, BoundingBox, plantKind, Position} from "../../types";
+import {appPhase, BoundingBox, plantKind} from "../../types";
 import useWindowSize from "../../hooks/useWindowSize";
 import {Camera} from "../../graphics/Camera";
 import ImageContext from "../../stores/ImageContext";
@@ -24,7 +24,6 @@ import {plantsKinds} from "../../constants/simulation";
 
 
 import {Shader} from "../../graphics/Shader";
-import {defaultShader} from "../../graphics/shaders";
 import {glScene} from "../../graphics/GLScene";
 import {glDriver} from "../../graphics/GLDriver";
 
@@ -60,6 +59,8 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         canvasHeight
     ]);
 
+    const grassSystem = useMemo(() => new GrassSystem(20000), [store])
+
     useMemo(() => {
         glScene.nativeCanvasContext = context;
         glScene.resetTexture();
@@ -83,15 +84,17 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         store.gatherStatistics()
         if (rollNPercentChance(store.getSimulationConstants.foodSpawnChance * store.getSimulationSpeed)) {
             const isSpecial = rollNPercentChance(0.2)
-            for (let i = 0; i < 0; i++) {
+            for (let i = 0; i < 10; i++) {
                 store.addPlant(new Plant({
                         kind: isSpecial ?
-                            plantsKinds[getRandomInRange(0, 5)] as plantKind : 'common'
+                            plantsKinds[getRandomInRange(0, 6)] as plantKind : 'common'
                     }
                 ))
             }
         }
         store.getAnimals.forEach(animal => animal.live())
+
+        grassSystem.update(store.getAnimals);
     }, [context, canvasWidth, canvasHeight])
 
 
@@ -121,15 +124,17 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         })
         {
             if (glDriver.gl && glDriver.defaultShader) {
-
                 glDriver.defaultShader.bind()
 
                 glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_time'), simulationStore.getTimestamp);
                 glDriver.gl.uniformMatrix4fv(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_transform'), false, glDriver.transform);
                 glDriver.gl.uniform2f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_resolution'), glDriver.gl.canvas.width, glDriver.gl.canvas.height);
-            }
 
-            renderer.drawPlants(store.getPlants);
+                renderer.drawPlants(store.getPlants);
+                renderer.drawGrass(grassSystem);
+
+                glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_isSkew'), 0);
+            }
 
             // store.getPlants.forEach(entity => {
             //     renderer.drawPlant(entity.position, entity.kind)
@@ -146,7 +151,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                     name: entity.name,
                     currentActivity: entity.currentActivity.activity,
                     birthTimestamp: entity.age.birthTimestamp,
-                    targetDirection: entity.targetDirection
+                    targetDirection: entity.speed
                 }
             )
             renderer.drawLabels(entity.position,

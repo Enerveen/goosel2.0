@@ -17,6 +17,7 @@ class Plant extends Entity {
     nutritionValue: number
     kind: plantKind
 
+
     constructor(props?: IPlantProps) {
         const {foodNutritionMin, foodNutritionMax, fieldSize: {width, height}} = simulationStore.getSimulationConstants
         const {
@@ -36,6 +37,7 @@ class Plant extends Entity {
         this.nutritionValue = nutritionValue
         this.kind = kind
     }
+
 
     public affect(animal: Animal) {
         const {addLogItem} = simulationStore

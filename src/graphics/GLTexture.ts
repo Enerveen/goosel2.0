@@ -8,6 +8,8 @@ export class GLTexture {
     private native: WebGLTexture | null
     readonly width: number
     readonly height: number
+    private numFramesX: number = 1
+    private numFramesY: number = 1
 
 
     constructor(image: HTMLImageElement) {
@@ -47,19 +49,5 @@ export class GLTexture {
     bind(index: number) {
         glDriver.gl?.activeTexture(glDriver.gl?.TEXTURE0 + index);
         glDriver.gl?.bindTexture(glDriver.gl?.TEXTURE_2D, this.native);
-    }
-}
-
-
-export class GLAnimation extends GLTexture {
-    private numFramesX: number = 1
-    private numFramesY: number = 1
-
-
-    constructor(image: HTMLImageElement, numFramesX: number=1, numFramesY: number=1) {
-        super(image);
-
-        this.numFramesX = numFramesX;
-        this.numFramesY = numFramesY;
     }
 }
