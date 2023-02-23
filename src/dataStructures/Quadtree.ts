@@ -1,5 +1,5 @@
 import Entity from "../entities/Entity";
-import {BoundingBox, Position} from "../types";
+import {BoundingBox, Circle, Position} from "../types";
 
 const nodeCapacity = 30;
 
@@ -44,10 +44,10 @@ class Node {
     }
 
 
-    get(obb: BoundingBox) {
+    get(obb: BoundingBox | Circle) {
         let result: Entity[] = [];
 
-        if (!obb.intersects(this.obb)) {
+        if (!this.obb.intersects(obb)) {
             return result;
         }
 
