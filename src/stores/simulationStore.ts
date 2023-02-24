@@ -2,11 +2,10 @@ import Animal from "../entities/Animal";
 import Plant from "../entities/Plant";
 import {action, computed, makeObservable, observable} from "mobx";
 import generateStatistics from "../utils/generateStatistics";
-import {BoundingBox, FieldDimensions, LogItem, Position, SimulationConstants} from "../types";
+import {BoundingBox, Circle, FieldDimensions, LogItem, Position, SimulationConstants} from "../types";
 import {defaultSimConstants, timeConstants} from "../constants/simulation";
 import {getRandomPosition} from "../utils/helpers";
 import Quadtree from "../dataStructures/Quadtree";
-import quadtree from "../dataStructures/Quadtree";
 import Entity from "../entities/Entity";
 
 
@@ -39,7 +38,7 @@ export class GrassSystem {
         const height = simulationStore.getSimulationConstants.fieldSize.height;
 
         for (let i = 0; i < count; i++) {
-            this.positions.push(new GrassEntity(getRandomPosition(width, height), i));
+            this.positions.push(new GrassEntity(getRandomPosition(0.5 * width, 0.5 * height), i));
             this.states.push({
                 age: 0.0,
                 timestamp: 0.0
@@ -61,8 +60,9 @@ export class GrassSystem {
                 entity.position.y - 40.0,
                 entity.position.y + 40.0
             )
+            const circle = new Circle(entity.position.x, entity.position.y, 40.0);
 
-            this.quadTree.get(obb).forEach(grassEntity => {
+            this.quadTree.get(circle).forEach(grassEntity => {
                 this.states[(grassEntity as GrassEntity).idx].timestamp = simulationStore.getTimestamp;
             })
         })
@@ -70,9 +70,7 @@ export class GrassSystem {
         this.states.forEach(state => {
             state.age = (simulationStore.getTimestamp - state.timestamp) / 600.0;
 
-            if (state.age >= 1.0) {
-                state.age = 1.0;
-            }
+            state.age = 1.0 - Math.min(1.0, state.age);
         })
     }
 }

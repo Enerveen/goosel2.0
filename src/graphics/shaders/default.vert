@@ -10,9 +10,9 @@ uniform vec2 scale;
 uniform vec2 u_resolution;
 
 out vec2 uv;
-out vec3 v_frag_position;
 out vec2 frameIdx;
 out float depth;
+out vec2 v_position;
 
 out float bendAge;
 
@@ -31,11 +31,10 @@ void main() {
     transform[2][0] = u_transform[3][0];
     transform[2][1] = -u_transform[3][1];
 
-
+    v_position = vec2(pos[gl_InstanceID].x, -pos[gl_InstanceID].y);
 
     mat3 matTransform = resolutionScale * transform * translate * matScale;
 
-    v_frag_position = position;
     uv = (0.5 * vec2(position.x, -position.y) + 0.5);
     frameIdx = textureFrame[gl_InstanceID];
 

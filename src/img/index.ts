@@ -8,6 +8,7 @@ import heart from "./heart.png";
 import egg_slider from "../../public/egg_slider.png";
 import corpse from './corpse.png'
 import plantAtlas from './plantsAtlas.png'
+import grass from './grass.png'
 
 const imagesSrc = {
     clouds,
@@ -19,7 +20,8 @@ const imagesSrc = {
     heart,
     egg_slider,
     corpse,
-    plantAtlas
+    plantAtlas,
+    grass
 }
 
 export default imagesSrc

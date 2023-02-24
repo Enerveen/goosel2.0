@@ -48,6 +48,7 @@ class Renderer {
     backgroundSeamlessTexture: HTMLImageElement
     backgroundGladeTexture: HTMLImageElement
     cloudsTexture: Texture
+    grassTexture: Texture
 
     constructor(ctx: CanvasRenderingContext2D | null, images: any) {
         this.context = ctx || null
@@ -62,6 +63,7 @@ class Renderer {
         this.plantAtlas = loadTextureAtlas(images.plantAtlas, {frameWidth: 300, frameHeight: 330, offsetY: 0.5, offsetX: 0.5, width: 45, height:49.5})
         this.cloudsTexture = loadTexture(images.clouds);
         this.breedingTexture = loadTexture(images.heart, {width: 20, height: 20, offsetX: 0.5, offsetY: 0.5});
+        this.grassTexture = loadTexture(images.grass, {offsetX: 0.5, offsetY: 0.8});
 
         this.backgroundTexture = images.background
         this.backgroundSeamlessTexture = images.backgroundSeamless
@@ -80,7 +82,7 @@ class Renderer {
     public drawSeamlessBackground(size: FieldDimensions) {
         const [image, gladeImage, {width, height}] = [this.backgroundSeamlessTexture, this.backgroundGladeTexture, size]
 
-        if (!this.context) {
+        if (!this.context || !glDriver.gl) {
             return;
         }
 
@@ -97,11 +99,14 @@ class Renderer {
                 const cutX = Math.min(tileSize.width, size.width - j * tileSize.width) / tileSize.width;
                 const cutY = Math.min(tileSize.height, size.height - i * tileSize.height) / tileSize.height;
 
-                if (i === 1 && j === 1) {
-                    this.context.drawImage(gladeImage, 0, 0, cutX * gladeImage.width, cutY * gladeImage.height, j * tileSize.width, i * tileSize.height, cutX * tileSize.width, cutY * tileSize.height)
-                } else {
-                    this.context.drawImage(image, 0, 0, cutX * image.width, cutY * image.height,j * tileSize.width, i * tileSize.height, cutX * tileSize.width, cutY * tileSize.height)
-                }
+                // if (i === 1 && j === 1) {
+                //     this.context.drawImage(gladeImage, 0, 0, cutX * gladeImage.width, cutY * gladeImage.height, j * tileSize.width, i * tileSize.height, cutX * tileSize.width, cutY * tileSize.height)
+                // } else {
+                //     this.context.drawImage(image, 0, 0, cutX * image.width, cutY * image.height,j * tileSize.width, i * tileSize.height, cutX * tileSize.width, cutY * tileSize.height)
+                // }
+
+
+                glDriver.drawImage(GLTexture.fromImage(image), 1, 1, [{x: (j + 0.5) * tileSize.width, y: (i + 0.5) * tileSize.height}], [{x: 0, y: 0}], {x: 0.5 * tileSize.width, y: 0.5 * tileSize.height});
             }
         }
     }
@@ -215,8 +220,8 @@ class Renderer {
         const frameBuffer: Position[] = []
         const buffer: number[] = []
         const scale = {
-            x: 1.25 * width,
-            y: 1.25 * height
+            x: 1.5 * width,
+            y: 1.5 * height
         }
 
         grassSystem.positions.forEach(plant => {

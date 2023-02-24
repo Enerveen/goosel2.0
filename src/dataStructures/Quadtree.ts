@@ -165,7 +165,7 @@ class Quadtree {
     }
 
 
-    get(obb: BoundingBox) {
+    get(obb: BoundingBox | Circle) {
         return this.node.get(obb);
     }
 

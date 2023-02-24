@@ -59,7 +59,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         canvasHeight
     ]);
 
-    const grassSystem = useMemo(() => new GrassSystem(20000), [store])
+    const grassSystem = useMemo(() => new GrassSystem(5000), [store])
 
     useMemo(() => {
         glScene.nativeCanvasContext = context;
@@ -84,7 +84,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         store.gatherStatistics()
         if (rollNPercentChance(store.getSimulationConstants.foodSpawnChance * store.getSimulationSpeed)) {
             const isSpecial = rollNPercentChance(0.2)
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 1; i++) {
                 store.addPlant(new Plant({
                         kind: isSpecial ?
                             plantsKinds[getRandomInRange(0, 6)] as plantKind : 'common'
@@ -108,8 +108,8 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         context.resetTransform();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
-        mainCamera.checkBounds(new BoundingBox(0, store.getSimulationConstants.fieldSize.width,
-           0, store.getSimulationConstants.fieldSize.height));
+        //mainCamera.checkBounds(new BoundingBox(0, store.getSimulationConstants.fieldSize.width,
+        //   0, store.getSimulationConstants.fieldSize.height));
         {
             const scale = Math.min(canvasWidth / mainCamera.fov.x, canvasHeight / mainCamera.fov.y);
             context.translate(canvasWidth / 2 - mainCamera.position.x * scale, canvasHeight / 2 - mainCamera.position.y * scale);
@@ -118,18 +118,20 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             glDriver.setGlobalTransform(context.getTransform().toFloat32Array());
         }
 
+        if (glDriver.gl && glDriver.defaultShader) {
+            glDriver.defaultShader.bind()
+
+            glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_time'), simulationStore.getTimestamp);
+            glDriver.gl.uniformMatrix4fv(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_transform'), false, glDriver.transform);
+            glDriver.gl.uniform2f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_resolution'), glDriver.gl.canvas.width, glDriver.gl.canvas.height);
+        }
+
         renderer.drawSeamlessBackground({
             width: store.getSimulationConstants.fieldSize.width,
             height: store.getSimulationConstants.fieldSize.height
         })
         {
             if (glDriver.gl && glDriver.defaultShader) {
-                glDriver.defaultShader.bind()
-
-                glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_time'), simulationStore.getTimestamp);
-                glDriver.gl.uniformMatrix4fv(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_transform'), false, glDriver.transform);
-                glDriver.gl.uniform2f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_resolution'), glDriver.gl.canvas.width, glDriver.gl.canvas.height);
-
                 renderer.drawPlants(store.getPlants);
                 renderer.drawGrass(grassSystem);
 

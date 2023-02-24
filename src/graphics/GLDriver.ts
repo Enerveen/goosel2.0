@@ -61,7 +61,7 @@ class GLDriver {
             return;
         }
 
-        this.gl.clearColor(0.0, 0.0, 0.0, 0.0);
+        this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
         //glContext.enable(glContext.DEPTH_TEST);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
         this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
@@ -70,7 +70,7 @@ class GLDriver {
         this.gl.depthFunc(this.gl.LESS);
         this.gl.depthMask(true);
         this.gl.enable(this.gl.BLEND);
-        this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA)
+        this.gl.blendFuncSeparate(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA, this.gl.ZERO, this.gl.ONE);
 
         this.gl.uniform1f(this.gl.getUniformLocation(this.defaultShader.glShaderProgram, 'u_maxAlpha'), 1.0);
 
