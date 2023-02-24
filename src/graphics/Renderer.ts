@@ -48,15 +48,15 @@ class Renderer {
 
     constructor(ctx: CanvasRenderingContext2D | null, images: any) {
         this.context = ctx || null
-        const animalTextureAtlas = loadTextureAtlas(images.animalTextureAtlas, {frameWidth: 350, frameHeight: 370, offsetX: 0.5, offsetY: 0.8});
+        const animalTextureAtlas = loadTextureAtlas(images.animalTextureAtlas, {frameWidth: 282, frameHeight: 361, offsetX: 0.5, offsetY: 0.8});
         const animalTextureAtlasFrameRatio = animalTextureAtlas.frameHeight / animalTextureAtlas.frameWidth
-        this.teenAnimalTextureAtlas = {...animalTextureAtlas, width: 87.5, height: 87.5 * animalTextureAtlasFrameRatio};
-        this.childAnimalTextureAtlas = {...animalTextureAtlas, width: 43.75, height: 43.75 * animalTextureAtlasFrameRatio};
-        this.matureAnimalTextureAtlas = {...animalTextureAtlas, width: 131.5, height: 131.5 * animalTextureAtlasFrameRatio};
+        this.teenAnimalTextureAtlas = {...animalTextureAtlas, width: 70.5, height: 70.5 * animalTextureAtlasFrameRatio};
+        this.childAnimalTextureAtlas = {...animalTextureAtlas, width: 47, height: 47 * animalTextureAtlasFrameRatio};
+        this.matureAnimalTextureAtlas = {...animalTextureAtlas, width: 94, height: 94 * animalTextureAtlasFrameRatio};
         const corpseTextureRatio = 262 / 421
-        this.childCorpseTexture = loadTexture(images.corpse, {width: 46.25, height: 46.25 * corpseTextureRatio, offsetX: 0.5, offsetY: 0.5})
-        this.teenCorpseTexture = loadTexture(images.corpse, {width: 92.5, height: 92.5 * corpseTextureRatio, offsetX: 0.5, offsetY: 0.5})
-        this.matureCorpseTexture = loadTexture(images.corpse, {width: 138.75, height: 138.5 * corpseTextureRatio, offsetX: 0.5, offsetY: 0.5})
+        this.childCorpseTexture = loadTexture(images.corpse, {width: 90.25, height: 90.25 * corpseTextureRatio, offsetX: 0.5, offsetY: 0.5})
+        this.teenCorpseTexture = loadTexture(images.corpse, {width: 60.16, height: 60.16 * corpseTextureRatio, offsetX: 0.5, offsetY: 0.5})
+        this.matureCorpseTexture = loadTexture(images.corpse, {width: 120.3, height: 120.3 * corpseTextureRatio, offsetX: 0.5, offsetY: 0.5})
         this.egg = loadTexture(images.egg_slider, {width: 32, height: 40, offsetX: 0.5, offsetY: 0.5});
         this.plantAtlas = loadTextureAtlas(images.plantAtlas, {frameWidth: 300, frameHeight: 330, offsetY: 0.5, offsetX: 0.5, width: 45, height:49.5})
         this.cloudsTexture = loadTexture(images.clouds);
@@ -107,21 +107,11 @@ class Renderer {
 
     public drawClouds() {
         const timestamp = simulationStore.getTimestamp
-        const {fieldSize: {width: fieldWidth, height: fieldHeight}} = simulationStore.getSimulationConstants
         if (this.context) {
             const width = 10.0 * this.cloudsTexture.width;
             const height = 10.0 * this.cloudsTexture.height;
 
             this.context.save();
-
-            // Uncomment to adjust brightness
-            // this.context.fillStyle = 'rgba(100, 100, 150, 1)';
-            // this.context.globalCompositeOperation = 'multiply';
-            // this.context.fillRect(0, 0, fieldSize.x, fieldSize.y)
-            // this.context.fillStyle = 'rgba(100, 100, 255, 0.1)';
-            // this.context.globalCompositeOperation = 'overlay';
-            // this.context.fillRect(0, 0, fieldSize.x, fieldSize.y)
-            //
             this.context.globalAlpha = 0.45;
             this.context.globalCompositeOperation = 'source-atop';
             this.context.drawImage(this.cloudsTexture.image,
@@ -157,7 +147,7 @@ class Renderer {
             const animationFrameId = simulationStore.getTimestamp - entity.birthTimestamp
             const [{image, width, height, frameWidth, frameHeight, offsetX, offsetY}, {x, y}]
                 = [this.calculateAnimalTexture(entity), position]
-            const heading = entity.targetDirection?.x < 0 ? 0 : 1
+            const heading = entity.targetDirection?.x < 0 ? 1 : 0
 
             const currentFrame = Math.floor((animationFrameId % appConstants.fps) / appConstants.fps * 15);
             const originOffset = { x: offsetX * width, y: offsetY * height };
