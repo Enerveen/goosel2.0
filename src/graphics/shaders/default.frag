@@ -40,14 +40,10 @@ void main() {
 
     fragColor.rgba = textureColor.rgba;
     if (u_isSkew) {
-        fragColor.rg += abs(0.05 + 0.15 * (1.0 - uv.y) * (bendAmplitude + 0.3 * windBendAmplitude)) * mix(vec2(8.0), vec2(8.0, 0.0), 0.5 * skew + 0.5);
+        fragColor.rg += abs(0.05 + 0.15 * (1.0 - uv.y) * (bendAmplitude * bendAge + 0.3 * windBendAmplitude)) * mix(vec2(8.0), vec2(8.0, 0.0), 0.5 * skew + 0.5);
     }
-    //fragColor.rgb *= 0.75 * vec3(1.98, 1.7, 1.02);
+    //fragColor.rgb *= vec3(1.98, 1.7, 1.02);
     fragColor.a *= u_maxAlpha;
 
-    //fragColor.rgb = vec3(bendAge);
-    //fragColor.rgb += 100.0 * waveAge;
-
     gl_FragDepth = fragColor.a <= 0.5 ? 1.0 : depth;
-    //fragColor.rgb = vec3(gl_FragDepth);
 }

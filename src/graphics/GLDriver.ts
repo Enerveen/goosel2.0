@@ -90,7 +90,6 @@ class GLDriver {
         texture.bind(0);
 
 
-
         const posBuffer: number[] = [];
         const frameBuffer: number[] = [];
         const buf: number[] = [];

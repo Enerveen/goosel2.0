@@ -1,7 +1,7 @@
 import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import classes from './Scene.module.scss'
 import {observer} from "mobx-react-lite";
-import simulationStore, {GrassSystem, SimulationStore} from "../../stores/simulationStore";
+import simulationStore, {SimulationStore} from "../../stores/simulationStore";
 import {getRandomInRange, rollNPercentChance} from "../../utils/utils";
 import Plant from "../../entities/Plant";
 import {
@@ -9,7 +9,7 @@ import {
     generateFood
 } from "../../utils/helpers";
 import Renderer from "../../graphics/Renderer";
-import {appPhase, BoundingBox, plantKind} from "../../types";
+import {appPhase, plantKind} from "../../types";
 import useWindowSize from "../../hooks/useWindowSize";
 import {Camera} from "../../graphics/Camera";
 import ImageContext from "../../stores/ImageContext";
@@ -26,6 +26,7 @@ import {plantsKinds} from "../../constants/simulation";
 import {Shader} from "../../graphics/Shader";
 import {glScene} from "../../graphics/GLScene";
 import {glDriver} from "../../graphics/GLDriver";
+import {GrassSystem} from "../../simulationSystems/GrassSystem";
 
 
 

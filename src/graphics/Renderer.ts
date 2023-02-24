@@ -1,10 +1,11 @@
 import {FieldDimensions, gender, plantKind, Position, Texture, TextureAtlas} from "../types";
 import {appConstants, plantsKinds} from "../constants/simulation";
-import simulationStore, {GrassSystem} from "../stores/simulationStore";
+import simulationStore from "../stores/simulationStore";
 import Vector2 from "../dataStructures/Vector2";
 import {glDriver} from "./GLDriver";
 import {GLTexture} from "./GLTexture";
 import Plant from "../entities/Plant";
+import {GrassSystem} from "../simulationSystems/GrassSystem";
 
 
 const loadTexture = (image: HTMLImageElement, params: {width?: number, height?: number, offsetX?: number, offsetY?: number}={}) => {
@@ -211,17 +212,15 @@ class Renderer {
             image,
             width,
             height,
-            frameWidth,
-            frameHeight,
             offsetX,
-            offsetY}] = [this.plantAtlas]
+            offsetY}] = [this.grassTexture]
 
         const posBuffer: Position[] = []
         const frameBuffer: Position[] = []
         const buffer: number[] = []
         const scale = {
-            x: 1.5 * width,
-            y: 1.5 * height
+            x: 0.15 * width,
+            y: 0.15 * height
         }
 
         grassSystem.positions.forEach(plant => {
@@ -244,7 +243,7 @@ class Renderer {
         })
 
         glDriver.gl?.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_isSkew'), 1);
-        glDriver.drawImage(GLTexture.fromImage(image), image.width / frameWidth, image.height / frameHeight, posBuffer, frameBuffer, scale, buffer);
+        glDriver.drawImage(GLTexture.fromImage(image), 1, 1, posBuffer, frameBuffer, scale, buffer);
     }
 
 
