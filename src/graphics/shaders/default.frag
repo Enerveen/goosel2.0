@@ -31,7 +31,7 @@ void main() {
 
     if (u_isSkew) {
         float bend = bendAmplitude * sin(4.0 * 2.0 * 3.1415 * bendAmplitude) + windBendAmplitude * sin(0.01 * float(u_time) + 13.0 * v_position.x / u_resolution.x);
-        skew = bend * (0.23 + 0.2 * (1.0)) * pow(1.0 - uv.y, 3.0);
+        skew = bend * (0.23 + 0.2 * (1.0)) * pow(1.0 - uv.y, 2.0);
         //skew = bendAge * 0.23 * pow(1.0 - uv.y, 3.0);
         _uv.x += min(1.0 - uv.x, skew);
     }

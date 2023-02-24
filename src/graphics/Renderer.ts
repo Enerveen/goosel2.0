@@ -64,7 +64,7 @@ class Renderer {
         this.plantAtlas = loadTextureAtlas(images.plantAtlas, {frameWidth: 300, frameHeight: 330, offsetY: 0.5, offsetX: 0.5, width: 45, height:49.5})
         this.cloudsTexture = loadTexture(images.clouds);
         this.breedingTexture = loadTexture(images.heart, {width: 20, height: 20, offsetX: 0.5, offsetY: 0.5});
-        this.grassTexture = loadTexture(images.grass, {offsetX: 0.5, offsetY: 0.8});
+        this.grassTexture = loadTexture(images.grass, {offsetX: 0.5, offsetY: 0.97});
 
         this.backgroundTexture = images.background
         this.backgroundSeamlessTexture = images.backgroundSeamless
@@ -225,8 +225,8 @@ class Renderer {
 
         grassSystem.positions.forEach(plant => {
             const position = {
-                x: plant.position.x - (offsetX - 0.5) * width,
-                y: plant.position.y - (offsetY - 0.5) * height,
+                x: plant.position.x - (offsetX - 0.5) * scale.x,
+                y: plant.position.y - (offsetY - 0.5) * scale.y,
                 z: plant.position.y
             }
             const frame = {

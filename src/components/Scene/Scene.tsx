@@ -85,13 +85,11 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         store.gatherStatistics()
         if (rollNPercentChance(store.getSimulationConstants.foodSpawnChance * store.getSimulationSpeed)) {
             const isSpecial = rollNPercentChance(0.2)
-            for (let i = 0; i < 1; i++) {
-                store.addPlant(new Plant({
-                        kind: isSpecial ?
-                            plantsKinds[getRandomInRange(0, 6)] as plantKind : 'common'
-                    }
-                ))
-            }
+            store.addPlant(new Plant({
+                    kind: isSpecial ?
+                        plantsKinds[getRandomInRange(0, 6)] as plantKind : 'common'
+                }
+            ))
         }
         store.getAnimals.forEach(animal => animal.live())
 
