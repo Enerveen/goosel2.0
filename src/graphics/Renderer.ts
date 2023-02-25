@@ -139,11 +139,11 @@ class Renderer {
 
             this.context.globalAlpha = 0.45;
             this.context.globalCompositeOperation = 'source-atop';
-            this.context.drawImage(this.cloudsTexture.image,
-                position.x,
-                position.y,
-                width,
-                height);
+            // this.context.drawImage(this.cloudsTexture.image,
+            //     position.x,
+            //     position.y,
+            //     width,
+            //     height);
 
             if (glDriver.gl && glDriver.defaultShader) {
                 const scale = {

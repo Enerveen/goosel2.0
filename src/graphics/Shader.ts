@@ -1,3 +1,22 @@
+type ShaderSource = {
+    vertex: string,
+    fragment: string,
+    compute?: string
+}
+
+
+const SHADERS_PATH = '/src/graphics/shaders';
+
+
+const fetchAll = (files: string[]) => {
+    return Promise.all(files.map((file) =>
+        fetch(`${SHADERS_PATH}/${file}`)
+    )).then(result =>
+        Promise.all(result.map(file => file.text()))
+    )
+}
+
+
 export class Shader {
 
     static gl: WebGL2RenderingContext | null
@@ -29,6 +48,30 @@ export class Shader {
         Shader.gl.attachShader(this.glShaderProgram, vertexShader);
         Shader.gl.attachShader(this.glShaderProgram, fragmentShader);
         Shader.gl.linkProgram(this.glShaderProgram);
+    }
+
+
+    static compileFromSourceFiles(source: ShaderSource, callback: (compiledShader: Shader | null) => void) {
+        const files = [source.vertex, source.fragment];
+        fetchAll(files)
+            .then(shaderSourceCodeList => Promise.all(shaderSourceCodeList.map(shaderCode => {
+                    const glslSources: string[] = [...shaderCode.matchAll(/<(.*?)>/g)].map(result => {
+                        return result[1]
+                    })
+
+                    return fetchAll(glslSources)
+                        .then(glslSourceCodeList => {
+                            glslSources.forEach((glslSourceName, index) => {
+                                shaderCode = shaderCode.replace(`#include \<${glslSourceName}\>`, glslSourceCodeList[index]);
+                            })
+
+                            return shaderCode;
+                        })
+                })
+            ))
+            .then(sources => {
+                callback(new Shader(sources[0], sources[1]));
+            })
     }
 
 

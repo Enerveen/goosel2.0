@@ -1,6 +1,9 @@
 #version 300 es
 precision highp float;
 
+#include <smoothNoise.glsl>
+
+
 uniform sampler2D tex;
 uniform int u_time;
 uniform vec2 u_numFrames;
@@ -42,6 +45,9 @@ void main() {
     if (u_isSkew) {
         fragColor.rg += abs(0.05 + 0.15 * (1.0 - uv.y) * (bendAmplitude * bendAge + 0.3 * windBendAmplitude)) * mix(vec2(8.0), vec2(8.0, 0.0), 0.5 * skew + 0.5);
     }
+
+    fragColor.rgb *= smoothNoise();
+
     //fragColor.rgb *= vec3(1.98, 1.7, 1.02);
     fragColor.a *= u_maxAlpha;
 

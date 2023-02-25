@@ -32,22 +32,27 @@ class GLDriver {
 
     init(gl: WebGL2RenderingContext) {
         this.gl = gl;
+        console.log('gl', gl);
 
         this.quadVertexBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.quadVertexBuffer);
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(verticies), this.gl.STATIC_DRAW);
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
 
-        const files = ['default.vert', 'default.frag'];
-        Promise.all(files.map((file) =>
-            fetch(`/src/graphics/shaders/${file}`)
-        ))
-            .then(result =>
-                Promise.all(result.map(file => file.text()))
-            )
-            .then(sh => {
-                this.defaultShader = new Shader(sh[0], sh[1]);
-            });
+        Shader.compileFromSourceFiles({vertex: 'default.vert', fragment: 'default.frag'}, (shader) => {
+            this.defaultShader = shader;
+        });
+
+        // const files = ['default.vert', 'default.frag'];
+        // Promise.all(files.map((file) =>
+        //     fetch(`/src/graphics/shaders/${file}`)
+        // ))
+        //     .then(result =>
+        //         Promise.all(result.map(file => file.text()))
+        //     )
+        //     .then(sh => {
+        //         this.defaultShader = new Shader(sh[0], sh[1]);
+        //     });
     }
 
 

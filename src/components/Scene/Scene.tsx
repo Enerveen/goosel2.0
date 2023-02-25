@@ -68,12 +68,16 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     }, [context])
 
 
-    const init = useCallback(() => {
+    const init = () => {
         console.log('Simulation has started with the following constants:',
             JSON.stringify(store.getSimulationConstants, null, 4))
         store.addAnimal(generateAnimals(store.getSimulationConstants.initialAnimalCount))
         store.addPlant(generateFood(store.getSimulationConstants.initialFoodCount))
-    }, [canvasWidth, canvasHeight])
+
+        Shader.initContext(glContext as WebGL2RenderingContext);
+        glDriver.init(glContext as WebGL2RenderingContext);
+        glScene.init(glContext as WebGL2RenderingContext);
+    }
 
 
     const calculateStep = useCallback(() => {
@@ -202,10 +206,6 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                 store.updateTimestamp()
                 animationFrameId = window.requestAnimationFrame(render);
             };
-
-            Shader.initContext(glContext as WebGL2RenderingContext);
-            glDriver.init(glContext as WebGL2RenderingContext);
-            glScene.init(glContext as WebGL2RenderingContext);
 
             render();
         }

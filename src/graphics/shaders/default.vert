@@ -3,6 +3,7 @@
 layout (location = 0) in vec3 position;
 
 uniform mat4 u_transform;
+
 uniform vec3 pos[1024];
 uniform vec2 textureFrame[1024];
 uniform float bendData[1024];
