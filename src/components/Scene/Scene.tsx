@@ -191,7 +191,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
 
     useEffect(() => {
         let animationFrameId: number;
-        if (context) {
+        if (context && glContext) {
             const render = () => {
                 const timestamp = store.getTimestamp
                 if (timestamp === 0) {
