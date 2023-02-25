@@ -81,6 +81,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
 
 
     const calculateStep = useCallback(() => {
+        const timestamp = store.getTimestamp
         if (!store.getAnimals.length) {
             setAppPhase('FINISHED')
             return
@@ -96,6 +97,11 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             ))
         }
         store.getAnimals.forEach(animal => animal.live())
+        store.getEggs.forEach(egg => {
+            if(timestamp > egg.hatchTimestamp) {
+                egg.hatch()
+            }
+        })
 
         grassSystem.update(store.getAnimals);
     }, [context, canvasWidth, canvasHeight])
@@ -133,37 +139,33 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             width: store.getSimulationConstants.fieldSize.width,
             height: store.getSimulationConstants.fieldSize.height
         })
-        {
-            if (glDriver.gl && glDriver.defaultShader) {
-                renderer.drawPlants(store.getPlants);
-                renderer.drawGrass(grassSystem);
 
-                glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_isSkew'), 0);
-            }
+        if (glDriver.gl && glDriver.defaultShader) {
+            renderer.drawPlants(store.getPlants);
+            renderer.drawGrass(grassSystem);
 
-            // store.getPlants.forEach(entity => {
-            //     renderer.drawPlant(entity.position, entity.kind)
-            // })
+            glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_isSkew'), 0);
         }
 
+        store.getPlants.forEach(entity => renderer.drawPlant(entity.position, entity.kind))
+        store.getCorpses.forEach(entity => renderer.drawCorpse(entity.position, entity.age))
+        store.getEggs.forEach(entity => renderer.drawEgg(entity.position))
         store.getAnimals.forEach(entity => {
             renderer.drawAnimal(
                 entity.position,
                 {
                     gender: entity.gender,
                     age: entity.age.current,
-                    isAlive: entity.isAlive,
                     name: entity.name,
                     currentActivity: entity.currentActivity.activity,
                     birthTimestamp: entity.age.birthTimestamp,
-                    targetDirection: entity.speed
+                    direction: entity.speed
                 }
             )
             renderer.drawLabels(entity.position,
                 {
                     gender: entity.gender,
                     age: entity.age.current,
-                    isAlive: entity.isAlive,
                     name: entity.name,
                     currentActivity: entity.currentActivity.activity
                 }

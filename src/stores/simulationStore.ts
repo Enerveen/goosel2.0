@@ -4,12 +4,16 @@ import {action, computed, makeObservable, observable} from "mobx";
 import generateStatistics from "../utils/generateStatistics";
 import {BoundingBox, Circle, FieldDimensions, LogItem, Position, SimulationConstants} from "../types";
 import {defaultSimConstants, timeConstants} from "../constants/simulation";
+import Egg from "../entities/Egg";
+import Corpse from "../entities/Corpse";
 
 
 
 export class SimulationStore {
     animals: Animal[] = []
     plants: Plant[] = []
+    eggs: Egg[] = []
+    corpses: Corpse[] = []
     activeEntity: Animal | null = null
     windowSize: FieldDimensions = {width:0, height: 0}
     timestamp: number = 0
@@ -44,6 +48,8 @@ export class SimulationStore {
             activeEntity: observable,
             animals: observable,
             plants: observable,
+            eggs: observable,
+            corpses: observable,
             idCounter: observable,
             statistics: observable,
             windowSize: observable,
@@ -51,6 +57,8 @@ export class SimulationStore {
             log: observable,
             getAnimals: computed,
             getPlants: computed,
+            getEggs: computed,
+            getCorpses: computed,
             getSimulationSpeed: computed,
             getActiveEntity: computed,
             getActiveEntityEnergy: computed,
@@ -68,6 +76,10 @@ export class SimulationStore {
             removeAnimal: action,
             addPlant: action,
             removePlant: action,
+            addEgg: action,
+            removeEgg: action,
+            addCorpse: action,
+            removeCorpse: action,
             setActiveEntity: action,
             removeActiveEntity: action,
             updateTimestamp: action,
@@ -85,6 +97,13 @@ export class SimulationStore {
 
     get getPlants() {
         return this.plants
+    }
+
+    get getEggs() {
+        return this.eggs
+    }
+    get getCorpses() {
+        return this.corpses
     }
 
     get getActiveEntity() {
@@ -152,6 +171,32 @@ export class SimulationStore {
         this.animals = this.animals.filter(animal => animal.id !== idToRemove)
     }
 
+    addEgg = (egg: Egg | Egg[]) => {
+        if (Array.isArray(egg)) {
+            this.eggs.unshift(...egg)
+        } else {
+            this.eggs.unshift(egg)
+        }
+
+    }
+
+    removeEgg = (idToRemove: string) => {
+        this.eggs = this.eggs.filter(egg => egg.id !== idToRemove)
+    }
+
+    addCorpse = (corpse: Corpse | Corpse[]) => {
+        if (Array.isArray(corpse)) {
+            this.corpses.unshift(...corpse)
+        } else {
+            this.corpses.unshift(corpse)
+        }
+
+    }
+
+    removeCorpse = (idToRemove: string) => {
+        this.animals = this.animals.filter(animal => animal.id !== idToRemove)
+    }
+
     addPlant = (plant: Plant | Plant[]) => {
         if (Array.isArray(plant)) {
             this.plants.push(...plant)
@@ -207,8 +252,8 @@ export class SimulationStore {
     }
 
     clearAnimalCorpses = () => {
-        this.animals = this.getAnimals.filter(entity =>
-            !(entity.age.deathTimestamp && this.getTimestamp - entity.age.deathTimestamp > timeConstants.yearLength / 2)
+        this.corpses = this.getCorpses.filter(entity =>
+            !(this.getTimestamp - entity.deathTimestamp > timeConstants.yearLength * 3)
         )
     }
 }

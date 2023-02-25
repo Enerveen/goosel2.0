@@ -114,7 +114,6 @@ export interface TextureAtlas extends Texture {
 export type Age = {
     current: number
     birthTimestamp: number
-    deathTimestamp: number | undefined
 }
 
 export type Energy = {
