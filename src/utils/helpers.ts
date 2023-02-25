@@ -2,7 +2,6 @@ import {gender, Position, Stats} from "../types";
 import Animal from "../entities/Animal";
 import {coinFlip, rollNPercentChance} from "./utils";
 import {generateAnimalFirstName} from "./nameGen";
-import {simulationValuesMultipliers} from "../constants/simulation";
 import Plant from "../entities/Plant";
 import simulationStore from "../stores/simulationStore";
 
@@ -15,7 +14,9 @@ export const getRandomPosition = (edgeX: number, edgeY: number) => ({
 })
 
 export const getChild = (
-    parents: { mother: Animal, father: Animal }
+    parents: { mother: Animal, father: Animal },
+    id: string,
+    position: Position
 ) => {
     const timestamp = simulationStore.getTimestamp
     const {mutationChance, animalMaxEnergy, breedingMaxProgress} = simulationStore.getSimulationConstants
@@ -55,21 +56,20 @@ export const getChild = (
         predator: rollNPercentChance(mutationChance / 2) ? !(mother.genes.predator || father.genes.predator) : (mother.genes.predator || father.genes.predator)
     }
     return new Animal({
-        id:`A${simulationStore.getId()}`,
+        id,
         parents,
         gender,
         genes,
         name: `${generateAnimalFirstName(gender)} ${father.name.split(' ').slice(1).join(' ')}`,
-        position: { x: mother.position.x, y: mother.position.y },
+        position: {...position},
         energy: {
-            current: (calculateEnergyLoss(father.stats) + calculateEnergyLoss(mother.stats)) * breedingMaxProgress * 0.8,
+            current: (calculateEnergyLoss(father.stats) + calculateEnergyLoss(mother.stats)) * breedingMaxProgress * 0.4,
             max: animalMaxEnergy,
             breedingCD: 0
         },
         age: {
-            current: -1,
-            birthTimestamp: timestamp + stats.hatchingTime * simulationValuesMultipliers.hatchingTime,
-            deathTimestamp: undefined
+            current: 0,
+            birthTimestamp: timestamp
         },
         stats
     })
@@ -107,6 +107,11 @@ export const generateAnimals = (amount: number, demo: boolean = false) => {
                 simulationStore.getWindowSize.width,
                 simulationStore.getWindowSize.height
             ) : getRandomPosition(width, height),
-            energy: {current: demo ? Infinity : animalMaxEnergy, max: animalMaxEnergy, breedingCD: 0}
+            energy: {current: demo ? Infinity : animalMaxEnergy, max: animalMaxEnergy, breedingCD: 0},
+            genes: {
+                gay: false,
+                scavenger: coinFlip(),
+                predator:coinFlip()
+            }
         }))
 }

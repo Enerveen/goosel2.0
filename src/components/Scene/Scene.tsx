@@ -58,6 +58,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
 
 
     const calculateStep = useCallback(() => {
+        const timestamp = store.getTimestamp
         if (!store.getAnimals.length) {
             setAppPhase('FINISHED')
             return
@@ -71,6 +72,11 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             ))
         }
         store.getAnimals.forEach(animal => animal.live())
+        store.getEggs.forEach(egg => {
+            if(timestamp > egg.hatchTimestamp) {
+                egg.hatch()
+            }
+        })
     }, [context, canvasWidth, canvasHeight])
 
 
@@ -94,27 +100,25 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             width: store.getSimulationConstants.fieldSize.width,
             height: store.getSimulationConstants.fieldSize.height
         })
-        store.getPlants.forEach(entity => {
-            renderer.drawPlant(entity.position, entity.kind)
-        })
+        store.getPlants.forEach(entity => renderer.drawPlant(entity.position, entity.kind))
+        store.getCorpses.forEach(entity => renderer.drawCorpse(entity.position, entity.age))
+        store.getEggs.forEach(entity => renderer.drawEgg(entity.position))
         store.getAnimals.forEach(entity => {
             renderer.drawAnimal(
                 entity.position,
                 {
                     gender: entity.gender,
                     age: entity.age.current,
-                    isAlive: entity.isAlive,
                     name: entity.name,
                     currentActivity: entity.currentActivity.activity,
                     birthTimestamp: entity.age.birthTimestamp,
-                    targetDirection: entity.targetDirection
+                    direction: entity.speed
                 }
             )
             renderer.drawLabels(entity.position,
                 {
                     gender: entity.gender,
                     age: entity.age.current,
-                    isAlive: entity.isAlive,
                     name: entity.name,
                     currentActivity: entity.currentActivity.activity
                 }

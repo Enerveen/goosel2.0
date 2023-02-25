@@ -13,7 +13,6 @@ interface IPlantProps {
 }
 
 class Plant extends Entity {
-    id: string
     nutritionValue: number
     kind: plantKind
 
@@ -31,8 +30,7 @@ class Plant extends Entity {
             ),
             kind = 'common'
         } = props || {}
-        super(position);
-        this.id = id
+        super(position, id);
         this.nutritionValue = nutritionValue
         this.kind = kind
     }
