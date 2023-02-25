@@ -416,6 +416,18 @@ class Renderer {
             const eggType = Math.floor(position.x) % 3
             this.context.drawImage(image, frameWidth * eggType, 0, frameWidth, frameHeight, x - originOffset.x, y - originOffset.y, width, height)
 
+            if (glDriver.gl) {
+                const scale = {
+                    x: 0.5 * width,
+                    y: 0.5 * height
+                }
+
+                glDriver.drawImage(GLTexture.fromImage(image), image.width / frameWidth, image.height / frameHeight, [{
+                    x: x - (offsetX - 0.5) * width,
+                    y: y - (offsetY - 0.5) * height,
+                    z: y
+                }], [{x: eggType, y: 0}], scale);
+            }
         }
     }
 
@@ -425,6 +437,19 @@ class Renderer {
                 {x, y}] = [this.calculateCorpseTexture(age), position]
             const originOffset = {x: offsetX * width, y: offsetY * height};
             this.context.drawImage(image, x - originOffset.x, y - originOffset.y, width, height)
+
+            if (glDriver.gl) {
+                const scale = {
+                    x: 0.5 * width,
+                    y: 0.5 * height
+                }
+
+                glDriver.drawImage(GLTexture.fromImage(image), 1, 1, [{
+                    x: x - (offsetX - 0.5) * width,
+                    y: y - (offsetY - 0.5) * height,
+                    z: y
+                }], [{x: 0, y: 0}], scale);
+            }
         }
     }
 
