@@ -27,6 +27,7 @@ import {Shader} from "../../graphics/Shader";
 import {glScene} from "../../graphics/GLScene";
 import {glDriver} from "../../graphics/GLDriver";
 import {GrassSystem} from "../../simulationSystems/GrassSystem";
+import {GLTexture} from "../../graphics/GLTexture";
 
 
 
@@ -133,6 +134,8 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_time'), simulationStore.getTimestamp);
             glDriver.gl.uniformMatrix4fv(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_transform'), false, glDriver.transform);
             glDriver.gl.uniform2f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_resolution'), glDriver.gl.canvas.width, glDriver.gl.canvas.height);
+
+            glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'tex'), 0);
         }
 
         renderer.drawSeamlessBackground({
@@ -175,7 +178,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             }
         })
 
-        renderer.drawClouds();
+        //renderer.drawClouds();
         if (!store.getLogHidden) {
             renderer.drawLogs()
         }

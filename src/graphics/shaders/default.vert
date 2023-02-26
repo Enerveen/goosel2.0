@@ -13,6 +13,7 @@ uniform vec2 u_resolution;
 out vec2 uv;
 out vec2 frameIdx;
 out float depth;
+out vec2 v_worldPosition;
 out vec2 v_position;
 
 out float bendAge;
@@ -32,7 +33,8 @@ void main() {
     transform[2][0] = u_transform[3][0];
     transform[2][1] = -u_transform[3][1];
 
-    v_position = vec2(pos[gl_InstanceID].x, -pos[gl_InstanceID].y);
+    v_worldPosition = vec2(pos[gl_InstanceID].x, -pos[gl_InstanceID].y);
+    v_position = vec2(translate[2][0] + position.x * scale.x, -translate[2][1] - position.y * scale.y);
 
     mat3 matTransform = resolutionScale * transform * translate * matScale;
 
