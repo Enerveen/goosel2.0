@@ -1,5 +1,9 @@
-float N21(vec2 p) {
-    return fract(sin(100.0 * p.x + 6574.0 * p.y) * 5647.0);
+float N11(float i) {
+    return fract(sin(i + 93741.369) * 31934.123);
+}
+
+float N21(vec2 i) {
+    return N11(N11(i.x) + i.y);
 }
 
 

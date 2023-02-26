@@ -3,7 +3,6 @@ precision highp float;
 
 #include <smoothNoise.glsl>
 
-
 uniform sampler2D tex;
 
 uniform int u_time;
@@ -31,7 +30,7 @@ void main() {
     vec2 _uv = uv;
     float skew = 0.0;
 
-    float bendAmplitude = mix(0.0, 0.5, bendAge);//min(bendAge, 1.0 - bendAge);
+    float bendAmplitude = mix(0.0, 0.5, bendAge);
     float windBendAmplitude = 0.2 + 0.3 * (0.5 * cos(0.06 * float(u_time) + 5.0 * v_worldPosition.y / u_resolution.y) + 0.5);
 
     if (u_isSkew) {
@@ -45,7 +44,7 @@ void main() {
 
     fragColor.rgba = textureColor.rgba;
 
-    float dayPhase = 0.0;//0.5 * sin(0.0005 * float(u_time)) + 0.5;
+    float dayPhase = 0.1;//0.5 * sin(0.0005 * float(u_time)) + 0.5;
 
     vec3 daylightColor = vec3(252.0, 253.0, 136.0) / 255.0;
     vec3 nightLightColor = vec3(20.0, 68.0, 86.0) / 255.0;
@@ -55,20 +54,18 @@ void main() {
     float noise = 0.0;
     {
         vec2 np = v_position / 4000.0;
-        float time = 0.125 * float(u_time);
-        noise = smoothNoise(4.0 * np) +
-            smoothNoise(8.0 * np + 0.02 * time) * 0.5 +
-            smoothNoise(16.0 * np + 0.04 * time) * 0.25 +
-            smoothNoise(32.0 * np + 0.08 * time) * 0.125 +
-            smoothNoise(64.0 * np + 0.16 * time) * 0.0625;
-        noise /= 2.0;
-        noise = smoothstep(0.3, 0.4, noise);
+        float time = 0.03125 * float(u_time);
+        noise = smoothNoise(4.0 * np + 615.0 + 0.01 * time) +
+            smoothNoise(8.0 * np + 0.04 * time) * 0.5 +
+            smoothNoise(16.0 * np + 0.16 * time) * 0.25 +
+            smoothNoise(32.0 * np + 0.32 * time) * 0.125 +
+            smoothNoise(64.0 * np + 0.64 * time) * 0.0625;
+        noise /= 1.9375;
+        noise = smoothstep(0.45, 0.55, noise);
     }
 
-    fragColor.rgb *= mix(vec3(ambient), vec3(ambient) + lightColor, smoothstep(0.0, 1.0, 1.0 - noise));
+    fragColor.rgb *= vec3(ambient) + mix(vec3(0.0), lightColor, smoothstep(0.0, 1.0, 1.0 - noise));
     //fragColor.rgb /= max(1.0, max(fragColor.b, max(fragColor.r, fragColor.g)));
-    //fragColor.rgb *= (1.0 - texture(shadowsTex, 0.2 * v_position / 4000.0).a) * vec3(1.98, 1.7, 1.02);
-    //fragColor.rgb = vec3(v_position.xy / 3000.0, 1.0);
 
     if (u_isSkew) {
         fragColor.rg += abs(0.05 + 0.25 * (1.0 - uv.y) * (bendAmplitude * bendAge + 0.3 * windBendAmplitude)) * mix(vec2(8.0), vec2(8.0, 0.0), 0.5 * skew + 0.5);
