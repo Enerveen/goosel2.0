@@ -45,7 +45,7 @@ void main() {
 
     fragColor.rgba = textureColor.rgba;
 
-    float dayPhase = 0.5 * cos(0.0005 * float(u_time)) + 0.5;
+    float dayPhase = 0.0;//0.5 * sin(0.0005 * float(u_time)) + 0.5;
 
     vec3 daylightColor = vec3(252.0, 253.0, 136.0) / 255.0;
     vec3 nightLightColor = vec3(20.0, 68.0, 86.0) / 255.0;
@@ -66,7 +66,7 @@ void main() {
     }
 
     fragColor.rgb *= mix(vec3(ambient), vec3(ambient) + lightColor, smoothstep(0.0, 1.0, 1.0 - noise));
-    fragColor.rgb /= max(1.0, max(fragColor.b, max(fragColor.r, fragColor.g)));
+    //fragColor.rgb /= max(1.0, max(fragColor.b, max(fragColor.r, fragColor.g)));
     //fragColor.rgb *= (1.0 - texture(shadowsTex, 0.2 * v_position / 4000.0).a) * vec3(1.98, 1.7, 1.02);
     //fragColor.rgb = vec3(v_position.xy / 3000.0, 1.0);
 
