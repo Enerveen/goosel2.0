@@ -59,13 +59,13 @@ class Renderer {
         this.childAnimalTextureAtlas = {...animalTextureAtlas, width: 47, height: 47 * animalTextureAtlasFrameRatio};
         this.matureAnimalTextureAtlas = {...animalTextureAtlas, width: 94, height: 94 * animalTextureAtlasFrameRatio};
         const corpseTextureRatio = 262 / 421
-        this.childCorpseTexture = loadTexture(images.corpse, {
+        this.teenCorpseTexture = loadTexture(images.corpse, {
             width: 90.25,
             height: 90.25 * corpseTextureRatio,
             offsetX: 0.5,
             offsetY: 0.5
         })
-        this.teenCorpseTexture = loadTexture(images.corpse, {
+        this.childCorpseTexture = loadTexture(images.corpse, {
             width: 60.16,
             height: 60.16 * corpseTextureRatio,
             offsetX: 0.5,
@@ -77,7 +77,7 @@ class Renderer {
             offsetX: 0.5,
             offsetY: 0.5
         })
-        this.eggsAtlas = loadTextureAtlas(images.eggAtlas, {frameWidth: 200, frameHeight: 201, width: 32, height: 32, offsetX: 0.5, offsetY: 0.5});
+        this.eggsAtlas = loadTextureAtlas(images.eggAtlas, {frameWidth: 200, frameHeight: 201, width: 44, height: 44, offsetX: 0.5, offsetY: 0.5});
         this.plantAtlas = loadTextureAtlas(images.plantAtlas, {
             frameWidth: 300,
             frameHeight: 330,
@@ -289,9 +289,6 @@ class Renderer {
             return this.teenAnimalTextureAtlas
         }
 
-        if (age >= 10) {
-            return this.matureAnimalTextureAtlas
-        }
         return this.matureAnimalTextureAtlas
     }
 }

@@ -63,7 +63,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             setAppPhase('FINISHED')
             return
         }
-        store.clearAnimalCorpses()
+        //store.clearAnimalCorpses()
         store.gatherStatistics()
         if (rollNPercentChance(store.getSimulationConstants.foodSpawnChance * store.getSimulationSpeed)) {
             const isSpecial = rollNPercentChance(0.2)
