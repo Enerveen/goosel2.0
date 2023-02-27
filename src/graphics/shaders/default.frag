@@ -4,6 +4,7 @@ precision highp float;
 #include <smoothNoise.glsl>
 
 uniform sampler2D tex;
+uniform sampler2D shadowMap;
 
 uniform int u_time;
 uniform vec2 u_numFrames;
@@ -25,7 +26,7 @@ out vec4 fragColor;
 void main() {
     vec2 oneOverNumFrames = vec2(1.0 / u_numFrames.x, 1.0 / u_numFrames.y);
 
-    vec2 pos = (gl_FragCoord.xy / min(u_resolution.x, u_resolution.y));
+    vec2 pos = 0.5 * (gl_FragCoord.xy / min(u_resolution.x, u_resolution.y));
 
     vec2 _uv = uv;
     float skew = 0.0;
@@ -71,7 +72,7 @@ void main() {
         fragColor.rg += abs(0.05 + 0.25 * (1.0 - uv.y) * (bendAmplitude * bendAge + 0.3 * windBendAmplitude)) * mix(vec2(8.0), vec2(8.0, 0.0), 0.5 * skew + 0.5);
     }
 
-    //fragColor.rgb = vec3(noise);
+    //fragColor.rgb = texture(shadowMap, pos).rgb;
 
     fragColor.a *= u_maxAlpha;
 

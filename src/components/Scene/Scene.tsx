@@ -113,8 +113,6 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             return;
         }
 
-        glDriver.renderPrepare();
-
         context.resetTransform();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
@@ -126,7 +124,10 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             context.scale(scale, scale);
 
             glDriver.setGlobalTransform(context.getTransform().toFloat32Array());
+            glDriver.createShadowMap(mainCamera.position, scale, mainCamera.fov);
         }
+
+        glDriver.renderPrepare();
 
         if (glDriver.gl && glDriver.defaultShader) {
             glDriver.defaultShader.bind()
@@ -136,6 +137,10 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             glDriver.gl.uniform2f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_resolution'), glDriver.gl.canvas.width, glDriver.gl.canvas.height);
 
             glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'tex'), 0);
+            glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'shadowMap'), 1);
+
+            glDriver.shadowMapRT?.texture.bind(1);
+            //GLTexture.fromImage(renderer.eggsAtlas.image).bind(1);
         }
 
         renderer.drawSeamlessBackground({

@@ -5,7 +5,8 @@ type GLTextureParams = {
     image?: HTMLImageElement,
     size?: {
         width: number,
-        height: number
+        height: number,
+        format: number
     }
 }
 
@@ -16,7 +17,7 @@ export class GLTexture {
     private static id: number = 0
 
 
-    private native: WebGLTexture | null
+    readonly native: WebGLTexture | null
     readonly width: number = 0
     readonly height: number = 0
     private numFramesX: number = 1
@@ -45,19 +46,19 @@ export class GLTexture {
             this.width = params.image.width;
             this.height = params.image.height;
         } else if (params.size) {
-            glDriver.gl.texImage2D(glDriver.gl.TEXTURE_2D, 0, glDriver.gl.RGBA, params.size.width, params.size.height, 0,
+            glDriver.gl.texImage2D(glDriver.gl.TEXTURE_2D, 0, params.size.format, params.size.width, params.size.height, 0,
                 glDriver.gl.RGBA, glDriver.gl.UNSIGNED_BYTE, null);
 
             this.width = params.size.width;
             this.height = params.size.height;
         }
 
-        glDriver.gl.texParameteri(glDriver.gl.TEXTURE_2D, glDriver.gl.TEXTURE_MIN_FILTER, glDriver.gl.LINEAR_MIPMAP_LINEAR);
+        glDriver.gl.texParameteri(glDriver.gl.TEXTURE_2D, glDriver.gl.TEXTURE_MIN_FILTER, glDriver.gl.LINEAR);
         glDriver.gl.texParameteri(glDriver.gl.TEXTURE_2D, glDriver.gl.TEXTURE_MAG_FILTER, glDriver.gl.LINEAR);
         glDriver.gl.texParameteri(glDriver.gl.TEXTURE_2D, glDriver.gl.TEXTURE_WRAP_S, glDriver.gl.MIRRORED_REPEAT);
         glDriver.gl.texParameteri(glDriver.gl.TEXTURE_2D, glDriver.gl.TEXTURE_WRAP_T, glDriver.gl.MIRRORED_REPEAT);
 
-        glDriver.gl.generateMipmap(glDriver.gl.TEXTURE_2D);
+        //glDriver.gl.generateMipmap(glDriver.gl.TEXTURE_2D);
 
         glDriver.gl.bindTexture(glDriver.gl.TEXTURE_2D, null);
     }
@@ -76,10 +77,13 @@ export class GLTexture {
 
 
     static create(width: number, height: number) {
-        const size = { width, height };
-        const texture = new GLTexture({ size });
+        if (!glDriver.gl) {
+            throw 'No gl driver'
+        }
 
-        return texture;
+        const size = { width, height, format: glDriver.gl.RGBA };
+
+        return new GLTexture({ size });
     }
 
 

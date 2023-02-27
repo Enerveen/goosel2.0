@@ -70,6 +70,7 @@ export class Shader {
                 })
             ))
             .then(sources => {
+                console.log(source.vertex);
                 callback(new Shader(sources[0], sources[1]));
             })
     }

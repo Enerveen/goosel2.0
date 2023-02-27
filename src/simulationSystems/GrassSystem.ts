@@ -10,7 +10,7 @@ class GrassEntity extends Entity {
     idx: number
 
     constructor(position: Position, idx: number) {
-        super(position);
+        super(position, 'GAVNO IZ ZHOPI');
 
         this.idx = idx;
     }

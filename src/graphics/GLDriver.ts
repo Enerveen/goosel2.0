@@ -1,7 +1,8 @@
 import {Shader} from "./Shader";
 import {GLTexture} from "./GLTexture";
-import simulationStore from "../stores/simulationStore";
+import {GLRenderTarget} from "./GLRenderTarget"
 import {Position} from "../types";
+import simulationStore from "../stores/simulationStore";
 
 
 const verticies = [
@@ -21,38 +22,36 @@ class GLDriver {
 
     gl: WebGL2RenderingContext | null = null;
     defaultShader: Shader | null = null;
+    shadowMapShader: Shader | null = null;
     transform: Float32Array = new Float32Array()
 
     quadVertexBuffer: WebGLBuffer | null = null;
-
-    constructor() {
-
-    }
+    shadowMapRT: GLRenderTarget | null = null;
 
 
     init(gl: WebGL2RenderingContext) {
         this.gl = gl;
-        console.log('gl', gl);
 
         this.quadVertexBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.quadVertexBuffer);
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(verticies), this.gl.STATIC_DRAW);
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
 
+        this.shadowMapRT = new GLRenderTarget(this.gl.canvas.width, this.gl.canvas.height);
+
         Shader.compileFromSourceFiles({vertex: 'default.vert', fragment: 'default.frag'}, (shader) => {
             this.defaultShader = shader;
         });
+        Shader.compileFromSourceFiles({vertex: 'shadowMap.vert', fragment: 'shadowMap.frag'}, (shader) => {
+            this.shadowMapShader = shader;
+        })
+    }
 
-        // const files = ['default.vert', 'default.frag'];
-        // Promise.all(files.map((file) =>
-        //     fetch(`/src/graphics/shaders/${file}`)
-        // ))
-        //     .then(result =>
-        //         Promise.all(result.map(file => file.text()))
-        //     )
-        //     .then(sh => {
-        //         this.defaultShader = new Shader(sh[0], sh[1]);
-        //     });
+
+    check() {
+        if (!this.gl) {
+            throw 'No gl driver'
+        }
     }
 
 
@@ -65,6 +64,8 @@ class GLDriver {
         if (!this.gl || !this.defaultShader) {
             return;
         }
+
+        this.defaultShader.bind();
 
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
         //glContext.enable(glContext.DEPTH_TEST);
@@ -80,6 +81,38 @@ class GLDriver {
         this.gl.uniform1f(this.gl.getUniformLocation(this.defaultShader.glShaderProgram, 'u_maxAlpha'), 1.0);
 
         this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
+    }
+
+
+    createShadowMap(cameraPosition: Position, cameraScale: number, cameraFov: Position) {
+        if (!this.shadowMapShader) {
+            return;
+        }
+
+        this.shadowMapShader!.bind();
+        this.gl!.uniform2f(this.gl!.getUniformLocation(this.shadowMapShader.glShaderProgram, 'u_resolution'),
+            simulationStore.getSimulationConstants.fieldSize.width, simulationStore.getSimulationConstants.fieldSize.height);
+        this.gl!.uniform2f(this.gl!.getUniformLocation(this.shadowMapShader.glShaderProgram, 'u_camPos'), cameraPosition.x, cameraPosition.y);
+        this.gl!.uniform2f(this.gl!.getUniformLocation(this.shadowMapShader.glShaderProgram, 'u_camFov'), cameraFov.x, cameraFov.y);
+        this.gl!.uniform1f(this.gl!.getUniformLocation(this.shadowMapShader.glShaderProgram, 'u_camScale'), cameraScale);
+
+        this.shadowMapRT!.bind();
+
+        this.gl!.clearColor(0.0, 1.0, 0.0, 1.0);
+        this.gl!.clear(this.gl!.COLOR_BUFFER_BIT);
+
+        this.gl!.bindBuffer(this.gl!.ARRAY_BUFFER, this.quadVertexBuffer);
+
+        this.gl!.enableVertexAttribArray(0);
+        this.gl!.vertexAttribPointer(0, 3, this.gl!.FLOAT, false, 0, 0);
+
+        this.gl!.viewport(0, 0, this.shadowMapRT!.texture.width, this.shadowMapRT!.texture.height);
+
+        this.gl!.drawArrays(this.gl!.TRIANGLES, 0, 6);
+
+        this.gl!.disableVertexAttribArray(0);
+
+        this.shadowMapRT!.unbind();
     }
 
 
