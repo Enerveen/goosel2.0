@@ -1,3 +1,5 @@
+import {glDriver} from "./GLDriver";
+
 type ShaderSource = {
     vertex: string,
     fragment: string,
@@ -18,36 +20,33 @@ const fetchAll = (files: string[]) => {
 
 
 export class Shader {
-
-    static gl: WebGL2RenderingContext | null
-
     glShaderProgram: WebGLProgram
     constructor(vertexShaderCode: string, fragmentShaderCode: string) {
-        if (!Shader.gl) {
+        if (!glDriver.gl) {
             throw 'No web gl context';
         }
 
-        const vertexShader = Shader.gl.createShader(Shader.gl.VERTEX_SHADER) as WebGLShader;
-        const fragmentShader = Shader.gl.createShader(Shader.gl.FRAGMENT_SHADER) as WebGLShader;
+        const vertexShader = glDriver.gl.createShader(glDriver.gl.VERTEX_SHADER) as WebGLShader;
+        const fragmentShader = glDriver.gl.createShader(glDriver.gl.FRAGMENT_SHADER) as WebGLShader;
 
-        Shader.gl.shaderSource(vertexShader, vertexShaderCode);
-        Shader.gl.shaderSource(fragmentShader, fragmentShaderCode);
+        glDriver.gl.shaderSource(vertexShader, vertexShaderCode);
+        glDriver.gl.shaderSource(fragmentShader, fragmentShaderCode);
 
-        Shader.gl.compileShader(vertexShader);
-        Shader.gl.compileShader(fragmentShader);
+        glDriver.gl.compileShader(vertexShader);
+        glDriver.gl.compileShader(fragmentShader);
 
 
-        var compiled = Shader.gl.getShaderParameter(fragmentShader, Shader.gl.COMPILE_STATUS);
+        var compiled = glDriver.gl.getShaderParameter(fragmentShader, glDriver.gl.COMPILE_STATUS);
         console.log('Shader compiled successfully: ' + compiled);
-        var compilationLog = Shader.gl.getShaderInfoLog(fragmentShader);
+        var compilationLog = glDriver.gl.getShaderInfoLog(fragmentShader);
         console.log('Shader compiler log: ' + compilationLog);
 
         console.log('program compiled');
 
-        this.glShaderProgram = Shader.gl.createProgram() as WebGLProgram;
-        Shader.gl.attachShader(this.glShaderProgram, vertexShader);
-        Shader.gl.attachShader(this.glShaderProgram, fragmentShader);
-        Shader.gl.linkProgram(this.glShaderProgram);
+        this.glShaderProgram = glDriver.gl.createProgram() as WebGLProgram;
+        glDriver.gl.attachShader(this.glShaderProgram, vertexShader);
+        glDriver.gl.attachShader(this.glShaderProgram, fragmentShader);
+        glDriver.gl.linkProgram(this.glShaderProgram);
     }
 
 
@@ -70,25 +69,18 @@ export class Shader {
                 })
             ))
             .then(sources => {
-                console.log(source.vertex);
+                console.log(`%c${source.vertex}`, 'color: red');
                 callback(new Shader(sources[0], sources[1]));
             })
     }
 
 
     public bind() {
-        Shader.gl?.useProgram(this.glShaderProgram);
+        glDriver.gl?.useProgram(this.glShaderProgram);
     }
 
 
     public unbind() {
-        Shader.gl?.useProgram(null);
+        glDriver.gl?.useProgram(null);
     }
-
-
-    static initContext(context: WebGL2RenderingContext) {
-        Shader.gl = context;
-    }
-
-
 }

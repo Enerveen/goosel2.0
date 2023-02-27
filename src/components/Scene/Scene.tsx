@@ -24,7 +24,6 @@ import {plantsKinds} from "../../constants/simulation";
 
 
 import {Shader} from "../../graphics/Shader";
-import {glScene} from "../../graphics/GLScene";
 import {glDriver} from "../../graphics/GLDriver";
 import {GrassSystem} from "../../simulationSystems/GrassSystem";
 import {GLTexture} from "../../graphics/GLTexture";
@@ -61,12 +60,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         canvasHeight
     ]);
 
-    const grassSystem = useMemo(() => new GrassSystem(5000), [store])
-
-    useMemo(() => {
-        glScene.nativeCanvasContext = context;
-        glScene.resetTexture();
-    }, [context])
+    const grassSystem = useMemo(() => new GrassSystem(5000), [])
 
 
     const init = () => {
@@ -75,9 +69,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         store.addAnimal(generateAnimals(store.getSimulationConstants.initialAnimalCount))
         store.addPlant(generateFood(store.getSimulationConstants.initialFoodCount))
 
-        Shader.initContext(glContext as WebGL2RenderingContext);
         glDriver.init(glContext as WebGL2RenderingContext);
-        glScene.init(glContext as WebGL2RenderingContext);
     }
 
 
@@ -124,7 +116,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             context.scale(scale, scale);
 
             glDriver.setGlobalTransform(context.getTransform().toFloat32Array());
-            glDriver.createShadowMap(mainCamera.position, scale, mainCamera.fov);
+            glDriver.createShadowMap(mainCamera.position, scale);
         }
 
         glDriver.renderPrepare();
@@ -187,8 +179,6 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         if (!store.getLogHidden) {
             renderer.drawLogs()
         }
-
-        //glScene.update();
 
     }, [context, glContext, canvasWidth, canvasHeight]);
 

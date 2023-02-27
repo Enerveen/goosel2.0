@@ -39,6 +39,8 @@ class GLDriver {
 
         this.shadowMapRT = new GLRenderTarget(this.gl.canvas.width, this.gl.canvas.height);
 
+
+        console.log('compilation');
         Shader.compileFromSourceFiles({vertex: 'default.vert', fragment: 'default.frag'}, (shader) => {
             this.defaultShader = shader;
         });
@@ -84,17 +86,17 @@ class GLDriver {
     }
 
 
-    createShadowMap(cameraPosition: Position, cameraScale: number, cameraFov: Position) {
+    createShadowMap(cameraPosition: Position, cameraScale: number) {
         if (!this.shadowMapShader) {
             return;
         }
 
         this.shadowMapShader!.bind();
         this.gl!.uniform2f(this.gl!.getUniformLocation(this.shadowMapShader.glShaderProgram, 'u_resolution'),
-            simulationStore.getSimulationConstants.fieldSize.width, simulationStore.getSimulationConstants.fieldSize.height);
+            this.shadowMapRT!.texture.width, this.shadowMapRT!.texture.height);
         this.gl!.uniform2f(this.gl!.getUniformLocation(this.shadowMapShader.glShaderProgram, 'u_camPos'), cameraPosition.x, cameraPosition.y);
-        this.gl!.uniform2f(this.gl!.getUniformLocation(this.shadowMapShader.glShaderProgram, 'u_camFov'), cameraFov.x, cameraFov.y);
         this.gl!.uniform1f(this.gl!.getUniformLocation(this.shadowMapShader.glShaderProgram, 'u_camScale'), cameraScale);
+        this.gl!.uniform1f(this.gl!.getUniformLocation(this.shadowMapShader.glShaderProgram, 'u_time'), simulationStore.getTimestamp);
 
         this.shadowMapRT!.bind();
 

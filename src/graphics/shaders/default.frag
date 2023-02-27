@@ -23,10 +23,27 @@ in float bendAge;
 
 out vec4 fragColor;
 
+
+
+vec3 getLightColor() {
+    float dayPhase = 0.1;//0.5 * sin(0.0005 * float(u_time)) + 0.5;
+
+    vec3 daylightColor = vec3(252.0, 253.0, 136.0) / 255.0;
+    vec3 nightLightColor = vec3(20.0, 68.0, 86.0) / 255.0;
+    vec3 lightColor = mix(mix(daylightColor, vec3(0.0), min(1.0, 2.0 * dayPhase)), nightLightColor, max(0.0, 2.0 * dayPhase - 1.0));
+    float ambient = mix(1.0, 0.2, min(1.0, 2.0 * dayPhase));
+
+    float shadow = texture(shadowMap, 0.5 * gl_FragCoord.xy / u_resolution).r;
+
+    return vec3(ambient) + mix(vec3(0.0), lightColor, smoothstep(0.0, 1.0, 1.0 - shadow));
+}
+
+
+
 void main() {
     vec2 oneOverNumFrames = vec2(1.0 / u_numFrames.x, 1.0 / u_numFrames.y);
 
-    vec2 pos = 0.5 * (gl_FragCoord.xy / min(u_resolution.x, u_resolution.y));
+    vec2 pos = 0.5 * (gl_FragCoord.xy / u_resolution);//min(u_resolution.x, u_resolution.y));
 
     vec2 _uv = uv;
     float skew = 0.0;
@@ -44,28 +61,7 @@ void main() {
     vec4 textureColor = texture(tex, frameIdx * oneOverNumFrames + _uv * oneOverNumFrames);
 
     fragColor.rgba = textureColor.rgba;
-
-    float dayPhase = 0.1;//0.5 * sin(0.0005 * float(u_time)) + 0.5;
-
-    vec3 daylightColor = vec3(252.0, 253.0, 136.0) / 255.0;
-    vec3 nightLightColor = vec3(20.0, 68.0, 86.0) / 255.0;
-    vec3 lightColor = mix(mix(daylightColor, vec3(0.0), min(1.0, 2.0 * dayPhase)), nightLightColor, max(0.0, 2.0 * dayPhase - 1.0));
-    float ambient = mix(1.0, 0.2, min(1.0, 2.0 * dayPhase));
-
-    float noise = 0.0;
-    {
-        vec2 np = v_position / 4000.0;
-        float time = 0.03125 * float(u_time);
-        noise = smoothNoise(4.0 * np + 615.0 + 0.01 * time) +
-            smoothNoise(8.0 * np + 0.04 * time) * 0.5 +
-            smoothNoise(16.0 * np + 0.16 * time) * 0.25 +
-            smoothNoise(32.0 * np + 0.32 * time) * 0.125 +
-            smoothNoise(64.0 * np + 0.64 * time) * 0.0625;
-        noise /= 1.9375;
-        noise = smoothstep(0.45, 0.55, noise);
-    }
-
-    fragColor.rgb *= vec3(ambient) + mix(vec3(0.0), lightColor, smoothstep(0.0, 1.0, 1.0 - noise));
+    fragColor.rgb *= getLightColor();
     //fragColor.rgb /= max(1.0, max(fragColor.b, max(fragColor.r, fragColor.g)));
 
     if (u_isSkew) {

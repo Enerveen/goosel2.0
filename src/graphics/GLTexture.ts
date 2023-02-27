@@ -8,6 +8,7 @@ type GLTextureParams = {
         height: number,
         format: number
     }
+    mipmap: boolean
 }
 
 
@@ -58,7 +59,10 @@ export class GLTexture {
         glDriver.gl.texParameteri(glDriver.gl.TEXTURE_2D, glDriver.gl.TEXTURE_WRAP_S, glDriver.gl.MIRRORED_REPEAT);
         glDriver.gl.texParameteri(glDriver.gl.TEXTURE_2D, glDriver.gl.TEXTURE_WRAP_T, glDriver.gl.MIRRORED_REPEAT);
 
-        //glDriver.gl.generateMipmap(glDriver.gl.TEXTURE_2D);
+        if (params.mipmap) {
+            glDriver.gl.texParameteri(glDriver.gl.TEXTURE_2D, glDriver.gl.TEXTURE_MIN_FILTER, glDriver.gl.LINEAR_MIPMAP_LINEAR);
+            glDriver.gl.generateMipmap(glDriver.gl.TEXTURE_2D);
+        }
 
         glDriver.gl.bindTexture(glDriver.gl.TEXTURE_2D, null);
     }
@@ -69,7 +73,7 @@ export class GLTexture {
             return GLTexture.loadedTextures[image.src];
         }
 
-        const texture = new GLTexture({ image });
+        const texture = new GLTexture({ image, mipmap: true });
         GLTexture.loadedTextures[image.src] = texture;
 
         return texture;
@@ -83,7 +87,7 @@ export class GLTexture {
 
         const size = { width, height, format: glDriver.gl.RGBA };
 
-        return new GLTexture({ size });
+        return new GLTexture({ size, mipmap: false });
     }
 
 
