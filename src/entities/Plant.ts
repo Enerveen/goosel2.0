@@ -45,7 +45,7 @@ class Plant extends Entity {
                 animal.energy.current -=this.nutritionValue * 2
                 break;
             case "lethal":
-                animal.die(timestamp)
+                animal.die()
                 addLogItem({message:`${animal.name} died after consuming a poisonous food`, timestamp})
                 break;
             case "lovely":
@@ -55,7 +55,7 @@ class Plant extends Entity {
                 animal.stats.speed += 0.1
                 break;
             case "gay":
-                //animal.genes.gay = !animal.genes.gay
+                animal.genes.gay = !animal.genes.gay
                 break;
             default: break;
         }

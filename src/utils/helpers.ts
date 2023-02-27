@@ -76,10 +76,16 @@ export const getChild = (
 }
 
 export const calculateEnergyLoss = (stats: Stats) => {
-    const {speed, foodSensitivity, breedingSensitivity, breedingCD} = stats
-    return speed * foodSensitivity * breedingSensitivity / breedingCD
-    // Alternative formula:
-    // (speed * 1.3 + foodSensitivity * 0.8 + breedingSensitivity * 0.8 - breedingCD * 0.7 - hatchingTime * 0.2) / 2
+    const {
+        speed,
+        foodSensitivity,
+        breedingSensitivity,
+        breedingCD,
+        curiosity,
+        hatchingTime,
+        immunity
+    } = stats
+    return speed * foodSensitivity * breedingSensitivity * curiosity * hatchingTime * immunity / breedingCD
 }
 
 export const checkBreedingPossibility = (animal: Animal) => {

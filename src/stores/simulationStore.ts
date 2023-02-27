@@ -194,7 +194,7 @@ export class SimulationStore {
     }
 
     removeCorpse = (idToRemove: string) => {
-        this.animals = this.animals.filter(animal => animal.id !== idToRemove)
+        this.corpses = this.corpses.filter(corpse => corpse.id !== idToRemove)
     }
 
     addPlant = (plant: Plant | Plant[]) => {
@@ -253,8 +253,7 @@ export class SimulationStore {
 
     clearAnimalCorpses = () => {
         this.corpses = this.getCorpses.filter(entity =>
-            !(this.getTimestamp - entity.deathTimestamp > timeConstants.yearLength * 3)
-        )
+            this.getTimestamp - entity.deathTimestamp < timeConstants.yearLength * 3)
     }
 }
 

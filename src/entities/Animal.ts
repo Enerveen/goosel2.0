@@ -218,11 +218,12 @@ class Animal extends Entity implements Movable {
 
         if (this.energy.current <= 1) {
             this.energy.current = 0
-            this.die(timestamp)
+            this.die()
             addLogItem({
                 message: `${this.name} died from malnutrition. That is so sad, can we hit ${this.age.current} like${this.age.current % 10 === 1 && this.age.current !== 11 ? '' : 's'}?`,
                 timestamp
             })
+            return;
         }
 
         this.energy.current -= simulationSpeed * calculateEnergyLoss(this.stats);
@@ -285,17 +286,18 @@ class Animal extends Entity implements Movable {
     }
 
     private lookForFood(food: (Plant | Corpse)[]) {
-        const nearestFoodPiece = food.sort((a, b) => {
-            const distanceToA = findDistance(this.position, a.position)
-            const distanceToB = findDistance(this.position, b.position)
-            if (distanceToA > distanceToB) {
-                return 1
-            }
-            if (distanceToB > distanceToA) {
-                return -1
-            }
-            return 0
-        })[0]
+        const nearestFoodPiece = food.reduce(
+            (acc: Plant | Corpse | null, elem) => {
+                if (!acc) {
+                    return elem
+                }
+                if (findDistance(this.position, elem.position) < findDistance(this.position, acc.position)) {
+                    return elem
+                } else {
+                    return acc
+                }
+            }, null
+        )
         if (nearestFoodPiece && findDistance(nearestFoodPiece.position, this.position) < this.stats.foodSensitivity * simulationValuesMultipliers.foodSensitivity) {
             return nearestFoodPiece
         }
@@ -345,10 +347,6 @@ class Animal extends Entity implements Movable {
     private applyAging() {
         const timestamp = store.getTimestamp;
 
-        if (this.age.current < 0) {
-            return;
-        }
-
         const isBirthday: boolean = Math.floor((timestamp - this.age.birthTimestamp) / timeConstants.yearLength) > this.age.current
         if (!isBirthday) {
             return;
@@ -364,7 +362,7 @@ class Animal extends Entity implements Movable {
             return;
         }
 
-        this.die(timestamp)
+        this.die()
         store.addLogItem({
             message: `${this.name} died from aging. RIP legend`,
             timestamp
@@ -388,15 +386,13 @@ class Animal extends Entity implements Movable {
             x: nearestFoodPiece.position.x,
             y: nearestFoodPiece.position.y
         }
-        // For some reason instanceof Corpse returns false even in truthy cases, so,
-        // code below is some sort of temporary workaround
-        if (nearestFoodPiece.id.startsWith('A')) {
+
+        if (nearestFoodPiece instanceof Corpse) {
             removeCorpse(nearestFoodPiece.id)
             return
         }
-        // @ts-ignore
+
         if (nearestFoodPiece.kind !== 'common' && !rollNPercentChance(this.stats.immunity * simulationValuesMultipliers.immunity)) {
-            // @ts-ignore
             nearestFoodPiece.affect(this)
         }
         removePlant(nearestFoodPiece.id)
@@ -423,16 +419,17 @@ class Animal extends Entity implements Movable {
         }
     }
 
-    public die(timestamp: number) {
+    public die() {
+        const timestamp = store.getTimestamp
         const {removeAnimal, addCorpse} = store
         removeAnimal(this.id)
-        addCorpse({
+        addCorpse(new Corpse({
             id: this.id,
             nutritionValue: 100 + this.energy.current,
             position: {...this.position},
             deathTimestamp: timestamp,
             age: this.age.current
-        })
+        }))
     }
 
     private breed(partner: Animal) {
