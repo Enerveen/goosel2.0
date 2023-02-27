@@ -293,9 +293,9 @@ class Animal extends Entity implements Movable {
                 }
                 if (findDistance(this.position, elem.position) < findDistance(this.position, acc.position)) {
                     return elem
+                } else {
+                    return acc
                 }
-                return null
-
             }, null
         )
         if (nearestFoodPiece && findDistance(nearestFoodPiece.position, this.position) < this.stats.foodSensitivity * simulationValuesMultipliers.foodSensitivity) {
