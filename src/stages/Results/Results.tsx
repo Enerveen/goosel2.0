@@ -6,8 +6,14 @@ import DynamicsChart from "../../components/Charts/DynamicsChart";
 import ComposedChart from "../../components/Charts/ComposedChart";
 import LineChart from "../../components/Charts/LineChart";
 import simulationStore from "../../stores/simulationStore";
+import {appPhase} from "../../types";
+import Button from "../../components/Button/Button";
 
-const Results = () => {
+interface IResultsProps {
+    setAppPhase: (phase: appPhase) => void
+}
+
+const Results = ({setAppPhase}: IResultsProps) => {
     const statistics = simulationStore.getStatistics
     return <div className={classes.container}>
         <h1>
@@ -46,8 +52,11 @@ const Results = () => {
                     dataKeys={['speed', 'breedingSensitivity', 'foodSensitivity', 'breedingCD', 'hatchingTime', 'curiosity', 'immunity']}
                     xAxisDataKey={'year'}/>
             </div>
-        </div>
 
+        </div>
+            <Button className={classes.backBtn} onClick={() => setAppPhase('NOT_STARTED')}>
+                Return to Main Menu
+            </Button>
     </div>
 }
 

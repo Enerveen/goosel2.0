@@ -27,7 +27,7 @@ const Controls = observer(({setAppPhase}: IControlsProps) => {
             new Animal({
                 id: `A${getId()}`,
                 position: getRandomPosition(fieldSize.width, fieldSize.height),
-                age: {current: 0, birthTimestamp: timestamp, deathTimestamp: undefined},
+                age: {current: 0, birthTimestamp: timestamp},
                 energy: {current: animalMaxEnergy, max: animalMaxEnergy, breedingCD: 0}
             })
         )

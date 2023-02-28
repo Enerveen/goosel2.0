@@ -14,8 +14,7 @@ export const handleCanvasClick = (
     const activeEntity = entities.find(animal => {
         const {width, height, offsetX, offsetY} = renderer.calculateAnimalTexture({
             gender: animal.gender,
-            age: animal.age.current,
-            isAlive: animal.isAlive
+            age: animal.age.current
         })
 
         if (renderer.context) {
