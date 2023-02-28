@@ -37,7 +37,7 @@ export class SimulationStore {
         animalCount: number[]
     } = {age: [], gender: [], averageStats: [], populationChange:[], animalCount: [], plantStats: [], genes: []}
     simulationConstants: SimulationConstants = defaultSimConstants
-    log: {logs: LogItem[], hidden: boolean} = {logs:[{message: 'Simulation has started!', timestamp:0}], hidden: true}
+    log: {logs: LogItem[], hidden: boolean} = {logs:[{message: 'Simulation has started!', timestamp:0}], hidden: false}
 
     constructor() {
         makeObservable(this, {
@@ -85,7 +85,8 @@ export class SimulationStore {
             clearAnimalCorpses: action,
             gatherStatistics: action,
             setWindowSize: action,
-            setSimulationConstants: action
+            setSimulationConstants: action,
+            reset: action
         })
     }
 
@@ -252,6 +253,21 @@ export class SimulationStore {
     clearAnimalCorpses = () => {
         this.corpses = this.getCorpses.filter(entity =>
             this.getTimestamp - entity.deathTimestamp < timeConstants.yearLength * 3)
+    }
+
+    reset = () => {
+        this.animals = []
+        this.plants = []
+        this.corpses = []
+        this.eggs = []
+        this.timestamp = 0
+        this.activeEntity = null
+        this.idCounter = 0
+        this.simulationSpeed = 2
+        this.currentYear = -1
+        this.simulationConstants = defaultSimConstants
+        this.statistics = {age: [], gender: [], averageStats: [], populationChange:[], animalCount: [], plantStats: [], genes: []}
+        this.log = {logs:[{message: 'Simulation has started!', timestamp:0}], hidden: false}
     }
 }
 

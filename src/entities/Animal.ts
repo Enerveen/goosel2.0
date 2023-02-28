@@ -253,6 +253,7 @@ class Animal extends Entity implements Movable {
             } else {
                 this.walk(isDemo)
             }
+            this.applyAging()
             return;
         }
         if (this.currentActivity.activity === 'walking') {
