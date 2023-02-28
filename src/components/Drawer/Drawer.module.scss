@@ -1,16 +1,20 @@
 .outerContainer {
   position: fixed;
-  width: 40%;
+  width: 100%;
   top:0;
   height: 100vh;
   height: -webkit-fill-available;
   background-color: rgba(34, 34, 34, 0.5);
-  right: -40%;
+  right: -100%;
   transition: 0.5s;
   z-index: 999;
 
   &.active {
     right: 0;
+  }
+  @media (min-width: 1080px) {
+    width: 40%;
+    right: -40%;
   }
 
 }

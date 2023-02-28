@@ -1,8 +1,11 @@
 .container {
   display: flex;
   justify-content: center;
-  width: 800px;
+  width: 340px;
   flex-wrap: wrap;
+  @media (min-width: 720px) {
+    width: 800px;
+  }
 }
 
 .slider {
@@ -11,6 +14,10 @@
 }
 
 .rangeSlider {
-  width: 640px;
+  width: 300px;
   margin: 20px;
+  @media (min-width: 720px) {
+    width: 640px;
+  }
 }
+
