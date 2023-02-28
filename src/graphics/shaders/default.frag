@@ -62,6 +62,7 @@ void main() {
         skew = bend * (0.23 + 0.2 * (1.0)) * pow(1.0 - uv.y, 2.0);
         //skew = bendAge * 0.23 * pow(1.0 - uv.y, 3.0);
         _uv.x += min(1.0 - uv.x, skew);
+        _uv = clamp(_uv, vec2(0.0), vec2(1.0));
     }
 
     vec4 textureColor = texture(tex, frameIdx * oneOverNumFrames + _uv * oneOverNumFrames);
