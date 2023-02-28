@@ -1,5 +1,5 @@
 import {FieldDimensions, gender, plantKind, Position, Texture, TextureAtlas} from "../types";
-import {appConstants, plantsKinds} from "../constants/simulation";
+import {animalConstants, appConstants, plantsKinds} from "../constants/simulation";
 import simulationStore from "../stores/simulationStore";
 import Vector2 from "../dataStructures/Vector2";
 
@@ -268,11 +268,14 @@ class Renderer {
     }
 
     public calculateCorpseTexture(age: number) {
-        if (age >= 0 && age < 5) {
-            return this.childCorpseTexture
+        if (age < 0) {
+            throw 'weird'
         }
 
-        if (age >= 5 && age < 10) {
+        if (age < animalConstants.ageMax.child) {
+            return this.childCorpseTexture
+        }
+        if (age < animalConstants.ageMax.teen) {
             return this.teenCorpseTexture
         }
 
@@ -281,11 +284,15 @@ class Renderer {
 
     calculateAnimalTexture(entity: { gender: gender, age: number }) {
         const {age} = entity
-        if (age >= 0 && age < 5) {
-            return this.childAnimalTextureAtlas
+
+        if (age < 0) {
+            throw 'weird'
         }
 
-        if (age >= 5 && age < 10) {
+        if (age < animalConstants.ageMax.child) {
+            return this.childAnimalTextureAtlas
+        }
+        if (age < animalConstants.ageMax.teen) {
             return this.teenAnimalTextureAtlas
         }
 

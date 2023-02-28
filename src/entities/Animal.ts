@@ -8,7 +8,7 @@ import {
     checkBreedingPossibility,
     findDistance
 } from "../utils/helpers";
-import {timeConstants, simulationValuesMultipliers} from "../constants/simulation";
+import {timeConstants, simulationValuesMultipliers, animalConstants} from "../constants/simulation";
 import Quadtree from "../dataStructures/Quadtree";
 import store from "../stores/simulationStore";
 import {Movable} from "./Movable";
@@ -52,6 +52,9 @@ class Animal extends Entity implements Movable {
     lastMealCoordinates: Position | null
     lastBreedingCoordinates: Position | null
 
+    private isDead: boolean = false
+    private followTargets: Animal[] = []
+
     constructor(props: IAnimalProps) {
         const {
             id,
@@ -92,11 +95,15 @@ class Animal extends Entity implements Movable {
                 age.birthTimestamp - stats.hatchingTime * simulationValuesMultipliers.hatchingTime : age.birthTimestamp
         })
 
+        if (parents) {
+            this.followTargets.push(parents.mother, parents.father);
+        }
+
         this.maxVelocity = this.stats.speed;
     }
 
 
-    update(elapsedTime: number) {
+    updatePosition(elapsedTime: number) {
         this.targetDirection.normalize();
 
         const desiredDirection = new Vector2(
@@ -139,7 +146,7 @@ class Animal extends Entity implements Movable {
             targetPosition.y - this.position.y
         ))
         this.checkMapBounds()
-        this.update(store.getSimulationSpeed);
+        this.updatePosition(store.getSimulationSpeed);
     }
 
     private walk(isDemo: boolean) {
@@ -164,11 +171,37 @@ class Animal extends Entity implements Movable {
         }
 
         this.checkMapBounds(isDemo)
-        this.update(store.getSimulationSpeed);
+        this.updatePosition(store.getSimulationSpeed);
+    }
+
+
+    private followAuthority() {
+        const index = this.followTargets.findIndex(animal => !animal.isDead);
+        if (index === -1) {
+            this.followTargets = []
+
+            return;
+        }
+
+        const followTarget = this.followTargets[index];
+        this.followTargets.slice(index);
+
+        if (followTarget.isDead) {
+            this.followTargets.shift();
+            return;
+        }
+
+        this.addForce(new Vector2(
+            followTarget.position.x - this.position.x,
+            followTarget.position.y - this.position.y
+        ).normalized())
+
+        this.updatePosition(store.getSimulationSpeed);
     }
 
 
     private checkMapBounds(isDemo: boolean = false) {
+        // TODO: Make getFieldSize method
         const {width, height} = isDemo ? store.getWindowSize : store.getSimulationConstants.fieldSize
 
         const offset = 50;
@@ -210,6 +243,7 @@ class Animal extends Entity implements Movable {
             ))
         }
     }
+
 
     public live(isDemo: boolean = false) {
         const timestamp = store.getTimestamp
@@ -256,7 +290,11 @@ class Animal extends Entity implements Movable {
             return;
         }
         if (this.currentActivity.activity === 'walking') {
-            this.walk(isDemo)
+            if (this.isChild() && this.followTargets.length) {
+                this.followAuthority()
+            } else {
+                this.walk(isDemo)
+            }
         }
         this.applyAging()
     }
@@ -422,6 +460,7 @@ class Animal extends Entity implements Movable {
     public die() {
         const timestamp = store.getTimestamp
         const {removeAnimal, addCorpse} = store
+        this.isDead = true;
         removeAnimal(this.id)
         addCorpse(new Corpse({
             id: this.id,
@@ -477,7 +516,9 @@ class Animal extends Entity implements Movable {
         return
     }
 
-
+    isChild() {
+        return this.age.current < animalConstants.ageMax.child;
+    }
 }
 
 export default Animal
