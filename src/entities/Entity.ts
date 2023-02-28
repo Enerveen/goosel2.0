@@ -1,20 +1,26 @@
 import {Position} from "../types";
 
 
-class RegisterEntity<T> {
-    registeredType: T | null = null;
-}
-
-
 class Entity {
+    private static uniqueId: number = 0;
+
     position: Position
     id: string
 
     constructor(position: Position, id: string) {
         this.position = position
-        this.id = id
+        this.id = id;
     }
 
+
+    getType() {
+        return null;
+    }
+
+
+    private static getUniqueId() {
+        return this.uniqueId++;
+    }
 }
 
 export default Entity

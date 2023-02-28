@@ -313,7 +313,7 @@ class Renderer {
                 = [this.calculateAnimalTexture(entity), position]
             const heading = entity.direction?.x < 0 ? 1 : 0
 
-            const currentFrame = Math.floor((animationFrameId % appConstants.fps) / appConstants.fps * 15);
+            const currentFrame = Math.floor((animationFrameId % appConstants.fps) / appConstants.fps * 19);
             const originOffset = { x: offsetX * width, y: offsetY * height };
             // if (frameWidth) {
             //     this.context.drawImage(image, frameWidth * currentFrame, frameHeight * heading, frameWidth, frameHeight, x - originOffset.x, y - originOffset.y, width, height)

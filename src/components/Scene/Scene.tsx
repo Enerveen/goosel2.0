@@ -141,10 +141,13 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         })
 
         if (glDriver.gl && glDriver.defaultShader) {
+            glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_isSkew'), 1);
             renderer.drawPlants(store.getPlants);
+            glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'isGrass'), 1);
             renderer.drawGrass(grassSystem);
 
             glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_isSkew'), 0);
+            glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'isGrass'), 0);
         }
 
         store.getPlants.forEach(entity => renderer.drawPlant(entity.position, entity.kind))

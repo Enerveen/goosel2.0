@@ -56,8 +56,8 @@ export class GLTexture {
 
         glDriver.gl.texParameteri(glDriver.gl.TEXTURE_2D, glDriver.gl.TEXTURE_MIN_FILTER, glDriver.gl.LINEAR);
         glDriver.gl.texParameteri(glDriver.gl.TEXTURE_2D, glDriver.gl.TEXTURE_MAG_FILTER, glDriver.gl.LINEAR);
-        glDriver.gl.texParameteri(glDriver.gl.TEXTURE_2D, glDriver.gl.TEXTURE_WRAP_S, glDriver.gl.MIRRORED_REPEAT);
-        glDriver.gl.texParameteri(glDriver.gl.TEXTURE_2D, glDriver.gl.TEXTURE_WRAP_T, glDriver.gl.MIRRORED_REPEAT);
+        glDriver.gl.texParameteri(glDriver.gl.TEXTURE_2D, glDriver.gl.TEXTURE_WRAP_S, glDriver.gl.CLAMP_TO_EDGE);
+        glDriver.gl.texParameteri(glDriver.gl.TEXTURE_2D, glDriver.gl.TEXTURE_WRAP_T, glDriver.gl.CLAMP_TO_EDGE);
 
         if (params.mipmap) {
             glDriver.gl.texParameteri(glDriver.gl.TEXTURE_2D, glDriver.gl.TEXTURE_MIN_FILTER, glDriver.gl.LINEAR_MIPMAP_LINEAR);

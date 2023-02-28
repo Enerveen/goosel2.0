@@ -11,6 +11,8 @@ uniform vec2 u_numFrames;
 uniform vec2 u_resolution;
 uniform bool u_isSkew;
 
+uniform bool isGrass;
+
 uniform float u_maxAlpha;
 
 in vec2 uv;
@@ -26,7 +28,7 @@ out vec4 fragColor;
 
 
 vec3 getLightColor() {
-    float dayPhase = 0.1;//0.5 * sin(0.0005 * float(u_time)) + 0.5;
+    float dayPhase = 0.0;//0.5 * sin(0.0005 * float(u_time)) + 0.5;
 
     vec3 daylightColor = vec3(252.0, 253.0, 136.0) / 255.0;
     vec3 nightLightColor = vec3(20.0, 68.0, 86.0) / 255.0;
@@ -51,6 +53,10 @@ void main() {
     float bendAmplitude = mix(0.0, 0.5, bendAge);
     float windBendAmplitude = 0.2 + 0.3 * (0.5 * cos(0.06 * float(u_time) + 5.0 * v_worldPosition.y / u_resolution.y) + 0.5);
 
+    if (!isGrass) {
+        bendAmplitude = 0.0;
+    }
+
     if (u_isSkew) {
         float bend = bendAmplitude * sin(4.0 * 2.0 * 3.1415 * bendAmplitude) + windBendAmplitude * sin(0.01 * float(u_time) + 13.0 * v_worldPosition.x / u_resolution.x);
         skew = bend * (0.23 + 0.2 * (1.0)) * pow(1.0 - uv.y, 2.0);
@@ -65,12 +71,13 @@ void main() {
     //fragColor.rgb /= max(1.0, max(fragColor.b, max(fragColor.r, fragColor.g)));
 
     if (u_isSkew) {
-        fragColor.rg += abs(0.05 + 0.25 * (1.0 - uv.y) * (bendAmplitude * bendAge + 0.3 * windBendAmplitude)) * mix(vec2(8.0), vec2(8.0, 0.0), 0.5 * skew + 0.5);
+        fragColor.rg += fragColor.a * abs(0.75 * pow(1.0 - uv.y, 4.0) * (0.3 + bendAmplitude * bendAge + 0.05 * windBendAmplitude)) * mix(vec2(8.0), vec2(8.0, 0.0), 0.5 * skew + 0.5);
     }
 
-    //fragColor.rgb = texture(shadowMap, pos).rgb;
+    vec2 uvOffset = _uv - vec2(-pow(1.0 - _uv.y, 1.0) * 0.15, mix(0.05, 0.2, 1.0 - _uv.y));
+    float cutU = 1.0 - abs(floor(uvOffset.x));
+    float cutV = 1.0 - abs(floor(uvOffset.y));
+    fragColor.rgba += cutU * cutV * vec4(vec3(0.12), 0.8) * (1.0 - fragColor.a) * vec4(texture(tex, frameIdx * oneOverNumFrames + oneOverNumFrames * uvOffset).a);
 
-    fragColor.a *= u_maxAlpha;
-
-    gl_FragDepth = fragColor.a <= 0.5 ? 1.0 : depth;
+    gl_FragDepth = fragColor.a <= 0.55 ? 1.0 : depth;
 }
