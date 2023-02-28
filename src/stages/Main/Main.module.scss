@@ -5,11 +5,19 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  color: #fafafa;
 
-  h1 {
-    color: #fafafa
+  h2 {
+    font-size: 32px;
+    margin: 0;
   }
+}
 
+.screenContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 
 .version {
@@ -21,9 +29,12 @@
 }
 
 .button {
-  width: 200px;
-  height: 100px;
-  font-size: 38px;
-  margin-bottom: 20px;
+  padding: 10px 20px;
+  font-size: 34px;
+  margin: 20px 0;
+}
+
+.checkboxNotExpanded {
+  margin-bottom: 60px;
 }
 

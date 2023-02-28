@@ -1,6 +1,6 @@
 import Entity from "./Entity";
 import {plantKind, Position} from "../types";
-import {getRandomInRange} from "../utils/utils";
+import {coinFlip, getRandomInRange} from "../utils/utils";
 import simulationStore from "../stores/simulationStore";
 import {getRandomPosition} from "../utils/helpers";
 import Animal from "./Animal";
@@ -52,7 +52,7 @@ class Plant extends Entity {
                 animal.energy.breedingCD = 0
                 break;
             case "speed":
-                animal.stats.speed += 0.1
+                coinFlip() ? animal.stats.speed += 0.1 : animal.stats.speed -= 0.1
                 break;
             case "gay":
                 animal.genes.gay = !animal.genes.gay

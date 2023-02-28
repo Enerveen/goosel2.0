@@ -18,7 +18,7 @@ const App = () => {
             {phase === 'NOT_STARTED' && <Main setAppPhase={setPhase}/>}
             {phase === 'STARTED' && <Simulation setAppPhase={setPhase}/>}
             <Suspense fallback={<Loader/>}>
-                {phase === 'FINISHED' && <LazyResults/>}
+                {phase === 'FINISHED' && <LazyResults setAppPhase={setPhase}/>}
             </Suspense>
         </div>
     </ImageContext.Provider> : <Loader/>

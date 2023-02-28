@@ -32,7 +32,7 @@ interface ITooltipContentProps {
 export const TooltipContent = ({o, calculateLabel}: ITooltipContentProps) => {
     const {payload, label} = o;
 
-    return <div className={classes.tooltipContainer}>
+    return payload ? <div className={classes.tooltipContainer}>
         <div className={classes.tooltipHeading}>Year {label}</div>
         <div className={classes.tooltipItemList}>
             {payload.map((entry: any, index: number) => {
@@ -43,7 +43,7 @@ export const TooltipContent = ({o, calculateLabel}: ITooltipContentProps) => {
                     </span>
             })}
         </div>
-    </div>
+    </div> : <></>
 };
 
 export const CustomLegend = ({payload}: any) => {

@@ -6,7 +6,7 @@ const drawClock = (timestamp: number, ctx: CanvasRenderingContext2D, width: numb
     const tickInterval = 6 // Defines padding between ticks, should be multiple of 30
     const centerX = width / 2
     const centerY = height / 2
-    const radius = width / 2 - 10
+    const radius = width / 2 - 4
     ctx.clearRect(0, 0, width, height)
 
     ctx.beginPath()

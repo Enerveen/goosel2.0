@@ -53,7 +53,7 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
         />
         <Slider
             label={'Days to finish breeding'}
-            tooltipContent={'Time, required to finish breeding process and lay eggs'}
+            tooltipContent={'Time, required to finish breeding process and lay eggs (Be careful: less time = less energy of a child on born!)'}
             className={classes.slider}
             id={'breedingMaxProgress'}
             min={simConstantsRanges.breedingMaxProgress.min * simConstantsRanges.breedingMaxProgress.multiplier}

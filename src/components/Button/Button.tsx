@@ -3,7 +3,7 @@ import classes from './Button.module.scss'
 import {clsSum} from "../../utils/utils";
 
 interface IButtonProps {
-    children: string | ReactNode | ReactNode[],
+    children?: string | ReactNode | ReactNode[],
     onClick: () => void,
     className?: string
 }
