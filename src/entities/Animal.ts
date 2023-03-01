@@ -8,7 +8,7 @@ import {
     checkBreedingPossibility,
     findDistance
 } from "../utils/helpers";
-import {timeConstants, simulationValuesMultipliers, animalConstants} from "../constants/simulation";
+import {timeConstants, simulationValuesMultipliers} from "../constants/simulation";
 import Quadtree from "../dataStructures/Quadtree";
 import store from "../stores/simulationStore";
 import {Movable} from "./Movable";
@@ -291,7 +291,7 @@ class Animal extends Entity implements Movable {
             return;
         }
         if (this.currentActivity.activity === 'walking') {
-            if (this.isChild() && this.followTargets.length) {
+            if (this.age.current < store.simulationConstants.breedingMinAge && this.followTargets.length) {
                 this.followAuthority()
             } else {
                 this.walk(isDemo)
@@ -515,10 +515,6 @@ class Animal extends Entity implements Movable {
             this.currentActivity.progress += simulationSpeed
         }
         return
-    }
-
-    isChild() {
-        return this.age.current < animalConstants.ageMax.child;
     }
 }
 

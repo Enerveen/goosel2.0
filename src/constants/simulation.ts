@@ -26,15 +26,6 @@ export const appConstants = {
 }
 
 
-export const animalConstants = {
-    ageMax: {
-        child: 5,
-        teen: 10,
-        oldAss: 15
-    }
-}
-
-
 export const defaultSimConstants:SimulationConstants = {
     mutationChance: 0.2,
     breedingMinAge: 5,
