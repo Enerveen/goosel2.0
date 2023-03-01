@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useCallback} from "react";
 import classes from './Results.module.scss'
 import AreaChart from "../../components/Charts/AreaChart";
 import BarChart from "../../components/Charts/BarChart";
@@ -15,6 +15,13 @@ interface IResultsProps {
 
 const Results = ({setAppPhase}: IResultsProps) => {
     const statistics = simulationStore.getStatistics
+    const {reset} = simulationStore
+
+    const onReturn = useCallback(() => {
+        setAppPhase('NOT_STARTED')
+        reset()
+    }, [setAppPhase, reset])
+
     return <div className={classes.container}>
         <h1>
             FIN!
@@ -54,7 +61,7 @@ const Results = ({setAppPhase}: IResultsProps) => {
             </div>
 
         </div>
-            <Button className={classes.backBtn} onClick={() => setAppPhase('NOT_STARTED')}>
+            <Button className={classes.backBtn} onClick={onReturn}>
                 Return to Main Menu
             </Button>
     </div>

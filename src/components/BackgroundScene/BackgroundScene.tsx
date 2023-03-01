@@ -25,10 +25,10 @@ const BackgroundScene = () => {
                     {
                         gender: entity.gender,
                         age: entity.age.current,
-                        isAlive: entity.isAlive,
                         name: entity.name,
                         currentActivity: entity.currentActivity.activity,
-                        birthTimestamp: entity.age.birthTimestamp
+                        birthTimestamp: entity.age.birthTimestamp,
+                        direction: entity.speed
                     }
                 )
             })

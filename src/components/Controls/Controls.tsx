@@ -11,6 +11,7 @@ import simulationStore from "../../stores/simulationStore";
 import {observer} from "mobx-react-lite";
 import {simConstantsRanges} from "../../constants/simulation";
 import RangeSlider from "../RangeSlider/RangeSlider";
+import DownloadSaveButton from "../DownloadSaveButton/DownloadSaveButton";
 
 interface IControlsProps {
     setAppPhase: (state: appPhase) => void
@@ -53,6 +54,7 @@ const Controls = observer(({setAppPhase}: IControlsProps) => {
             <Button className={classes.button} onClick={createNewAnimal}>
                 Goose!
             </Button>
+            <DownloadSaveButton className={classes.button}/>
             <Button className={classes.button} onClick={() => setAppPhase('FINISHED')}>
                 Fin
             </Button>
