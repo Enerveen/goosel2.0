@@ -157,6 +157,8 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
 
             glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_isSkew'), 0);
             glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'isGrass'), 0);
+
+            renderer.drawButterflies(boidsSystem.boids, store.getTimestamp);
         }
 
         store.getPlants.forEach(entity => renderer.drawPlant(entity.position, entity.kind))
@@ -190,8 +192,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         //renderer.drawClouds();
         if (!store.getLogHidden) {
             renderer.drawLogs()
-        };
-        renderer.drawButterflies(boidsSystem.boids, store.getTimestamp);
+        }
     }, [context, glContext, canvasWidth, canvasHeight]);
 
     useEffect(() => {

@@ -99,7 +99,7 @@ class Renderer {
         this.breedingTexture = loadTexture(images.heart, {width: 20, height: 20, offsetX: 0.5, offsetY: 0.5});
         this.grassTexture = loadTexture(images.grass, {offsetX: 0.5, offsetY: 0.97});
 
-        const butterfliesParams = {width: 15, height:15, frameWidth: 25, frameHeight: 25, offsetX: 0.5, offsetY: 0.5};
+        const butterfliesParams = {width: 8, height: 8, frameWidth: 25, frameHeight: 25, offsetX: 0.5, offsetY: 0.5};
         this.butterflyTextureAtlas = loadTextureAtlas(images.butterflyTextureAtlas, butterfliesParams);
         this.butterflyWhiteTextureAtlas = loadTextureAtlas(images.butterflyWhiteTextureAtlas, butterfliesParams);
         this.butterflyShadowTextureAtlas = loadTextureAtlas(images.butterflyShadowTextureAtlas, butterfliesParams);
@@ -245,40 +245,6 @@ class Renderer {
 
             boids.forEach((butterfly, index) => {
                 if (!this.context) {
-                    return;
-                }
-
-                const currentFrame = Math.floor(((timestamp + 37 * index) % animationSpeed) / animationSpeed * 16);
-
-                const position = {
-                    x: butterfly.position.x - this.butterflyTextureAtlas.offsetX * this.butterflyTextureAtlas.width,
-                    y: butterfly.position.y - this.butterflyTextureAtlas.offsetY * this.butterflyTextureAtlas.height
-                }
-
-                const angle = Math.atan2(butterfly.direction.y, butterfly.direction.x) + Math.PI / 2;
-
-                this.context.save();
-                this.context.globalAlpha = 0.3;
-                this.context.translate(0, 40);
-                this.context.translate(butterfly.position.x, butterfly.position.y);
-                this.context.rotate(angle);
-                this.context.translate(-butterfly.position.x, -butterfly.position.y);
-                this.context.drawImage(this.butterflyShadowTextureAtlas.image,
-                    this.butterflyTextureAtlas.frameWidth * (currentFrame % 4),
-                    this.butterflyTextureAtlas.frameHeight * Math.floor(currentFrame / 4),
-                    this.butterflyTextureAtlas.frameWidth,
-                    this.butterflyTextureAtlas.frameHeight,
-                    position.x,
-                    position.y,
-                    this.butterflyTextureAtlas.width,
-                    this.butterflyTextureAtlas.height
-                );
-
-                this.context.restore();
-            })
-
-            boids.forEach((butterfly, index) => {
-                if (!this.context) {
                     return
                 }
 
@@ -308,7 +274,48 @@ class Renderer {
                 );
 
                 this.context.restore();
-            });
+            })
+
+
+            if (!glDriver.gl) {
+                return;
+            }
+
+            const [{
+                image,
+                width,
+                height,
+                frameWidth,
+                frameHeight,
+                offsetX,
+                offsetY}] = [this.butterflyTextureAtlas]
+
+            const posBuffer: Position[] = []
+            const frameBuffer: Position[] = []
+            const scale = {
+                x: 0.5 * width,
+                y: 0.5 * height
+            }
+
+
+            boids.forEach((boid, index) => {
+                const position = {
+                    x: boid.position.x - (offsetX - 0.5) * width,
+                    y: boid.position.y - (offsetY - 0.5) * height,
+                    z: boid.position.y
+                }
+
+                const currentFrame = Math.floor(((timestamp + 37 * index) % animationSpeed) / animationSpeed * 16);
+                const frame = {
+                    x: currentFrame % 4,
+                    y: Math.floor(currentFrame / 4)
+                }
+
+                posBuffer.push(position)
+                frameBuffer.push(frame);
+            })
+
+            glDriver.drawImage(GLTexture.fromImage(image), 4, 4, posBuffer, frameBuffer, scale);
         }
     }
 
