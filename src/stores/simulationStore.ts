@@ -6,6 +6,7 @@ import {FieldDimensions, LogItem, SimulationConstants} from "../types";
 import {defaultSimConstants, timeConstants} from "../constants/simulation";
 import Egg from "../entities/Egg";
 import Corpse from "../entities/Corpse";
+import {validateSimulationConstants} from "../utils/validators";
 
 export class SimulationStore {
     animals: Animal[] = []
@@ -268,6 +269,21 @@ export class SimulationStore {
         this.simulationConstants = defaultSimConstants
         this.statistics = {age: [], gender: [], averageStats: [], populationChange:[], animalCount: [], plantStats: [], genes: []}
         this.log = {logs:[{message: 'Simulation has started!', timestamp:0}], hidden: false}
+    }
+
+    set = (data: SimulationStore) => {
+        this.animals = data.animals.map((elem) => new Animal(elem))
+        this.plants = data.plants.map((elem) => new Plant(elem))
+        this.corpses = data.corpses.map((elem) => new Corpse(elem))
+        this.eggs = data.eggs.map((elem) => new Egg(elem))
+        this.timestamp = data.timestamp
+        this.activeEntity = data.activeEntity
+        this.idCounter = data.idCounter
+        this.simulationSpeed = data.simulationSpeed
+        this.currentYear = data.currentYear
+        this.simulationConstants = validateSimulationConstants(data.simulationConstants)
+        this.statistics = data.statistics
+        this.log = data.log
     }
 }
 

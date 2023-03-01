@@ -1,0 +1,19 @@
+.notificationContainer {
+  padding: 8px 16px;
+  font-size: 18px;
+  text-align: center;
+  border-radius: 10px;
+
+  &.error {
+    background: #8c182f;
+  }
+  &.info {
+    background: #1e80b4;
+  }
+  &.warning {
+    background: #d2a71f;
+  }
+  &.success {
+    background: #1eb441;
+  }
+}
