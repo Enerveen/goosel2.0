@@ -2,10 +2,12 @@ import Animal from "../entities/Animal";
 import Plant from "../entities/Plant";
 import {action, computed, makeObservable, observable} from "mobx";
 import generateStatistics from "../utils/generateStatistics";
-import {FieldDimensions, LogItem, SimulationConstants} from "../types";
+import {BoundingBox, Circle, FieldDimensions, LogItem, Position, SimulationConstants} from "../types";
 import {defaultSimConstants, timeConstants} from "../constants/simulation";
 import Egg from "../entities/Egg";
 import Corpse from "../entities/Corpse";
+
+
 
 export class SimulationStore {
     animals: Animal[] = []
