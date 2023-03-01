@@ -2,17 +2,29 @@
   display: flex;
   flex-wrap: wrap;
 }
+.sliderBlock {
+  display: flex;
+  flex-wrap: wrap;
+  width: 324px;
 
-.sliderContainer {
-  width: 150px;
-  margin-bottom: 20px;
+  @media (min-width: 440px) {
+    width: 540px;
+  }
+
+}
+
+.slider {
+  width: 240px;
+  margin: 20px 20px 20px 0;
+  padding-left: 10px;
 }
 
 .timeBlock {
   display: flex;
   align-items: center;
   flex-direction: column;
-  width: 230px;
+  width: 220px;
+  margin-bottom: 20px;
 }
 
 .button {
@@ -21,4 +33,9 @@
   width: 100px;
   height: 50px;
   font-size: 34px;
+}
+
+.buttonBlock {
+  padding-left: 10px;
+  margin-right: 20px;
 }

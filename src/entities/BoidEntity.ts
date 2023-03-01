@@ -1,7 +1,8 @@
 import Entity from "./Entity";
-import {BoundingBox, Circle, Position, Vector2} from "../types";
+import {BoundingBox, Circle, Position} from "../types";
 import {findDistance} from "../utils/helpers";
-import {Quadtree} from "../dataStructures/quadtree";
+import Vector2 from "../dataStructures/Vector2";
+import Quadtree from "../dataStructures/Quadtree";
 
 
 const dot = (v1: Vector2, v2: Vector2) => {
@@ -10,7 +11,7 @@ const dot = (v1: Vector2, v2: Vector2) => {
 
 
 export class BoidEntity extends Entity {
-    readonly id: number = BoidsSystem.getUniqueBoidId()
+    readonly boidId: number = BoidsSystem.getUniqueBoidId()
 
     direction: Vector2
     newDirection: Vector2 = new Vector2(0, 0)
@@ -20,7 +21,7 @@ export class BoidEntity extends Entity {
     centerPoints: Position[] = []
 
     constructor(position: Position={x: 0, y: 0}, direction: Vector2=new Vector2(1, 0), velocity: number=0, senseRadius: number=1, senseAngle: number=270) {
-        super(position);
+        super(position, "ZAEBALO");
 
         this.direction = direction.normalized();
         this.newDirection.x = this.direction.x;
@@ -197,7 +198,7 @@ export class BoidsSystem {
             const possibleBoids = quadtree.get(circle) as BoidEntity[];
 
             possibleBoids.forEach(other => {
-                if (entity.id === other.id) {
+                if (entity.boidId === other.boidId) {
                     return;
                 }
 

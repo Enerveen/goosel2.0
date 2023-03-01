@@ -1,8 +1,11 @@
-import {FieldDimensions, gender, LogItem, Position, Texture, TextureAtlas} from "../types";
-import {appConstants} from "../constants/simulation";
+import {FieldDimensions, gender, plantKind, Position, Texture, TextureAtlas} from "../types";
+import {appConstants, plantsKinds} from "../constants/simulation";
+import simulationStore from "../stores/simulationStore";
+import Vector2 from "../dataStructures/Vector2";
+
 import {BoidEntity} from "../entities/BoidEntity";
 
-const loadTexture = (image: HTMLImageElement, params: {width?: number, height?: number, offsetX?: number, offsetY?: number}={}) => {
+const loadTexture = (image: HTMLImageElement, params: { width?: number, height?: number, offsetX?: number, offsetY?: number } = {}) => {
 
     return {
         image,
@@ -14,7 +17,7 @@ const loadTexture = (image: HTMLImageElement, params: {width?: number, height?: 
 }
 
 
-const loadTextureAtlas = (image: HTMLImageElement, params: {width?: number, height?: number, frameWidth?: number, frameHeight?: number, offsetX?: number, offsetY?: number}={}) => {
+const loadTextureAtlas = (image: HTMLImageElement, params: { width?: number, height?: number, frameWidth?: number, frameHeight?: number, offsetX?: number, offsetY?: number } = {}) => {
 
     return {
         image,
@@ -30,12 +33,15 @@ const loadTextureAtlas = (image: HTMLImageElement, params: {width?: number, heig
 
 class Renderer {
     context: CanvasRenderingContext2D | null
-    plantTexture: Texture
-    eggTexture: Texture
+    plantAtlas: TextureAtlas
+    eggsAtlas: TextureAtlas
     breedingTexture: Texture
     matureAnimalTextureAtlas: TextureAtlas
     teenAnimalTextureAtlas: TextureAtlas
     childAnimalTextureAtlas: TextureAtlas
+    childCorpseTexture: Texture
+    teenCorpseTexture: Texture
+    matureCorpseTexture: Texture
     butterflyTextureAtlas: TextureAtlas
     butterflyWhiteTextureAtlas: TextureAtlas
     butterflyShadowTextureAtlas : TextureAtlas
@@ -46,20 +52,51 @@ class Renderer {
 
     constructor(ctx: CanvasRenderingContext2D | null, images: any) {
         this.context = ctx || null
-        const animalTextureAtlas = loadTextureAtlas(images.animalTextureAtlas, {frameWidth: 200, frameHeight: 250, offsetX: 0.5, offsetY: 0.8});
-        this.teenAnimalTextureAtlas = {...animalTextureAtlas, width: 60, height: 75};
-        this.childAnimalTextureAtlas = {...animalTextureAtlas, width: 40, height: 50};
-        this.matureAnimalTextureAtlas = {...animalTextureAtlas, width: 80, height: 100};
+        const animalTextureAtlas = loadTextureAtlas(images.animalTextureAtlas, {
+            frameWidth: 282,
+            frameHeight: 361,
+            offsetX: 0.5,
+            offsetY: 0.8
+        });
+        const animalTextureAtlasFrameRatio = animalTextureAtlas.frameHeight / animalTextureAtlas.frameWidth
+        this.teenAnimalTextureAtlas = {...animalTextureAtlas, width: 70.5, height: 70.5 * animalTextureAtlasFrameRatio};
+        this.childAnimalTextureAtlas = {...animalTextureAtlas, width: 47, height: 47 * animalTextureAtlasFrameRatio};
+        this.matureAnimalTextureAtlas = {...animalTextureAtlas, width: 94, height: 94 * animalTextureAtlasFrameRatio};
+        const corpseTextureRatio = 262 / 421
+        this.teenCorpseTexture = loadTexture(images.corpse, {
+            width: 90.25,
+            height: 90.25 * corpseTextureRatio,
+            offsetX: 0.5,
+            offsetY: 0.5
+        })
+        this.childCorpseTexture = loadTexture(images.corpse, {
+            width: 60.16,
+            height: 60.16 * corpseTextureRatio,
+            offsetX: 0.5,
+            offsetY: 0.5
+        })
+        this.matureCorpseTexture = loadTexture(images.corpse, {
+            width: 120.3,
+            height: 120.3 * corpseTextureRatio,
+            offsetX: 0.5,
+            offsetY: 0.5
+        })
+        this.eggsAtlas = loadTextureAtlas(images.eggAtlas, {frameWidth: 200, frameHeight: 201, width: 44, height: 44, offsetX: 0.5, offsetY: 0.5});
+        this.plantAtlas = loadTextureAtlas(images.plantAtlas, {
+            frameWidth: 300,
+            frameHeight: 330,
+            offsetY: 0.5,
+            offsetX: 0.5,
+            width: 45,
+            height: 49.5
+        })
+        this.cloudsTexture = loadTexture(images.clouds);
+        this.breedingTexture = loadTexture(images.heart, {width: 20, height: 20, offsetX: 0.5, offsetY: 0.5});
 
         const butterfliesParams = {width: 15, height:15, frameWidth: 25, frameHeight: 25, offsetX: 0.5, offsetY: 0.5};
         this.butterflyTextureAtlas = loadTextureAtlas(images.butterflyTextureAtlas, butterfliesParams);
         this.butterflyWhiteTextureAtlas = loadTextureAtlas(images.butterflyWhiteTextureAtlas, butterfliesParams);
         this.butterflyShadowTextureAtlas = loadTextureAtlas(images.butterflyShadowTextureAtlas, butterfliesParams);
-
-        this.eggTexture = loadTexture(images.egg, {width: 40, height: 40});
-        this.plantTexture = loadTexture(images.plant, {width: 50, height: 45, offsetX: 0.5, offsetY: 0.6});
-        this.cloudsTexture = loadTexture(images.clouds);
-        this.breedingTexture = loadTexture(images.heart, {width: 20, height: 20, offsetX: 0.5, offsetY: 0.5});
 
         this.backgroundTexture = images.background
         this.backgroundSeamlessTexture = images.backgroundSeamless
@@ -97,29 +134,21 @@ class Renderer {
                 if (i === 1 && j === 1) {
                     this.context.drawImage(gladeImage, 0, 0, cutX * gladeImage.width, cutY * gladeImage.height, j * tileSize.width, i * tileSize.height, cutX * tileSize.width, cutY * tileSize.height)
                 } else {
-                    this.context.drawImage(image, 0, 0, cutX * image.width, cutY * image.height,j * tileSize.width, i * tileSize.height, cutX * tileSize.width, cutY * tileSize.height)
+                    this.context.drawImage(image, 0, 0, cutX * image.width, cutY * image.height, j * tileSize.width, i * tileSize.height, cutX * tileSize.width, cutY * tileSize.height)
                 }
             }
         }
     }
 
 
-    public drawClouds(timestamp: number, fieldSize: FieldDimensions) {
+    public drawClouds() {
+        const timestamp = simulationStore.getTimestamp
         if (this.context) {
             const width = 10.0 * this.cloudsTexture.width;
             const height = 10.0 * this.cloudsTexture.height;
 
             this.context.save();
-
-            // Uncomment to adjust brightness
-            // this.context.fillStyle = 'rgba(100, 100, 150, 1)';
-            // this.context.globalCompositeOperation = 'multiply';
-            // this.context.fillRect(0, 0, fieldSize.x, fieldSize.y)
-            // this.context.fillStyle = 'rgba(100, 100, 255, 0.1)';
-            // this.context.globalCompositeOperation = 'overlay';
-            // this.context.fillRect(0, 0, fieldSize.x, fieldSize.y)
-            //
-            this.context.globalAlpha = 0.25;
+            this.context.globalAlpha = 0.45;
             this.context.globalCompositeOperation = 'source-atop';
             this.context.drawImage(this.cloudsTexture.image,
                 -500 - height / 4 * (0.5 * Math.cos(0.0002 * timestamp) + 0.5),
@@ -205,48 +234,59 @@ class Renderer {
     }
 
 
-    public drawPlant(position: Position) {
-        const [{image, width, height}, {x, y}] = [this.plantTexture, position]
+    public drawPlant(position: Position, kind: plantKind) {
+        const [{
+            image,
+            width,
+            height,
+            frameWidth,
+            frameHeight,
+            offsetX,
+            offsetY
+        },
+            {x, y}] = [this.plantAtlas, position]
         if (this.context) {
-            const originOffset = { x: 0.5 * width, y: 0.6 * height };
-            this.context.drawImage(image, x - originOffset.x, y - originOffset.y, width, height);
+            const kindIndex = ['common', ...plantsKinds].indexOf(kind)
+            const originOffset = {x: offsetX * width, y: offsetY * height};
+            this.context.drawImage(image, frameWidth * kindIndex, 0, frameWidth, frameHeight, x - originOffset.x, y - originOffset.y, width, height);
         }
     }
 
     public drawAnimal(
         position: Position,
-        animationFrameId: number,
-        entity: { gender: gender, name: string, isAlive: boolean, age: number, currentActivity: string }) {
+        entity: { gender: gender, name: string, age: number, currentActivity: string, birthTimestamp: number, direction: Vector2 }) {
         if (this.context) {
+            const animationFrameId = simulationStore.getTimestamp - entity.birthTimestamp
             const [{image, width, height, frameWidth, frameHeight, offsetX, offsetY}, {x, y}]
                 = [this.calculateAnimalTexture(entity), position]
+            const heading = entity.direction?.x < 0 ? 1 : 0
 
-            const currentFrame = Math.floor((animationFrameId % appConstants.fps) / appConstants.fps * 15);
-            const originOffset = { x: offsetX * width, y: offsetY * height };
+            const currentFrame = Math.floor((animationFrameId % appConstants.fps) / appConstants.fps * 19);
+            const originOffset = {x: offsetX * width, y: offsetY * height};
             if (frameWidth) {
-                this.context.drawImage(image, frameWidth * currentFrame, 0, frameWidth, frameHeight, x - originOffset.x, y - originOffset.y, width, height)
+                this.context.drawImage(image, frameWidth * currentFrame, frameHeight * heading, frameWidth, frameHeight, x - originOffset.x, y - originOffset.y, width, height)
             } else {
                 this.context.drawImage(image, x - originOffset.x, y - originOffset.y, width, height)
             }
         }
     }
 
-    public drawBreeding (position: Position) {
+    public drawBreeding(position: Position) {
         const [{image, width, height, offsetX, offsetY}, {x, y}] = [this.breedingTexture, position]
         if (this.context) {
             this.context.drawImage(image, x - offsetX * width, y - offsetY * height, width, height)
         }
     }
 
-    public drawLabels (position: Position,
-                       entity: { gender: gender, name: string, isAlive: boolean, age: number, currentActivity: string }
+    public drawLabels(position: Position,
+                      entity: { gender: gender, name: string, age: number, currentActivity: string }
     ) {
         if (!this.context) {
             return
         }
         const [{width, height, offsetX, offsetY}, {x, y},
-            {gender, name, age, isAlive, currentActivity}] = [this.calculateAnimalTexture(entity), position, entity]
-        const originOffset = { x: offsetX * width, y: offsetY * height };
+            {gender, name, age, currentActivity}] = [this.calculateAnimalTexture(entity), position, entity]
+        const originOffset = {x: offsetX * width, y: offsetY * height};
         this.context.textAlign = 'center';
         this.context.font = "bold 18px AmasticBold"
         const styles = [
@@ -263,7 +303,7 @@ class Renderer {
             if (this.context) {
                 this.context.fillStyle = style;
                 this.context.fillText(name, textPos.x - originOffset.x + width / 2, textPos.y - originOffset.y - 26)
-                this.context.fillText(isAlive ? age >= 0 ? `${age} y.o.` : 'Egg' : 'Corpse',
+                this.context.fillText(age >= 0 ? `${age} y.o.` : 'Egg',
                     textPos.x - originOffset.x + width / 2, textPos.y - originOffset.y - 6)
             }
         })
@@ -272,7 +312,9 @@ class Renderer {
         }
     }
 
-    public drawLogs(timestamp:number, logs: LogItem[]) {
+    public drawLogs() {
+        const timestamp = simulationStore.getTimestamp
+        const logs = simulationStore.getLog
         if (this.context) {
             this.context.save()
             this.context.resetTransform()
@@ -283,17 +325,46 @@ class Renderer {
                 .forEach(({message, timestamp: messageTimestamp}, index) => {
                     // @ts-ignore
                     this.context.fillStyle = `rgba(250, 250, 250, ${1 - (timestamp - messageTimestamp - 300) / 1000})`
-                    this.context?.fillText(message, 10,  50 + index * 24)
+                    this.context?.fillText(message, 10, 50 + index * 24)
                 })
             this.context.restore()
         }
     }
 
-    calculateAnimalTexture(entity: { gender: gender, isAlive: boolean, age: number }) {
-        const {age} = entity
-        if (age < 0) {
-            return {...this.eggTexture, frameWidth: 0, frameHeight: 0, offsetX: this.eggTexture.offsetX, offsetY: this.eggTexture.offsetY}
+    public drawEgg(position: Position) {
+        if (this.context) {
+            const [{image, frameHeight, frameWidth, width, height, offsetX, offsetY},
+                {x, y}] = [this.eggsAtlas, position]
+            const originOffset = {x: offsetX * width, y: offsetY * height};
+            const eggType = Math.floor(position.x) % 3
+            this.context.drawImage(image, frameWidth * eggType, 0, frameWidth, frameHeight, x - originOffset.x, y - originOffset.y, width, height)
+
         }
+    }
+
+    public drawCorpse(position: Position, age: number) {
+        if (this.context) {
+            const [{image, width, height, offsetX, offsetY},
+                {x, y}] = [this.calculateCorpseTexture(age), position]
+            const originOffset = {x: offsetX * width, y: offsetY * height};
+            this.context.drawImage(image, x - originOffset.x, y - originOffset.y, width, height)
+        }
+    }
+
+    public calculateCorpseTexture(age: number) {
+        if (age >= 0 && age < 5) {
+            return this.childCorpseTexture
+        }
+
+        if (age >= 5 && age < 10) {
+            return this.teenCorpseTexture
+        }
+
+        return this.matureCorpseTexture
+    }
+
+    calculateAnimalTexture(entity: { gender: gender, age: number }) {
+        const {age} = entity
         if (age >= 0 && age < 5) {
             return this.childAnimalTextureAtlas
         }
@@ -302,9 +373,6 @@ class Renderer {
             return this.teenAnimalTextureAtlas
         }
 
-        if (age >= 10) {
-            return this.matureAnimalTextureAtlas
-        }
         return this.matureAnimalTextureAtlas
     }
 }

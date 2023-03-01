@@ -1,12 +1,13 @@
-import {Position, Vector2} from "../types";
+import {Position} from "../types";
 import {BoundingBox} from "../types";
+import Vector2 from "../dataStructures/Vector2";
 
 
 export class Camera {
     position: Position
     fov: Vector2
     private scale: number
-    private readonly aspect: number
+    readonly aspect: number
 
     constructor(position: Position, fov: Vector2) {
         this.position = position;

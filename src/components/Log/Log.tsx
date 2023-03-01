@@ -1,3 +1,5 @@
+// deprecated logs logic, currently logs are implemented with drawLogs method of Renderer class
+
 import React from "react";
 import classes from './Log.module.scss'
 import {observer} from "mobx-react-lite";

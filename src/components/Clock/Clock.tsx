@@ -1,12 +1,10 @@
 import React, {useEffect, useRef, useState} from "react";
 import drawClock from "../../graphics/drawClock";
+import simulationStore from "../../stores/simulationStore";
 import {observer} from "mobx-react-lite";
 
-interface IClockProps {
-    timestamp: number
-}
-
-const Clock = observer(({timestamp}:IClockProps) => {
+const Clock = observer(() => {
+    const timestamp = simulationStore.getTimestamp
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
 

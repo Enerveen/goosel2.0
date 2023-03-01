@@ -16,4 +16,14 @@
 
 .chartContainer {
   margin: 20px;
+  width: calc(100vw - 20px);
+  @media (min-width: 720px) {
+    width: calc(100vw - 80px);
+  }
+}
+
+.backBtn {
+  margin: 20px 0 40px 0;
+  padding: 10px 20px;
+  font-size: 34px;
 }

@@ -1,5 +1,4 @@
-import {Position, Vector2} from "../types";
-
+import Vector2 from "../dataStructures/Vector2";
 export interface Movable {
     steerFactor: number
     maxVelocity: number

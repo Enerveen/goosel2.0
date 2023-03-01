@@ -1,19 +1,12 @@
-import React, {useEffect, useState} from "react";
-import {observer} from "mobx-react-lite";
+import React from "react";
 import classes from './ActiveEntityInfo.module.scss'
-import Animal from "../../entities/Animal";
 import {simulationValuesMultipliers} from "../../constants/simulation";
+import simulationStore from "../../stores/simulationStore";
+import {observer} from "mobx-react-lite";
 
-interface IProps {
-    activeEntity: Animal | null
-    energy: number | undefined
-}
-
-const ActiveEntityInfo = observer(({activeEntity, energy}: IProps) => {
-    const [entity, setEntity] = useState<null | Animal>(null)
-    useEffect(() => {
-        setEntity(activeEntity)
-    }, [activeEntity])
+const ActiveEntityInfo = observer(() => {
+    const entity = simulationStore.getActiveEntity
+    const energy = simulationStore.getActiveEntityEnergy
 
     return entity ? <div className={classes.container}>
         <div>
@@ -29,6 +22,7 @@ const ActiveEntityInfo = observer(({activeEntity, energy}: IProps) => {
                     <b>Mother: </b>{entity.parents.mother.name}
                 </div>
             </> : <div className={classes.stat}>Homunculus</div>}
+            <div className={classes.stat}>{entity.genes.gay ? 'Gay' : 'Hetero'}</div>
             <div className={classes.stat}>
                 <b>Energy: </b>{energy?.toFixed(2)}/{entity.energy.max}
             </div>
@@ -39,6 +33,14 @@ const ActiveEntityInfo = observer(({activeEntity, energy}: IProps) => {
             <div className={classes.stat}>
                 <b>Speed: </b>
                 {entity.stats.speed}
+            </div>
+            <div className={classes.stat}>
+                <b>Curiosity: </b>
+                {entity.stats.curiosity}
+            </div>
+            <div className={classes.stat}>
+                <b>Immunity: </b>
+                {entity.stats.immunity}
             </div>
             <div className={classes.stat}>
                 <b>FS: </b>
@@ -58,7 +60,6 @@ const ActiveEntityInfo = observer(({activeEntity, energy}: IProps) => {
             </div>
         </div>
     </div> : <></>
-});
-
+})
 export default ActiveEntityInfo
 

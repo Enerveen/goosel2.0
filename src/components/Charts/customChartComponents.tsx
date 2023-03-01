@@ -1,6 +1,10 @@
 import classes from './chartsStyles.module.scss'
 
 enum keyNames {
+    total = 'Total',
+    gay = 'Homosexual',
+    predator = 'Predator',
+    scavenger = 'Scavenger',
     child = 'Children',
     teen = 'Teens',
     mature = 'Adults',
@@ -10,6 +14,8 @@ enum keyNames {
     foodSensitivity = 'Food Sensitivity',
     breedingCD = 'Breeding cooldown',
     hatchingTime = 'Time to hatch',
+    curiosity = 'Curiosity',
+    immunity = 'Immunity',
     male = 'Male',
     female = 'Female',
     count = 'Amount of plants',
@@ -26,7 +32,7 @@ interface ITooltipContentProps {
 export const TooltipContent = ({o, calculateLabel}: ITooltipContentProps) => {
     const {payload, label} = o;
 
-    return <div className={classes.tooltipContainer}>
+    return payload ? <div className={classes.tooltipContainer}>
         <div className={classes.tooltipHeading}>Year {label}</div>
         <div className={classes.tooltipItemList}>
             {payload.map((entry: any, index: number) => {
@@ -37,7 +43,7 @@ export const TooltipContent = ({o, calculateLabel}: ITooltipContentProps) => {
                     </span>
             })}
         </div>
-    </div>
+    </div> : <></>
 };
 
 export const CustomLegend = ({payload}: any) => {

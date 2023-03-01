@@ -1,12 +1,27 @@
-import React from "react";
+import React, {useCallback} from "react";
 import classes from './Results.module.scss'
 import AreaChart from "../../components/Charts/AreaChart";
 import BarChart from "../../components/Charts/BarChart";
 import DynamicsChart from "../../components/Charts/DynamicsChart";
 import ComposedChart from "../../components/Charts/ComposedChart";
 import LineChart from "../../components/Charts/LineChart";
+import simulationStore from "../../stores/simulationStore";
+import {appPhase} from "../../types";
+import Button from "../../components/Button/Button";
 
-const Results = ({statistics}: any) => {
+interface IResultsProps {
+    setAppPhase: (phase: appPhase) => void
+}
+
+const Results = ({setAppPhase}: IResultsProps) => {
+    const statistics = simulationStore.getStatistics
+    const {reset} = simulationStore
+
+    const onReturn = useCallback(() => {
+        setAppPhase('NOT_STARTED')
+        reset()
+    }, [setAppPhase, reset])
+
     return <div className={classes.container}>
         <h1>
             FIN!
@@ -34,14 +49,21 @@ const Results = ({statistics}: any) => {
                 <BarChart data={statistics.age} dataKeys={['child', 'teen', 'mature', 'elder']} xAxisDataKey={'year'}/>
             </div>
             <div className={classes.chartContainer}>
+                <h2>Animals genes representation</h2>
+                <BarChart data={statistics.genes} dataKeys={['total', 'gay', 'predator', 'scavenger']} xAxisDataKey={'year'}/>
+            </div>
+            <div className={classes.chartContainer}>
                 <h2>Average population stats</h2>
                 <LineChart
                     data={statistics.averageStats}
-                    dataKeys={['speed', 'breedingSensitivity', 'foodSensitivity', 'breedingCD', 'hatchingTime']}
+                    dataKeys={['speed', 'breedingSensitivity', 'foodSensitivity', 'breedingCD', 'hatchingTime', 'curiosity', 'immunity']}
                     xAxisDataKey={'year'}/>
             </div>
-        </div>
 
+        </div>
+            <Button className={classes.backBtn} onClick={onReturn}>
+                Return to Main Menu
+            </Button>
     </div>
 }
 

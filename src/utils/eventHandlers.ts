@@ -1,21 +1,20 @@
 import React from "react";
-import Renderer from "../graphics/Renderer";
-import Animal from "../entities/Animal";
+import Renderer from "../graphics/Renderer"
 import {Camera, mouseCameraController} from "../graphics/Camera";
 import {cameraConstants} from "../constants/view";
 import {findDistance} from "./helpers";
+import simulationStore from "../stores/simulationStore";
 
 export const handleCanvasClick = (
     event: React.MouseEvent<HTMLCanvasElement>,
     renderer: Renderer,
-    entities: Animal[],
-    setActiveEntity: (entity: Animal) => void,
-    removeActiveEntity: () => void) => {
+) => {
+    const entities = simulationStore.getAnimals
+    const {setActiveEntity, removeActiveEntity} = simulationStore
     const activeEntity = entities.find(animal => {
         const {width, height, offsetX, offsetY} = renderer.calculateAnimalTexture({
             gender: animal.gender,
-            age: animal.age.current,
-            isAlive: animal.isAlive
+            age: animal.age.current
         })
 
         if (renderer.context) {
@@ -64,13 +63,26 @@ export const handleCanvasMouseRelease = () => {
 export const handleCanvasMouseMove = (
     event: React.MouseEvent<HTMLCanvasElement>,
     camera: Camera) => {
-    mouseCameraController.moveUpdate(camera, {x: event.clientX, y: event.clientY}, 2);
+    mouseCameraController.moveUpdate(camera, {x: event.clientX, y: event.clientY}, 1);
 }
 
 export const handleCanvasMouseWheel = (
     event: React.WheelEvent<HTMLCanvasElement>,
+    clientWidth: number,
+    clientHeight: number,
     camera: Camera) => {
-    camera.setZoom(Math.max(cameraConstants.minZoom, Math.min(cameraConstants.maxZoom, camera.getFovScale() * (1 - 0.001 * event.deltaY))));
+    const fovScalePrev = camera.getFovScale();
+    const zoom = 1 - 0.001 * event.deltaY;
+
+    camera.setZoom(Math.max(cameraConstants.minZoom, Math.min(cameraConstants.maxZoom, camera.getFovScale() * zoom)));
+
+    const p = camera.getFovScale() / fovScalePrev - 1.0;
+    const ddx = camera.fov.x / clientWidth;
+    const ddy = camera.fov.y / clientHeight;
+    const dd = Math.max(ddx, ddy);
+
+    camera.position.x += p * dd * (event.clientX - clientWidth / 2.0);
+    camera.position.y += p * dd * (event.clientY - clientHeight / 2.0);
 }
 
 export const handleCanvasTouchStart = (

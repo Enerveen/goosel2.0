@@ -1,65 +1,10 @@
 import Animal from "./entities/Animal";
+import {plantsKinds} from "./constants/simulation";
 
 export type Position = {
     x: number
     y: number
 }
-
-
-export class Vector2 {
-    x: number = 0
-    y: number = 0
-
-
-    constructor(x: number, y: number) {
-        this.x = x;
-        this.y = y;
-    }
-
-
-    normalize() {
-        const norm = this.norm();
-        this.x /= norm;
-        this.y /= norm;
-
-        return this;
-    }
-
-
-    normalized() {
-        return new Vector2(this.x, this.y).normalize();
-    }
-
-
-    clamp(magnitude: number) {
-        const length = this.norm();
-
-        this.normalize();
-        this.x *= Math.min(length, magnitude);
-        this.y *= Math.min(length, magnitude);
-
-        return this;
-    }
-
-
-    clamped(magnitude: number) {
-        return new Vector2(this.x, this.y).clamp(magnitude);
-    }
-
-
-    norm() {
-        return Math.sqrt(this.x ** 2 + this.y ** 2);
-    }
-}
-
-
-export type Color = {
-    r: number,
-    g: number,
-    b: number,
-    a: number
-}
-
 
 export class Circle {
     x: number
@@ -145,6 +90,7 @@ export class BoundingBox {
 }
 
 
+
 export type FieldDimensions = {
     width: number,
     height: number
@@ -166,7 +112,6 @@ export interface TextureAtlas extends Texture {
 export type Age = {
     current: number
     birthTimestamp: number
-    deathTimestamp: number | undefined
 }
 
 export type Energy = {
@@ -180,7 +125,9 @@ export type Stats = {
     foodSensitivity: number
     breedingSensitivity: number,
     breedingCD: number,
-    hatchingTime: number
+    hatchingTime: number,
+    immunity: number,
+    curiosity: number
 }
 
 export type Activity = {
@@ -195,11 +142,12 @@ export type gender = 'male' | 'female'
 export type appPhase = 'NOT_STARTED' | 'STARTED' | 'FINISHED'
 
 export type SimulationConstants = {
+    mutationChance: number
     breedingMinAge: number,
     breedingMaxAge: number,
     breedingMaxProgress: number,
     animalMaxEnergy: number,
-    foodSpawnChanceK: number,
+    foodSpawnChance: number,
     initialFoodCount: number,
     initialAnimalCount: number,
     foodNutritionMin: number,
@@ -211,3 +159,11 @@ export type LogItem = {
     message: string,
     timestamp: number
 }
+
+export type Genes = {
+    gay: boolean,
+    scavenger: boolean,
+    predator: boolean
+}
+
+export type plantKind = typeof plantsKinds[number] | 'common'
