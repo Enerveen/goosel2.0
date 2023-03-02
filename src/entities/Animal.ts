@@ -253,6 +253,7 @@ class Animal extends Entity implements Movable {
             } else {
                 this.walk(isDemo)
             }
+            this.applyAging()
             return;
         }
         if (this.currentActivity.activity === 'walking') {
@@ -447,7 +448,7 @@ class Animal extends Entity implements Movable {
                         return new Egg({
                             parents: {father, mother},
                             id: `A${getId()}`,
-                            position: {x: this.position.x - 20 + index * 10, y: this.position.y - 20 * index % 2},
+                            position: {x: this.position.x - 20 + index * 20, y: this.position.y - 20 * (index % 2)},
                             hatchTimestamp: timestamp + mother.stats.hatchingTime * simulationValuesMultipliers.hatchingTime
                         })
                     })

@@ -6,6 +6,7 @@ import {BoundingBox, Circle, FieldDimensions, LogItem, Position, SimulationConst
 import {defaultSimConstants, timeConstants} from "../constants/simulation";
 import Egg from "../entities/Egg";
 import Corpse from "../entities/Corpse";
+import {validateSimulationConstants} from "../utils/validators";
 
 
 
@@ -39,7 +40,7 @@ export class SimulationStore {
         animalCount: number[]
     } = {age: [], gender: [], averageStats: [], populationChange:[], animalCount: [], plantStats: [], genes: []}
     simulationConstants: SimulationConstants = defaultSimConstants
-    log: {logs: LogItem[], hidden: boolean} = {logs:[{message: 'Simulation has started!', timestamp:0}], hidden: true}
+    log: {logs: LogItem[], hidden: boolean} = {logs:[{message: 'Simulation has started!', timestamp:0}], hidden: false}
 
     constructor() {
         makeObservable(this, {
@@ -87,7 +88,8 @@ export class SimulationStore {
             clearAnimalCorpses: action,
             gatherStatistics: action,
             setWindowSize: action,
-            setSimulationConstants: action
+            setSimulationConstants: action,
+            reset: action
         })
     }
 
@@ -254,6 +256,36 @@ export class SimulationStore {
     clearAnimalCorpses = () => {
         this.corpses = this.getCorpses.filter(entity =>
             this.getTimestamp - entity.deathTimestamp < timeConstants.yearLength * 3)
+    }
+
+    reset = () => {
+        this.animals = []
+        this.plants = []
+        this.corpses = []
+        this.eggs = []
+        this.timestamp = 0
+        this.activeEntity = null
+        this.idCounter = 0
+        this.simulationSpeed = 2
+        this.currentYear = -1
+        this.simulationConstants = defaultSimConstants
+        this.statistics = {age: [], gender: [], averageStats: [], populationChange:[], animalCount: [], plantStats: [], genes: []}
+        this.log = {logs:[{message: 'Simulation has started!', timestamp:0}], hidden: false}
+    }
+
+    set = (data: SimulationStore) => {
+        this.animals = data.animals.map((elem) => new Animal(elem))
+        this.plants = data.plants.map((elem) => new Plant(elem))
+        this.corpses = data.corpses.map((elem) => new Corpse(elem))
+        this.eggs = data.eggs.map((elem) => new Egg(elem))
+        this.timestamp = data.timestamp
+        this.activeEntity = data.activeEntity
+        this.idCounter = data.idCounter
+        this.simulationSpeed = data.simulationSpeed
+        this.currentYear = data.currentYear
+        this.simulationConstants = validateSimulationConstants(data.simulationConstants)
+        this.statistics = data.statistics
+        this.log = data.log
     }
 }
 
