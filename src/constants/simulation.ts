@@ -25,6 +25,7 @@ export const appConstants = {
     version: '0.0.1'
 }
 
+
 export const defaultSimConstants:SimulationConstants = {
     mutationChance: 0.2,
     breedingMinAge: 5,
