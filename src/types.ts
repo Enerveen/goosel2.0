@@ -1,95 +1,11 @@
 import Animal from "./entities/Animal";
 import {plantsKinds} from "./constants/simulation";
+import {ReactNode} from "react";
 
 export type Position = {
     x: number
     y: number
 }
-
-export class Circle {
-    x: number
-    y: number
-    r: number
-
-    constructor(x: number, y: number, r: number) {
-        this.x = x;
-        this.y = y;
-        this.r = r;
-    }
-
-
-    check(position: Position) {
-        return (position.x - this.x) ** 2 + (position.y - this.y) ** 2 < this.r ** 2;
-    }
-
-
-    obbIntersectionImpl(obb: BoundingBox) {
-        const halfWidth = (obb.right - obb.left) / 2;
-        const halfHeight = (obb.bottom - obb.top) / 2;
-        const center = {
-            x: obb.left + halfWidth,
-            y: obb.top + halfHeight
-        }
-
-        const circleVector = {
-            x: Math.abs(center.x - this.x),
-            y: Math.abs(center.y - this.y)
-        }
-
-        if (circleVector.x > halfWidth + this.r) {
-            return false;
-        }
-        if (circleVector.y > halfHeight + this.r) {
-            return false;
-        }
-
-        if (circleVector.x <= halfWidth) {
-            return true;
-        }
-        if (circleVector.y <= halfHeight) {
-            return true;
-        }
-
-        return (circleVector.x - halfWidth) ** 2 + (circleVector.y - halfHeight) ** 2 <= this.r ** 2;
-    }
-}
-
-
-export class BoundingBox {
-    left: number = 0
-    right: number = 0
-    top: number = 0
-    bottom: number = 0
-
-
-    constructor(left: number=0, right: number=0, top: number=0, bottom: number=0) {
-        this.left = left;
-        this.right = right;
-        this.top = top;
-        this.bottom = bottom;
-    }
-
-
-    check(position: Position) {
-        return position.x >= this.left &&
-            position.x <= this.right &&
-            position.y >= this.top &&
-            position.y <= this.bottom;
-    }
-
-
-    intersects(obb: BoundingBox | Circle) {
-        return obb.obbIntersectionImpl(this)
-    }
-
-
-    obbIntersectionImpl(obb: BoundingBox) {
-        return Math.max(this.right, obb.right) - Math.min(this.left, obb.left) <= this.right - this.left + obb.right - obb.left &&
-            Math.max(this.bottom, obb.bottom) - Math.min(this.top, obb.top) <= this.bottom - this.top + obb.bottom - obb.top;
-    }
-}
-
-
 
 export type FieldDimensions = {
     width: number,
@@ -167,3 +83,9 @@ export type Genes = {
 }
 
 export type plantKind = typeof plantsKinds[number] | 'common'
+
+export type Tab = {
+    content: ReactNode | ReactNode[],
+    id: string,
+    label: string
+}

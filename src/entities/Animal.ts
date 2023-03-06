@@ -1,5 +1,5 @@
 import Entity from "./Entity";
-import {Activity, Age, BoundingBox, Energy, gender, Genes, Position, Stats} from "../types";
+import {Activity, Age, Energy, gender, Genes, Position, Stats} from "../types";
 import {coinFlip, getRandomInRange, rollNPercentChance} from "../utils/utils";
 import Plant from "./Plant";
 import {generateAnimalName} from "../utils/nameGen";
@@ -9,7 +9,7 @@ import {
     findDistance
 } from "../utils/helpers";
 import {timeConstants, simulationValuesMultipliers} from "../constants/simulation";
-import Quadtree from "../dataStructures/Quadtree";
+import Quadtree, {BoundingBox} from "../dataStructures/Quadtree";
 import store from "../stores/simulationStore";
 import {Movable} from "./Movable";
 import Vector2 from "../dataStructures/Vector2";

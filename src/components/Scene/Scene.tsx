@@ -9,7 +9,7 @@ import {
     generateFood
 } from "../../utils/helpers";
 import Renderer from "../../graphics/Renderer";
-import {appPhase, BoundingBox, plantKind} from "../../types";
+import {appPhase, plantKind} from "../../types";
 import useWindowSize from "../../hooks/useWindowSize";
 import {Camera} from "../../graphics/Camera";
 import ImageContext from "../../stores/ImageContext";
@@ -21,6 +21,7 @@ import {
 } from "../../utils/eventHandlers";
 import Vector2 from "../../dataStructures/Vector2";
 import {plantsKinds} from "../../constants/simulation";
+import {BoundingBox} from "../../dataStructures/Quadtree";
 
 interface ISceneProps {
     store: SimulationStore,
