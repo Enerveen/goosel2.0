@@ -121,11 +121,11 @@ class Renderer {
             for (let j = 0; j < countX + 1; j++) {
                 const cutX = Math.min(tileSize.width, size.width - j * tileSize.width) / tileSize.width;
                 const cutY = Math.min(tileSize.height, size.height - i * tileSize.height) / tileSize.height;
-
+                // temporary fix, it can surely be done better
                 if (i === 1 && j === 1) {
-                    this.context.drawImage(gladeImage, 0, 0, cutX * gladeImage.width, cutY * gladeImage.height, j * tileSize.width, i * tileSize.height, cutX * tileSize.width, cutY * tileSize.height)
+                    this.context.drawImage(gladeImage, 0, 0, cutX * gladeImage.width, cutY * gladeImage.height, j * tileSize.width, i * tileSize.height, cutX * (tileSize.width + 1), cutY * (tileSize.height + 1))
                 } else {
-                    this.context.drawImage(image, 0, 0, cutX * image.width, cutY * image.height, j * tileSize.width, i * tileSize.height, cutX * tileSize.width, cutY * tileSize.height)
+                    this.context.drawImage(image, 0, 0, cutX * image.width, cutY * image.height, j * tileSize.width, i * tileSize.height, cutX * (tileSize.width + 1), cutY * (tileSize.height + 1))
                 }
             }
         }
