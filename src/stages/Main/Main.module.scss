@@ -18,6 +18,7 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  padding: 0 20px;
 }
 
 .version {
@@ -44,5 +45,16 @@
 
 .tabs {
   margin-bottom: 40px;
+}
+
+.infoContent {
+  .special {
+    color: #d2a71f;
+  }
+  .link {
+    color: #1e80b4;
+    text-decoration: underline;
+    cursor: pointer;
+  }
 }
 

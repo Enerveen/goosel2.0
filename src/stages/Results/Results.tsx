@@ -24,7 +24,7 @@ const Results = ({setAppPhase}: IResultsProps) => {
 
     return <div className={classes.container}>
         <h1>
-            FIN!
+            SIMULATION REPORT
         </h1>
         <div className={classes.chartsSection}>
             <div className={classes.chartContainer}>

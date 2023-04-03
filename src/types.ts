@@ -85,7 +85,7 @@ export type Genes = {
 export type plantKind = typeof plantsKinds[number] | 'common'
 
 export type Tab = {
-    content: ReactNode | ReactNode[],
+    content: (setTab: (id: string) => void) => ReactNode | ReactNode[],
     id: string,
     label: string
 }

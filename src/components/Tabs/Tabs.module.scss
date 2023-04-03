@@ -1,25 +1,49 @@
 .container {
   display: flex;
+  flex-direction: column;
+  @media (min-width: 720px) {
+    flex-direction: row;
+  }
 }
 
 .tabNavItem {
-  min-width: 200px;
-  font-size: 24px;
-  padding: 8px 16px;
-  cursor: pointer;
-  border-radius: 10px 0 0 10px;
-  border: 1px solid #fafafa;
-  border-right: none;
-  background: rgba(34, 34, 34, 0.5);
+  padding: 4px;
   &:not(:last-child) {
-    margin-bottom: 4px;
+    margin-right: 4px;
+  }
+  font-size: 24px;
+  cursor: pointer;
+  border-radius: 10px 10px 0 0;
+  border-bottom-style: none;
+  @media (min-width: 720px) {
+    min-width: 200px;
+    padding: 8px 16px;
+    border-radius: 10px 0 0 10px;
+    border: 1px solid #fafafa;
+    border-right-style: none;
+    &:not(:last-child) {
+      margin-bottom: 4px;
+      margin-right: 0;
+    }
   }
 }
 
 .tabContent {
-  width: 600px;
+  min-width: 300px;
+  max-width: 600px;
   padding: 16px;
   border: 1px solid #fafafa;
+  border-radius: 0 0 10px 10px;
   background: rgba(34, 34, 34, 0.5);
-  border-radius: 0 10px 10px 10px;
+  @media (min-width: 720px) {
+    min-width: 400px;
+    border-radius: 0 10px 10px 10px;
+  }
+}
+
+.tabNav {
+  display: flex;
+  @media (min-width: 720px) {
+    display: block;
+  }
 }
