@@ -25,8 +25,8 @@ const CreditCard = ({imageSrc, description, links, name}: ICreditCardProps) => <
         {links.map(({type, link}:CreditsLink) => {
             switch (type) {
                 case "gh":
-                    return <a href={link}>
-                        <Github key={type}/>
+                    return <a href={link} key={type}>
+                        <Github/>
                     </a>
                 case "ig":
                     return <a href={link} key={type}>
