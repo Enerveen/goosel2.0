@@ -35,6 +35,7 @@ class Renderer {
     plantAtlas: TextureAtlas
     eggsAtlas: TextureAtlas
     breedingTexture: Texture
+    gaySexTexture: Texture
     matureAnimalTextureAtlas: TextureAtlas
     teenAnimalTextureAtlas: TextureAtlas
     childAnimalTextureAtlas: TextureAtlas
@@ -88,6 +89,7 @@ class Renderer {
         })
         this.cloudsTexture = loadTexture(images.clouds);
         this.breedingTexture = loadTexture(images.heart, {width: 20, height: 20, offsetX: 0.5, offsetY: 0.5});
+        this.gaySexTexture = loadTexture(images.heartGay, {width: 20, height: 20, offsetX: 0.5, offsetY: 0.5});
 
         this.backgroundTexture = images.background
         this.backgroundSeamlessTexture = images.backgroundSeamless
@@ -187,21 +189,22 @@ class Renderer {
         }
     }
 
-    public drawBreeding(position: Position) {
-        const [{image, width, height, offsetX, offsetY}, {x, y}] = [this.breedingTexture, position]
+    public drawBreeding(position: Position, isGay = false) {
+        const [{image, width, height, offsetX, offsetY}, {x, y}] =
+            [isGay ? this.breedingTexture : this.gaySexTexture, position]
         if (this.context) {
             this.context.drawImage(image, x - offsetX * width, y - offsetY * height, width, height)
         }
     }
 
     public drawLabels(position: Position,
-                      entity: { gender: gender, name: string, age: number, currentActivity: string }
+                      entity: { gender: gender, name: string, age: number, currentActivity: string, isGay: boolean }
     ) {
         if (!this.context) {
             return
         }
         const [{width, height, offsetX, offsetY}, {x, y},
-            {gender, name, age, currentActivity}] = [this.calculateAnimalTexture(entity), position, entity]
+            {gender, name, age, currentActivity, isGay}] = [this.calculateAnimalTexture(entity), position, entity]
         const originOffset = {x: offsetX * width, y: offsetY * height};
         this.context.textAlign = 'center';
         this.context.font = "bold 18px AmasticBold"
@@ -224,7 +227,7 @@ class Renderer {
             }
         })
         if (currentActivity === 'breeding') {
-            this.drawBreeding({x: x + 30 - offsetX * width, y: y - 90})
+            this.drawBreeding({x: x + 30 - offsetX * width, y: y - 90}, isGay)
         }
     }
 

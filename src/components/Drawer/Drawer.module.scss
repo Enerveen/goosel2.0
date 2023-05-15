@@ -28,4 +28,11 @@
   cursor: pointer;
   right: 10px;
   top: 10px;
+
+  svg {
+    fill: #941430;
+    &:hover {
+      fill: #be2241
+    }
+  }
 }

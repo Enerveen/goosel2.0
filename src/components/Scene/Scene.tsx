@@ -121,7 +121,8 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                     gender: entity.gender,
                     age: entity.age.current,
                     name: entity.name,
-                    currentActivity: entity.currentActivity.activity
+                    currentActivity: entity.currentActivity.activity,
+                    isGay: entity.genes.gay
                 }
             )
             if (entity.id === store.getActiveEntity?.id) {
