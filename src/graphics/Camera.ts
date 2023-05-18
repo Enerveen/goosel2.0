@@ -1,6 +1,6 @@
 import {Position} from "../types";
-import {BoundingBox} from "../types";
 import Vector2 from "../dataStructures/Vector2";
+import {BoundingBox} from "../dataStructures/Quadtree";
 
 
 export class Camera {

@@ -21,6 +21,7 @@ import {
 } from "../../utils/eventHandlers";
 import Vector2 from "../../dataStructures/Vector2";
 import {plantsKinds} from "../../constants/simulation";
+import {BoundingBox} from "../../dataStructures/Quadtree";
 
 
 import {Shader} from "../../graphics/Shader";
@@ -170,7 +171,8 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                     gender: entity.gender,
                     age: entity.age.current,
                     name: entity.name,
-                    currentActivity: entity.currentActivity.activity
+                    currentActivity: entity.currentActivity.activity,
+                    isGay: entity.genes.gay
                 }
             )
             if (entity.id === store.getActiveEntity?.id) {

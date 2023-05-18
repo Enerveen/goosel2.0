@@ -23,4 +23,11 @@
   &.active {
     right: -48px;
   }
+
+  svg {
+    fill: #d2a71f;
+    &:hover {
+      fill: #ebcc6c;
+    }
+  }
 }
