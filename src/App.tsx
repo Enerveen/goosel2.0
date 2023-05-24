@@ -17,11 +17,11 @@ const App = () => {
         <div className={classes.container}>
             {phase === 'NOT_STARTED' && <Main setAppPhase={setPhase}/>}
             {phase === 'STARTED' && <Simulation setAppPhase={setPhase}/>}
-            <Suspense fallback={<Loader/>}>
+            <Suspense fallback={<Loader fullscreen={true}/>}>
                 {phase === 'FINISHED' && <LazyResults setAppPhase={setPhase}/>}
             </Suspense>
         </div>
-    </ImageContext.Provider> : <Loader/>
+    </ImageContext.Provider> : <Loader fullscreen={true}/>
 }
 
 export default App
