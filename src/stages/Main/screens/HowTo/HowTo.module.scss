@@ -1,0 +1,46 @@
+.tabs {
+  margin-bottom: 40px;
+}
+
+.screenContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 0 20px;
+}
+
+.infoContent {
+  .special {
+    color: #d2a71f;
+  }
+  .link {
+    color: #1e80b4;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+
+.plantInfoContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.clippedImage {
+  width: 100px;
+  min-width: 100px;
+  overflow: hidden;
+  display: inline-block;
+  img {
+    width: 600px;
+  }
+
+}
+
+.button {
+  padding: 10px 20px;
+  font-size: 34px;
+  margin: 10px 0;
+}

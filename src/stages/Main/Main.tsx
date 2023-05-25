@@ -4,7 +4,7 @@ import {appPhase} from "../../types";
 import {appConstants} from "../../constants/simulation";
 import BackgroundScene from "../../components/BackgroundScene/BackgroundScene";
 import MainMenu from "./screens/MainMenu";
-import HowTo from "./screens/HowTo";
+import HowTo from "./screens/HowTo/HowTo";
 import SimulationNew from "./screens/SimulationNew";
 import Credits from "./screens/Credits";
 import SimulationLoad from "./screens/SimulationLoad";
