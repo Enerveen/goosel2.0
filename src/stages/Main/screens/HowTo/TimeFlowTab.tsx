@@ -27,7 +27,7 @@ const TimeFlowInfo = ({setTab}: {setTab: (id:string) => void}) => {
                 various possibilities and behaviour depending on their age. It is described with more details
                 in <span className={classes.link} onClick={() => setTab('plants')} >Geese behaviour</span> tab.
             </li>
-            <li>At the end of each year, statistics gathers to later be represented in simulation report</li>
+            <li>At the end of each year, statistics is gathered to later be represented in simulation report</li>
         </ul>
     </div>
 }

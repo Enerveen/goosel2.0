@@ -22,29 +22,29 @@ const PlantsInfo = () => {
             description={'Common geese food that makes their lives a bit better, provides fulfillment without any side effects'}
         />
         <PlantInfo
-            plantName={'Goosegrass'}
-            posShift={'-100px'}
-            description={'Common geese food, provides fulfillment without any side effects'}
+            plantName={'Yarrow'}
+            posShift={'-75px'}
+            description={'Totally inedible. Causes immediate, inevitable, and irreversible death'}
         />
         <PlantInfo
-            plantName={'Goosegrass'}
-            posShift={'-200px'}
-            description={'Common geese food, provides fulfillment without any side effects'}
+            plantName={'Peas'}
+            posShift={'-150px'}
+            description={'Causes diarrhea, making geese feel even more exhausted than before eating'}
         />
         <PlantInfo
-            plantName={'Goosegrass'}
+            plantName={'Clover'}
+            posShift={'-225px'}
+            description={'Sometimes works as tonic, sometimes as sedative. It\'s all just a matter of luck'}
+        />
+        <PlantInfo
+            plantName={'Strawberries'}
             posShift={'-300px'}
-            description={'Common geese food, provides fulfillment without any side effects'}
+            description={'Fills geese with wonderful lovely energy, making them eager to make love immediately'}
         />
         <PlantInfo
-            plantName={'Goosegrass'}
-            posShift={'-400px'}
-            description={'Common geese food, provides fulfillment without any side effects'}
-        />
-        <PlantInfo
-            plantName={'Goosegrass'}
-            posShift={'-500px'}
-            description={'Common geese food, provides fulfillment without any side effects'}
+            plantName={'Blueberry'}
+            posShift={'-375px'}
+            description={'Causes inexplicable changes in the brains of geese, affecting their sexual preferences'}
         />
     </div>
 }
