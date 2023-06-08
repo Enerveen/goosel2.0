@@ -10,6 +10,7 @@ const Soundtrack = () => {
         const audio = new Audio(soundtrack)
         audio.muted = true
         audio.loop = true
+        audio.volume = 0.6
         return audio
     }, [])
     const toggleSound = useCallback(() => setSoundOn(prevState => !prevState), [])
