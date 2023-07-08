@@ -62,7 +62,12 @@ class Renderer {
         });
         const animalTextureAtlasFrameRatio = animalTextureAtlas.frameHeight / animalTextureAtlas.frameWidth
         this.teenAnimalTextureAtlas = {...animalTextureAtlas, width: 70.5, height: 70.5 * animalTextureAtlasFrameRatio};
-        this.childAnimalTextureAtlas = {...animalTextureAtlas, width: 47, height: 47 * animalTextureAtlasFrameRatio};
+        this.childAnimalTextureAtlas = loadTextureAtlas(images.childTextureAtlas, {
+            frameWidth: 156,
+            frameHeight:200,
+            width: 39,
+            height: 50
+        })
         this.matureAnimalTextureAtlas = {...animalTextureAtlas, width: 94, height: 94 * animalTextureAtlasFrameRatio};
         const corpseTextureRatio = 262 / 421
         this.teenCorpseTexture = loadTexture(images.corpse, {

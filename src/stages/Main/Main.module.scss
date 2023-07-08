@@ -24,7 +24,7 @@
 .version {
   position: fixed;
   color: #fafafa;
-  top: 10px;
+  top: 18px;
   right: 20px;
   z-index: 100;
 }
@@ -41,21 +41,6 @@
 
 .notification {
   margin: 10px 0 20px 0;
-}
-
-.tabs {
-  margin-bottom: 40px;
-}
-
-.infoContent {
-  .special {
-    color: #d2a71f;
-  }
-  .link {
-    color: #1e80b4;
-    text-decoration: underline;
-    cursor: pointer;
-  }
 }
 
 .creditCardsBox {
