@@ -1,0 +1,32 @@
+.cardContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 300px;
+  padding: 16px;
+  margin: 16px;
+  img {
+    max-width: 300px;
+  }
+}
+
+.name {
+  font-size: 32px;
+}
+
+.description {
+  margin-bottom: 20px;
+}
+
+.linksBox {
+  a {
+    padding: 5px;
+    svg {
+      fill: #ffffff;
+      &:hover {
+        fill: #19ecca;
+      }
+    }
+
+  }
+}

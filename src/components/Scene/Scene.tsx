@@ -23,6 +23,7 @@ import Vector2 from "../../dataStructures/Vector2";
 import {plantsKinds} from "../../constants/simulation";
 import {BoidsSystem} from "../../entities/BoidEntity";
 import Entity from "../../entities/Entity";
+import {BoundingBox} from "../../dataStructures/Quadtree";
 
 
 import {Shader} from "../../graphics/Shader";
@@ -140,7 +141,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'tex'), 0);
             glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'shadowMap'), 1);
 
-            glDriver.shadowMapRT?.texture.bind(1);
+            glDriver.shadowMapRT?.getTexture().bind(1);
             //GLTexture.fromImage(renderer.eggsAtlas.image).bind(1);
         }
 
@@ -181,13 +182,16 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                     gender: entity.gender,
                     age: entity.age.current,
                     name: entity.name,
-                    currentActivity: entity.currentActivity.activity
+                    currentActivity: entity.currentActivity.activity,
+                    isGay: entity.genes.gay
                 }
             )
             if (entity.id === store.getActiveEntity?.id) {
                 store.setActiveEntity(entity)
             }
         })
+
+        glDriver.copyImage(glDriver.mainRT!.getTexture(0));
 
         //renderer.drawClouds();
         if (!store.getLogHidden) {

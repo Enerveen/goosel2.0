@@ -1,7 +1,7 @@
 import {SimulationConstants} from "../types";
 
 export const plantsKinds =
-    ['lovely', 'gay', 'speed', 'poisonous', 'lethal'] as const
+    ['lethal', 'poisonous', 'speed', 'lovely', 'gay'] as const
 
 export const simulationValuesMultipliers = {
     foodSensitivity: 200,
@@ -24,6 +24,7 @@ export const appConstants = {
     fieldYPadding: 0,
     version: '0.0.1'
 }
+
 
 export const defaultSimConstants:SimulationConstants = {
     mutationChance: 0.2,

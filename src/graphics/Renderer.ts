@@ -40,6 +40,7 @@ class Renderer {
     plantAtlas: TextureAtlas
     eggsAtlas: TextureAtlas
     breedingTexture: Texture
+    gaySexTexture: Texture
     matureAnimalTextureAtlas: TextureAtlas
     teenAnimalTextureAtlas: TextureAtlas
     childAnimalTextureAtlas: TextureAtlas
@@ -54,6 +55,7 @@ class Renderer {
     backgroundGladeTexture: HTMLImageElement
     cloudsTexture: Texture
     grassTexture: Texture
+    baseGrassTexture: Texture
 
     constructor(ctx: CanvasRenderingContext2D | null, images: any) {
         this.context = ctx || null
@@ -65,7 +67,14 @@ class Renderer {
         });
         const animalTextureAtlasFrameRatio = animalTextureAtlas.frameHeight / animalTextureAtlas.frameWidth
         this.teenAnimalTextureAtlas = {...animalTextureAtlas, width: 70.5, height: 70.5 * animalTextureAtlasFrameRatio};
-        this.childAnimalTextureAtlas = {...animalTextureAtlas, width: 47, height: 47 * animalTextureAtlasFrameRatio};
+        this.childAnimalTextureAtlas = loadTextureAtlas(images.childTextureAtlas, {
+            frameWidth: 156,
+            frameHeight:200,
+            width: 39,
+            height: 50,
+            offsetX: 0.5,
+            offsetY: 0.9
+        })
         this.matureAnimalTextureAtlas = {...animalTextureAtlas, width: 94, height: 94 * animalTextureAtlasFrameRatio};
         const corpseTextureRatio = 262 / 421
         this.teenCorpseTexture = loadTexture(images.corpse, {
@@ -78,7 +87,7 @@ class Renderer {
             width: 60.16,
             height: 60.16 * corpseTextureRatio,
             offsetX: 0.5,
-            offsetY: 0.5
+            offsetY: 0.9
         })
         this.matureCorpseTexture = loadTexture(images.corpse, {
             width: 120.3,
@@ -91,13 +100,15 @@ class Renderer {
             frameWidth: 300,
             frameHeight: 330,
             offsetY: 0.5,
-            offsetX: 0.5,
+            offsetX: 0.8,
             width: 45,
             height: 49.5
         })
         this.cloudsTexture = loadTexture(images.clouds);
         this.breedingTexture = loadTexture(images.heart, {width: 20, height: 20, offsetX: 0.5, offsetY: 0.5});
+        this.gaySexTexture = loadTexture(images.heartGay, {width: 20, height: 20, offsetX: 0.5, offsetY: 0.5});
         this.grassTexture = loadTexture(images.grass, {offsetX: 0.5, offsetY: 0.97});
+        this.baseGrassTexture = loadTexture(images.baseGrass, {offsetX: 0.5, offsetY: 0.97});
 
         const butterfliesParams = {width: 8, height: 8, frameWidth: 25, frameHeight: 25, offsetX: 0.5, offsetY: 0.5};
         this.butterflyTextureAtlas = loadTextureAtlas(images.butterflyTextureAtlas, butterfliesParams);
@@ -137,6 +148,7 @@ class Renderer {
             for (let j = 0; j < countX + 1; j++) {
                 const cutX = Math.min(tileSize.width, size.width - j * tileSize.width) / tileSize.width;
                 const cutY = Math.min(tileSize.height, size.height - i * tileSize.height) / tileSize.height;
+                // temporary fix, it can surely be done better
 
                 // if (i === 1 && j === 1) {
                 //     this.context.drawImage(gladeImage, 0, 0, cutX * gladeImage.width, cutY * gladeImage.height, j * tileSize.width, i * tileSize.height, cutX * tileSize.width, cutY * tileSize.height)
@@ -439,21 +451,22 @@ class Renderer {
         }
     }
 
-    public drawBreeding(position: Position) {
-        const [{image, width, height, offsetX, offsetY}, {x, y}] = [this.breedingTexture, position]
+    public drawBreeding(position: Position, isGay = false) {
+        const [{image, width, height, offsetX, offsetY}, {x, y}] =
+            [isGay ? this.breedingTexture : this.gaySexTexture, position]
         if (this.context) {
             this.context.drawImage(image, x - offsetX * width, y - offsetY * height, width, height)
         }
     }
 
     public drawLabels(position: Position,
-                      entity: { gender: gender, name: string, age: number, currentActivity: string }
+                      entity: { gender: gender, name: string, age: number, currentActivity: string, isGay: boolean }
     ) {
         if (!this.context) {
             return
         }
         const [{width, height, offsetX, offsetY}, {x, y},
-            {gender, name, age, currentActivity}] = [this.calculateAnimalTexture(entity), position, entity]
+            {gender, name, age, currentActivity, isGay}] = [this.calculateAnimalTexture(entity), position, entity]
         const originOffset = {x: offsetX * width, y: offsetY * height};
         this.context.textAlign = 'center';
         this.context.font = "bold 18px AmasticBold"
@@ -476,7 +489,7 @@ class Renderer {
             }
         })
         if (currentActivity === 'breeding') {
-            this.drawBreeding({x: x + 30 - offsetX * width, y: y - 90})
+            this.drawBreeding({x: x + 30 - offsetX * width, y: y - 90}, isGay)
         }
     }
 

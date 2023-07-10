@@ -23,10 +23,12 @@ class GLDriver {
     gl: WebGL2RenderingContext | null = null;
     defaultShader: Shader | null = null;
     shadowMapShader: Shader | null = null;
+    copyShader: Shader | null = null;
     transform: Float32Array = new Float32Array()
 
     quadVertexBuffer: WebGLBuffer | null = null;
     shadowMapRT: GLRenderTarget | null = null;
+    mainRT: GLRenderTarget | null = null;
 
 
     init(gl: WebGL2RenderingContext) {
@@ -38,6 +40,7 @@ class GLDriver {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
 
         this.shadowMapRT = new GLRenderTarget(this.gl.canvas.width, this.gl.canvas.height);
+        this.mainRT = new GLRenderTarget(this.gl.canvas.width, this.gl.canvas.height, true, 2);
 
 
         console.log('compilation');
@@ -46,6 +49,9 @@ class GLDriver {
         });
         Shader.compileFromSourceFiles({vertex: 'shadowMap.vert', fragment: 'shadowMap.frag'}, (shader) => {
             this.shadowMapShader = shader;
+        })
+        Shader.compileFromSourceFiles({vertex: 'copy.vert', fragment: 'copy.frag'}, (shader) => {
+            this.copyShader = shader;
         })
     }
 
@@ -67,6 +73,7 @@ class GLDriver {
             return;
         }
 
+        this.mainRT!.bind();
         this.defaultShader.bind();
 
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -93,7 +100,7 @@ class GLDriver {
 
         this.shadowMapShader!.bind();
         this.gl!.uniform2f(this.gl!.getUniformLocation(this.shadowMapShader.glShaderProgram, 'u_resolution'),
-            this.shadowMapRT!.texture.width, this.shadowMapRT!.texture.height);
+            this.shadowMapRT!.width, this.shadowMapRT!.height);
         this.gl!.uniform2f(this.gl!.getUniformLocation(this.shadowMapShader.glShaderProgram, 'u_camPos'), cameraPosition.x, cameraPosition.y);
         this.gl!.uniform1f(this.gl!.getUniformLocation(this.shadowMapShader.glShaderProgram, 'u_camScale'), cameraScale);
         this.gl!.uniform1f(this.gl!.getUniformLocation(this.shadowMapShader.glShaderProgram, 'u_time'), simulationStore.getTimestamp);
@@ -108,13 +115,57 @@ class GLDriver {
         this.gl!.enableVertexAttribArray(0);
         this.gl!.vertexAttribPointer(0, 3, this.gl!.FLOAT, false, 0, 0);
 
-        this.gl!.viewport(0, 0, this.shadowMapRT!.texture.width, this.shadowMapRT!.texture.height);
+        this.gl!.viewport(0, 0, this.shadowMapRT!.width, this.shadowMapRT!.height);
 
         this.gl!.drawArrays(this.gl!.TRIANGLES, 0, 6);
 
         this.gl!.disableVertexAttribArray(0);
 
         this.shadowMapRT!.unbind();
+    }
+
+
+    copyImage(texture: GLTexture, target: GLRenderTarget | null = null) {
+        if (!this.gl || !this.copyShader) {
+            return;
+        }
+
+        this.copyShader.bind();
+
+        const targetWidth: number = target ? target.width : this.gl.canvas.width;
+        let targetHeight: number = target ? target.height : this.gl.canvas.height;
+
+        if (target) {
+            target.bind();
+        } else {
+            glDriver.gl!.bindFramebuffer(glDriver.gl!.FRAMEBUFFER, null);
+        }
+
+        this.gl!.viewport(0, 0, targetWidth, targetHeight);
+
+        this.gl!.clearColor(0.0, 0.0, 0.0, 1.0);
+        this.gl!.clear(this.gl!.COLOR_BUFFER_BIT);
+
+        this.gl.disable(this.gl.DEPTH_TEST);
+
+        this.gl.uniform1i(this.gl.getUniformLocation(this.copyShader.glShaderProgram, 'tex'), 0);
+        this.gl.uniform1i(this.gl.getUniformLocation(this.copyShader.glShaderProgram, 'bloomMask'), 1);
+        this.gl.uniform2f(this.gl.getUniformLocation(this.copyShader.glShaderProgram, 'u_resolution'), targetWidth, targetHeight);
+        texture.bind(0);
+        this.mainRT?.getTexture(1).bind(1);
+
+        this.gl!.bindBuffer(this.gl!.ARRAY_BUFFER, this.quadVertexBuffer);
+
+        this.gl!.enableVertexAttribArray(0);
+        this.gl!.vertexAttribPointer(0, 3, this.gl!.FLOAT, false, 0, 0);
+
+        this.gl!.drawArrays(this.gl!.TRIANGLES, 0, 6);
+
+        this.gl!.disableVertexAttribArray(0);
+
+        if (target) {
+            target.unbind();
+        }
     }
 
 

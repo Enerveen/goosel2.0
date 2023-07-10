@@ -18,12 +18,13 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  padding: 0 20px;
 }
 
 .version {
   position: fixed;
   color: #fafafa;
-  top: 10px;
+  top: 18px;
   right: 20px;
   z-index: 100;
 }
@@ -31,7 +32,7 @@
 .button {
   padding: 10px 20px;
   font-size: 34px;
-  margin: 20px 0;
+  margin: 10px 0;
 }
 
 .checkboxNotExpanded {
@@ -40,5 +41,11 @@
 
 .notification {
   margin: 10px 0 20px 0;
+}
+
+.creditCardsBox {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 

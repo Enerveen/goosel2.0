@@ -10,11 +10,18 @@ uniform float bendData[1024];
 uniform vec2 scale;
 uniform vec2 u_resolution;
 
+uniform int u_time;
+uniform bool isGrass;
+
 out vec2 uv;
 out vec2 frameIdx;
 out float depth;
 out vec2 v_worldPosition;
 out vec2 v_position;
+
+out float v_bend;
+out float v_bendAmplitude;
+out float v_windBendAmplitude;
 
 out float bendAge;
 
@@ -47,4 +54,8 @@ void main() {
     depth = 1.0 - pos[gl_InstanceID].z / 5000.0;
 
     bendAge = bendData[gl_InstanceID];
+
+    v_bendAmplitude = isGrass ? mix(0.0, 0.5, bendAge) : 0.f;
+    v_windBendAmplitude = 0.2 + 0.3 * (0.5 * cos(0.06 * float(u_time) + 5.0 * v_worldPosition.y / u_resolution.y) + 0.5);
+    v_bend = v_bendAmplitude * sin(4.0 * 2.0 * 3.1415 * v_bendAmplitude) + v_windBendAmplitude * sin(0.01 * float(u_time) + 13.0 * v_worldPosition.x / u_resolution.x);
 }

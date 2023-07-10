@@ -1,5 +1,6 @@
 import Animal from "./entities/Animal";
 import {plantsKinds} from "./constants/simulation";
+import {ReactNode} from "react";
 
 export type Position = {
     x: number
@@ -169,3 +170,9 @@ export type Genes = {
 }
 
 export type plantKind = typeof plantsKinds[number] | 'common'
+
+export type Tab = {
+    content: (setTab: (id: string) => void) => ReactNode | ReactNode[],
+    id: string,
+    label: string
+}
