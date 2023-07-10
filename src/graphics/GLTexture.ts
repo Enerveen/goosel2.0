@@ -80,14 +80,14 @@ export class GLTexture {
     }
 
 
-    static create(width: number, height: number) {
+    static create(width: number, height: number, mipmap: boolean = false) {
         if (!glDriver.gl) {
             throw 'No gl driver'
         }
 
         const size = { width, height, format: glDriver.gl.RGBA };
 
-        return new GLTexture({ size, mipmap: false });
+        return new GLTexture({ size, mipmap: mipmap });
     }
 
 

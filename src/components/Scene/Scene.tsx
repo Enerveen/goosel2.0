@@ -132,7 +132,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'tex'), 0);
             glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'shadowMap'), 1);
 
-            glDriver.shadowMapRT?.texture.bind(1);
+            glDriver.shadowMapRT?.getTexture().bind(1);
             //GLTexture.fromImage(renderer.eggsAtlas.image).bind(1);
         }
 
@@ -179,6 +179,8 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                 store.setActiveEntity(entity)
             }
         })
+
+        glDriver.copyImage(glDriver.mainRT!.getTexture(0));
 
         //renderer.drawClouds();
         if (!store.getLogHidden) {

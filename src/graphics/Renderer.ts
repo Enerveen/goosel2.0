@@ -51,6 +51,7 @@ class Renderer {
     backgroundGladeTexture: HTMLImageElement
     cloudsTexture: Texture
     grassTexture: Texture
+    baseGrassTexture: Texture
 
     constructor(ctx: CanvasRenderingContext2D | null, images: any) {
         this.context = ctx || null
@@ -66,7 +67,9 @@ class Renderer {
             frameWidth: 156,
             frameHeight:200,
             width: 39,
-            height: 50
+            height: 50,
+            offsetX: 0.5,
+            offsetY: 0.9
         })
         this.matureAnimalTextureAtlas = {...animalTextureAtlas, width: 94, height: 94 * animalTextureAtlasFrameRatio};
         const corpseTextureRatio = 262 / 421
@@ -80,7 +83,7 @@ class Renderer {
             width: 60.16,
             height: 60.16 * corpseTextureRatio,
             offsetX: 0.5,
-            offsetY: 0.5
+            offsetY: 0.9
         })
         this.matureCorpseTexture = loadTexture(images.corpse, {
             width: 120.3,
@@ -93,7 +96,7 @@ class Renderer {
             frameWidth: 300,
             frameHeight: 330,
             offsetY: 0.5,
-            offsetX: 0.5,
+            offsetX: 0.8,
             width: 45,
             height: 49.5
         })
@@ -101,6 +104,7 @@ class Renderer {
         this.breedingTexture = loadTexture(images.heart, {width: 20, height: 20, offsetX: 0.5, offsetY: 0.5});
         this.gaySexTexture = loadTexture(images.heartGay, {width: 20, height: 20, offsetX: 0.5, offsetY: 0.5});
         this.grassTexture = loadTexture(images.grass, {offsetX: 0.5, offsetY: 0.97});
+        this.baseGrassTexture = loadTexture(images.baseGrass, {offsetX: 0.5, offsetY: 0.97});
 
         this.backgroundTexture = images.background
         this.backgroundSeamlessTexture = images.backgroundSeamless
