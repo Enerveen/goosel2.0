@@ -47,8 +47,10 @@ export class GLTexture {
             this.width = params.image.width;
             this.height = params.image.height;
         } else if (params.size) {
+            const channelFormat = params.size.format === glDriver.gl.RGBA32F ? glDriver.gl.FLOAT : glDriver.gl.UNSIGNED_BYTE;
+
             glDriver.gl.texImage2D(glDriver.gl.TEXTURE_2D, 0, params.size.format, params.size.width, params.size.height, 0,
-                glDriver.gl.RGBA, glDriver.gl.UNSIGNED_BYTE, null);
+                glDriver.gl.RGBA, channelFormat, null);
 
             this.width = params.size.width;
             this.height = params.size.height;
@@ -80,12 +82,12 @@ export class GLTexture {
     }
 
 
-    static create(width: number, height: number, mipmap: boolean = false) {
+    static create(width: number, height: number, mipmap: boolean = false, format: number = glDriver.gl!.RGBA) {
         if (!glDriver.gl) {
             throw 'No gl driver'
         }
 
-        const size = { width, height, format: glDriver.gl.RGBA };
+        const size = { width, height, format: format };
 
         return new GLTexture({ size, mipmap: mipmap });
     }
@@ -94,5 +96,11 @@ export class GLTexture {
     bind(index: number) {
         glDriver.gl?.activeTexture(glDriver.gl?.TEXTURE0 + index);
         glDriver.gl?.bindTexture(glDriver.gl?.TEXTURE_2D, this.native);
+    }
+
+
+    unbind(index: number) {
+        glDriver.gl?.activeTexture(glDriver.gl?.TEXTURE0 + index);
+        glDriver.gl?.bindTexture(glDriver.gl?.TEXTURE_2D, null);
     }
 }

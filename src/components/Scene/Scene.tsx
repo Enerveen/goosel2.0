@@ -4,18 +4,19 @@ import {observer} from "mobx-react-lite";
 import simulationStore, {SimulationStore} from "../../stores/simulationStore";
 import {getRandomInRange, rollNPercentChance} from "../../utils/utils";
 import Plant from "../../entities/Plant";
-import {
-    generateAnimals,
-    generateFood
-} from "../../utils/helpers";
+import {generateAnimals, generateFood} from "../../utils/helpers";
 import Renderer from "../../graphics/Renderer";
 import {appPhase, plantKind} from "../../types";
 import useWindowSize from "../../hooks/useWindowSize";
 import {Camera} from "../../graphics/Camera";
 import ImageContext from "../../stores/ImageContext";
 import {
-    handleCanvasClick, handleCanvasMouseMove,
-    handleCanvasMousePress, handleCanvasMouseRelease, handleCanvasMouseWheel, handleCanvasTouchEnd,
+    handleCanvasClick,
+    handleCanvasMouseMove,
+    handleCanvasMousePress,
+    handleCanvasMouseRelease,
+    handleCanvasMouseWheel,
+    handleCanvasTouchEnd,
     handleCanvasTouchMove,
     handleCanvasTouchStart
 } from "../../utils/eventHandlers";
@@ -27,10 +28,9 @@ import {BoundingBox} from "../../dataStructures/Quadtree";
 
 
 import {Shader} from "../../graphics/Shader";
+import {RENDER_PASS} from "../../constants/render";
 import {glDriver} from "../../graphics/GLDriver";
 import {GrassSystem} from "../../simulationSystems/GrassSystem";
-import {GLTexture} from "../../graphics/GLTexture";
-
 
 
 interface ISceneProps {
@@ -110,7 +110,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     }, [context, canvasWidth, canvasHeight])
 
 
-    const drawStep = useCallback(() => {
+    const drawStep = useCallback((pass: RENDER_PASS) => {
         if (!context) {
             return;
         }
@@ -126,10 +126,13 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             context.scale(scale, scale);
 
             glDriver.setGlobalTransform(context.getTransform().toFloat32Array());
-            glDriver.createShadowMap(mainCamera.position, scale);
+
+            if (pass === RENDER_PASS.COLOR) {
+                glDriver.createShadowMap(mainCamera.position, scale);
+            }
         }
 
-        glDriver.renderPrepare();
+        glDriver.renderPrepare(pass);
 
         if (glDriver.gl && glDriver.defaultShader) {
             glDriver.defaultShader.bind()
@@ -139,16 +142,23 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             glDriver.gl.uniform2f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_resolution'), glDriver.gl.canvas.width, glDriver.gl.canvas.height);
 
             glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'tex'), 0);
-            glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'shadowMap'), 1);
 
-            glDriver.shadowMapRT?.getTexture().bind(1);
+            if (pass === RENDER_PASS.COLOR) {
+                glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'shadowMap'), 1);
+                glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'gBuffer'), 2);
+
+                glDriver.shadowMapRT?.getTexture().bind(1);
+                glDriver.depthRT?.getTexture().bind(2);
+            }
             //GLTexture.fromImage(renderer.eggsAtlas.image).bind(1);
         }
 
-        renderer.drawSeamlessBackground({
-            width: store.getSimulationConstants.fieldSize.width,
-            height: store.getSimulationConstants.fieldSize.height
-        })
+        if (pass === RENDER_PASS.COLOR) {
+            renderer.drawSeamlessBackground({
+                width: store.getSimulationConstants.fieldSize.width,
+                height: store.getSimulationConstants.fieldSize.height
+            })
+        }
 
         if (glDriver.gl && glDriver.defaultShader) {
             glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_isSkew'), 1);
@@ -191,7 +201,13 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             }
         })
 
-        glDriver.copyImage(glDriver.mainRT!.getTexture(0));
+        if (pass === RENDER_PASS.COLOR) {
+            glDriver.depthRT?.getTexture().unbind(2);
+            glDriver.copyImage(glDriver.mainRT!.getTexture(0));
+        } else if (pass === RENDER_PASS.DEPTH) {
+            glDriver.depthRT?.unbind();
+        }
+        //glDriver.copyImage(glDriver.depthRT!.getTexture(0), null, 1);
 
         //renderer.drawClouds();
         if (!store.getLogHidden) {
@@ -219,7 +235,8 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                     init()
                 }
                 calculateStep();
-                drawStep();
+                drawStep(RENDER_PASS.DEPTH);
+                drawStep(RENDER_PASS.COLOR);
                 store.updateTimestamp()
                 animationFrameId = window.requestAnimationFrame(render);
             };

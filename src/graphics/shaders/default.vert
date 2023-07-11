@@ -12,6 +12,7 @@ uniform vec2 u_resolution;
 
 uniform int u_time;
 uniform bool isGrass;
+uniform bool isDepthPass;
 
 out vec2 uv;
 out vec2 frameIdx;
@@ -24,6 +25,7 @@ out float v_bendAmplitude;
 out float v_windBendAmplitude;
 
 out float bendAge;
+out float dayPhase;
 
 
 void main() {
@@ -40,7 +42,7 @@ void main() {
     transform[2][0] = u_transform[3][0];
     transform[2][1] = -u_transform[3][1];
 
-    v_worldPosition = vec2(pos[gl_InstanceID].x, -pos[gl_InstanceID].y);
+    v_worldPosition = vec2(pos[gl_InstanceID].x + position.x * scale.x, -pos[gl_InstanceID].y); // same as v_position except y
     v_position = vec2(translate[2][0] + position.x * scale.x, -translate[2][1] - position.y * scale.y);
 
     mat3 matTransform = resolutionScale * transform * translate * matScale;
@@ -48,7 +50,14 @@ void main() {
     uv = (0.5 * vec2(position.x, -position.y) + 0.5);
     frameIdx = textureFrame[gl_InstanceID];
 
-    gl_Position = vec4(matTransform * vec3(position.xy, 1.0), 1.0);
+    dayPhase = 1.f;//0.5 * sin(0.003 * float(u_time)) + 0.5;
+
+    if (isDepthPass) {
+        vec2 sunLightDirection = mix(vec2(-4.f, 0.f), vec2(4.f, 0.f), 0.5f * sin(1.1f * 3.14f) + 0.5f);
+        gl_Position = vec4(matTransform * vec3(position.xy + sunLightDirection * clamp(position.yy, vec2(0.f), vec2(1.f)), 1.0), 1.0);
+    } else {
+        gl_Position = vec4(matTransform * vec3(position.xy, 1.0), 1.0);
+    }
     //gl_Position = vec4(position.xy, 1.0, 1.0);
     gl_Position.xy -= vec2(1.0, -1.0);
     depth = 1.0 - pos[gl_InstanceID].z / 5000.0;
