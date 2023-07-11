@@ -10,7 +10,7 @@ in vec2 worldPosition;
 out vec4 fragValue;
 
 void main() {
-    vec2 np = 123.0 + (worldPosition) / 4000.0;
+    vec2 np = 12873.0 + (worldPosition) / 4000.0;
     float time = 0.03125 * u_time;
     float noise = smoothNoise(4.0 * np + 615.0 + 0.02 * time) +
                 smoothNoise(8.0 * np + 0.04 * time) * 0.5 +

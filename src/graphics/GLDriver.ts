@@ -3,6 +3,7 @@ import {GLTexture} from "./GLTexture";
 import {GLRenderTarget} from "./GLRenderTarget"
 import {Position} from "../types";
 import simulationStore from "../stores/simulationStore";
+import {RENDER_PASS} from "../constants/render";
 
 
 const verticies = [
@@ -21,6 +22,7 @@ const INSTANCES_PER_DRAW = 1024;
 class GLDriver {
 
     gl: WebGL2RenderingContext | null = null;
+    ext: EXT_color_buffer_float | null = null;
     defaultShader: Shader | null = null;
     shadowMapShader: Shader | null = null;
     copyShader: Shader | null = null;
@@ -29,10 +31,13 @@ class GLDriver {
     quadVertexBuffer: WebGLBuffer | null = null;
     shadowMapRT: GLRenderTarget | null = null;
     mainRT: GLRenderTarget | null = null;
+    depthRT: GLRenderTarget | null = null;
 
 
     init(gl: WebGL2RenderingContext) {
         this.gl = gl;
+        this.ext = this.gl.getExtension("EXT_color_buffer_float");
+        this.gl.getExtension('OES_texture_float_linear');
 
         this.quadVertexBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.quadVertexBuffer);
@@ -40,7 +45,8 @@ class GLDriver {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
 
         this.shadowMapRT = new GLRenderTarget(this.gl.canvas.width, this.gl.canvas.height);
-        this.mainRT = new GLRenderTarget(this.gl.canvas.width, this.gl.canvas.height, true, 2);
+        this.mainRT = new GLRenderTarget(this.gl.canvas.width, this.gl.canvas.height, true, 2, this.gl.RGBA32F);
+        this.depthRT = new GLRenderTarget(this.gl.canvas.width, this.gl.canvas.height, true, 1, this.gl.RGBA32F);
 
 
         console.log('compilation');
@@ -68,12 +74,17 @@ class GLDriver {
     }
 
 
-    renderPrepare() {
+    renderPrepare(pass: RENDER_PASS) {
         if (!this.gl || !this.defaultShader) {
             return;
         }
 
-        this.mainRT!.bind();
+        if (pass === RENDER_PASS.DEPTH) {
+            this.depthRT!.bind();
+        } else {
+            this.mainRT!.bind();
+        }
+
         this.defaultShader.bind();
 
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -88,6 +99,7 @@ class GLDriver {
         this.gl.blendFuncSeparate(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA, this.gl.ZERO, this.gl.ONE);
 
         this.gl.uniform1f(this.gl.getUniformLocation(this.defaultShader.glShaderProgram, 'u_maxAlpha'), 1.0);
+        this.gl.uniform1i(this.gl.getUniformLocation(this.defaultShader.glShaderProgram, 'isDepthPass'), Number(pass === RENDER_PASS.DEPTH));
 
         this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
     }
@@ -125,7 +137,7 @@ class GLDriver {
     }
 
 
-    copyImage(texture: GLTexture, target: GLRenderTarget | null = null) {
+    copyImage(texture: GLTexture, target: GLRenderTarget | null = null, corner: number = 0) {
         if (!this.gl || !this.copyShader) {
             return;
         }
@@ -141,7 +153,11 @@ class GLDriver {
             glDriver.gl!.bindFramebuffer(glDriver.gl!.FRAMEBUFFER, null);
         }
 
-        this.gl!.viewport(0, 0, targetWidth, targetHeight);
+        if (corner > 0) {
+            this.gl!.viewport(0, (corner - 1) * targetHeight / 5.0, targetWidth / 5.0, targetHeight / 5.0);
+        } else {
+            this.gl!.viewport(0, 0, targetWidth, targetHeight);
+        }
 
         this.gl!.clearColor(0.0, 0.0, 0.0, 1.0);
         this.gl!.clear(this.gl!.COLOR_BUFFER_BIT);

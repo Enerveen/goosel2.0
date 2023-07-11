@@ -8,7 +8,7 @@ export class GLRenderTarget {
     width: number = 0
     height: number = 0
 
-    constructor(width: number, height: number, depth: boolean = false, count: number = 1) {
+    constructor(width: number, height: number, depth: boolean = false, count: number = 1, format: number = glDriver.gl!.RGBA) {
         glDriver.check()
 
         this.width = width;
@@ -19,8 +19,10 @@ export class GLRenderTarget {
 
         let buffers: number[] = [];
         for (let i = 0; i < count; i++) {
-            this.texture.push(GLTexture.create(width, height, true));
+            this.texture.push(GLTexture.create(width, height, false, format));
+            console.log(glDriver.gl!.getError());
             glDriver.gl!.framebufferTexture2D(glDriver.gl!.FRAMEBUFFER, glDriver.gl!.COLOR_ATTACHMENT0 + i, glDriver.gl!.TEXTURE_2D, this.texture[i].native, 0);
+            console.log(glDriver.gl!.getError());
 
             buffers.push(glDriver.gl!.COLOR_ATTACHMENT0 + i);
         }
@@ -34,6 +36,7 @@ export class GLRenderTarget {
         }
 
         glDriver.gl!.drawBuffers(buffers);
+        console.log(glDriver.gl!.getError());
 
         glDriver.gl!.bindFramebuffer(glDriver.gl!.FRAMEBUFFER, null);
     }
