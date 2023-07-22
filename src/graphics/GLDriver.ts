@@ -88,6 +88,7 @@ class GLDriver {
         this.defaultShader.bind();
 
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        this.gl.clearDepth(1.0);
         //glContext.enable(glContext.DEPTH_TEST);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
         this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
@@ -202,7 +203,7 @@ class GLDriver {
         const buf: number[] = [];
 
         pos.forEach(p => {
-            posBuffer.push(p.x, p.y, p.z ? p.z : 1);
+            posBuffer.push(p.x, p.y, p.z ? p.z : 0.0);
         })
         frame.forEach(f => {
             frameBuffer.push(f.x, f.y);

@@ -50,7 +50,7 @@ void main() {
     uv = (0.5 * vec2(position.x, -position.y) + 0.5);
     frameIdx = textureFrame[gl_InstanceID];
 
-    dayPhase = 1.f;//0.5 * sin(0.003 * float(u_time)) + 0.5;
+    dayPhase = 0.0f;//0.5 * sin(0.003 * float(u_time)) + 0.5;
 
     if (isDepthPass) {
         vec2 sunLightDirection = mix(vec2(-4.f, 0.f), vec2(4.f, 0.f), 0.5f * sin(1.1f * 3.14f) + 0.5f);
@@ -60,7 +60,9 @@ void main() {
     }
     //gl_Position = vec4(position.xy, 1.0, 1.0);
     gl_Position.xy -= vec2(1.0, -1.0);
-    depth = 1.0 - pos[gl_InstanceID].z / 5000.0;
+    translate[2][1] = -pos[gl_InstanceID].z;
+    depth = 1.f - 0.5f * (clamp((resolutionScale * transform * translate * matScale * vec3(0.f, 0.f, -1.f)).y + 0.1f, 0.f, 2.f));//1.0 - pos[gl_InstanceID].z / 5000.0;
+    depth -= 0.001f;
 
     bendAge = bendData[gl_InstanceID];
 

@@ -93,14 +93,14 @@ class Renderer {
             width: 120.3,
             height: 120.3 * corpseTextureRatio,
             offsetX: 0.5,
-            offsetY: 0.5
+            offsetY: 0.9
         })
         this.eggsAtlas = loadTextureAtlas(images.eggAtlas, {frameWidth: 200, frameHeight: 201, width: 44, height: 44, offsetX: 0.5, offsetY: 0.5});
         this.plantAtlas = loadTextureAtlas(images.plantAtlas, {
             frameWidth: 300,
             frameHeight: 330,
-            offsetY: 0.5,
-            offsetX: 0.8,
+            offsetX: 0.5,
+            offsetY: 0.8,
             width: 45,
             height: 49.5
         })

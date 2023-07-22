@@ -140,6 +140,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_time'), simulationStore.getTimestamp);
             glDriver.gl.uniformMatrix4fv(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_transform'), false, glDriver.transform);
             glDriver.gl.uniform2f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_resolution'), glDriver.gl.canvas.width, glDriver.gl.canvas.height);
+            glDriver.gl.uniform1f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'intensityMultiplier'), 1.0);
 
             glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'tex'), 0);
 
@@ -153,11 +154,15 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             //GLTexture.fromImage(renderer.eggsAtlas.image).bind(1);
         }
 
-        if (pass === RENDER_PASS.COLOR) {
+        console.log(context.getTransform());
+
+        if (pass === RENDER_PASS.COLOR && glDriver.gl && glDriver.defaultShader) {
+            glDriver.gl!.uniform1i(glDriver.gl!.getUniformLocation(glDriver.defaultShader!.glShaderProgram, 'isTerrain'), 1);
             renderer.drawSeamlessBackground({
                 width: store.getSimulationConstants.fieldSize.width,
                 height: store.getSimulationConstants.fieldSize.height
             })
+            glDriver.gl!.uniform1i(glDriver.gl!.getUniformLocation(glDriver.defaultShader!.glShaderProgram, 'isTerrain'), 0);
         }
 
         if (glDriver.gl && glDriver.defaultShader) {
@@ -169,7 +174,9 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_isSkew'), 0);
             glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'isGrass'), 0);
 
+            glDriver.gl.uniform1f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'intensityMultiplier'), 100.0);
             renderer.drawButterflies(boidsSystem.boids, store.getTimestamp);
+            glDriver.gl.uniform1f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'intensityMultiplier'), 1.0);
         }
 
         store.getPlants.forEach(entity => renderer.drawPlant(entity.position, entity.kind))
@@ -203,6 +210,13 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
 
         if (pass === RENDER_PASS.COLOR) {
             glDriver.depthRT?.getTexture().unbind(2);
+
+            if (glDriver.gl && glDriver.copyShader) {
+                glDriver.copyShader.bind();
+                console.log(mainCamera.getFovScale());
+                glDriver.gl.uniform1f(glDriver.gl.getUniformLocation(glDriver.copyShader.glShaderProgram, 'camScale'), mainCamera.getFovScale());
+            }
+
             glDriver.copyImage(glDriver.mainRT!.getTexture(0));
         } else if (pass === RENDER_PASS.DEPTH) {
             glDriver.depthRT?.unbind();

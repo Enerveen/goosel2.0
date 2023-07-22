@@ -4,27 +4,30 @@ precision highp float;
 uniform sampler2D tex;
 uniform sampler2D bloomMask;
 uniform vec2 u_resolution;
+uniform float camScale;
 
 out vec4 fragValue;
 
 void main() {
     const int quatSteps = 0;
+    const int bloomSteps = 4;
 
     fragValue = texture(tex, gl_FragCoord.xy / u_resolution);
 
-    for (int i = -4; i <= 4; i++) {
-        for (int j = -4; j <= 4; j++) {
-            vec2 uv = (gl_FragCoord.xy + 2.f * vec2(i, j)) / u_resolution;
-            float bloomValue = texture(bloomMask, uv).r;
-
-            if (bloomValue > 0.f) {
-                fragValue += 0.13f * texture(tex, uv) * bloomValue * (0.005f + 0.003f * length(vec2(float(abs(i)), float(abs(j)))));
-            }
-
-        }
-    }
-
-    fragValue.a = 1.f;
+//    for (int i = -bloomSteps; i <= bloomSteps; i++) {
+//        for (int j = -bloomSteps; j <= bloomSteps; j++) {
+//            vec2 uv = (gl_FragCoord.xy + 1.4f * vec2(j, i)) / u_resolution;
+//            float bloomValue = texture(bloomMask, uv).r;
+//            float bloomFactor = 0.005f + max(0.f, 1.22f - 0.08f * pow(length(vec2(float(abs(i)), float(abs(j)))), 2.f));
+//
+//            if (bloomValue > 5.7f) {
+//                fragValue += 0.0013f * texture(tex, uv) * bloomValue * bloomFactor;
+//            }
+//
+//        }
+//    }
+//
+//    fragValue.a = 1.f;
 
 //    for (int i = -quatSteps; i <= quatSteps; i++) {
 //        for (int j = -quatSteps; j <= quatSteps; j++) {
