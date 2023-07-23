@@ -50,7 +50,7 @@ void main() {
     uv = (0.5 * vec2(position.x, -position.y) + 0.5);
     frameIdx = textureFrame;
 
-    dayPhase = 0.f;///0.5 * sin(0.003 * float(u_time)) + 0.5;
+    dayPhase = 0.5 * sin(0.003 * float(u_time)) + 0.5;
 
     bendAge = bendData;
     v_bendAmplitude = isGrass ? mix(0.0, 0.75, bendAge) : 0.f;

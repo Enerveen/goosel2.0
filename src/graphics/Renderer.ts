@@ -110,7 +110,7 @@ class Renderer {
         this.grassTexture = loadTexture(images.grass, {offsetX: 0.5, offsetY: 0.97});
         this.baseGrassTexture = loadTexture(images.baseGrass, {offsetX: 0.5, offsetY: 0.97});
 
-        const butterfliesParams = {width: 18, height: 18, frameWidth: 25, frameHeight: 25, offsetX: 0.5, offsetY: 0.5};
+        const butterfliesParams = {width: 8, height: 8, frameWidth: 25, frameHeight: 25, offsetX: 0.5, offsetY: 0.5};
         this.butterflyTextureAtlas = loadTextureAtlas(images.butterflyTextureAtlas, butterfliesParams);
         this.butterflyWhiteTextureAtlas = loadTextureAtlas(images.butterflyWhiteTextureAtlas, butterfliesParams);
         this.butterflyShadowTextureAtlas = loadTextureAtlas(images.butterflyShadowTextureAtlas, butterfliesParams);

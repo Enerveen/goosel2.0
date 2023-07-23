@@ -85,7 +85,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         }
         //store.clearAnimalCorpses()
 
-        boidsSystem.follow([new Entity({x: canvasWidth / 2, y: canvasHeight / 2}, 'ZHOPA')], 50000.0, true);
+        boidsSystem.follow([new Entity({x: store.getSimulationConstants.fieldSize.width / 2, y: store.getSimulationConstants.fieldSize.height / 2}, 'ZHOPA')], 500000.0, true);
         boidsSystem.steerAwayFrom(store.getAnimals, 1.0, true);
         boidsSystem.update(0.1 * store.simulationSpeed);
 
@@ -140,7 +140,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_time'), simulationStore.getTimestamp);
             glDriver.gl.uniformMatrix4fv(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_transform'), false, glDriver.transform);
             glDriver.gl.uniform2f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_resolution'), glDriver.gl.canvas.width, glDriver.gl.canvas.height);
-            glDriver.gl.uniform1f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'intensityMultiplier'), 1.0);
+            glDriver.gl.uniform1f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'intensityMultiplier'), 0.0);
 
             glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'tex'), 0);
 
@@ -172,9 +172,9 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_isSkew'), 0);
             glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'isGrass'), 0);
 
-            glDriver.gl.uniform1f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'intensityMultiplier'), 10.0);
+            glDriver.gl.uniform1f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'intensityMultiplier'), 30.0);
             renderer.drawButterflies(boidsSystem.boids, store.getTimestamp);
-            glDriver.gl.uniform1f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'intensityMultiplier'), 1.0);
+            glDriver.gl.uniform1f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'intensityMultiplier'), 0.0);
         }
 
         store.getPlants.forEach(entity => renderer.drawPlant(entity.position, entity.kind))

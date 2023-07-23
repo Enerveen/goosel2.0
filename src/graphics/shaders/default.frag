@@ -134,7 +134,7 @@ void main() {
         }
 
         float fragDepth = fragColor.a <= 0.55f ? 1.f : depth;
-        fragColor.rgb *= intensityMultiplier * getLightColor(shadowDepth.g < fragDepth ? shadowDepth.r : 0.f);
+        fragColor.rgb = fragColor.rgb * intensityMultiplier + fragColor.rgb * getLightColor(shadowDepth.g < fragDepth ? shadowDepth.r : 0.f);
 
         if (u_isSkew) {
             vec3 bloomColor = mix(vec3(0.f), vec3(1.f, 0.4f, 0.f), bendAge * (1.f - (0.5f * skew + 0.5f)));

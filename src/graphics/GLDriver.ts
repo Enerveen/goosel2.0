@@ -264,6 +264,14 @@ class GLDriver {
 
         texture.unbind(0);
     }
+
+    drawQuad(shader: Shader) {
+        shader.bind();
+
+
+
+        shader.unbind();
+    }
 }
 
 

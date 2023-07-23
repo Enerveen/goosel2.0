@@ -18,7 +18,7 @@ void main() {
 
     for (int i = -bloomSteps; i <= bloomSteps; i++) {
         for (int j = -bloomSteps; j <= bloomSteps; j++) {
-            vec2 uv = (gl_FragCoord.xy + 1.f * vec2(j, i)) / u_resolution;
+            vec2 uv = (gl_FragCoord.xy + 3.f * vec2(j, i)) / u_resolution;
             float bloomValue = texture(bloomMask, uv).r;
             float bloomFactor = 0.005f + max(0.f, 1.22f - 0.08f * pow(length(vec2(float(abs(i)), float(abs(j)))), 2.f));
 
