@@ -172,7 +172,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_isSkew'), 0);
             glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'isGrass'), 0);
 
-            glDriver.gl.uniform1f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'intensityMultiplier'), 40.0);
+            glDriver.gl.uniform1f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'intensityMultiplier'), 10.0);
             renderer.drawButterflies(boidsSystem.boids, store.getTimestamp);
             glDriver.gl.uniform1f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'intensityMultiplier'), 1.0);
         }
@@ -212,7 +212,6 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             if (glDriver.gl && glDriver.copyShader) {
                 glDriver.copyShader.bind();
                 glDriver.gl.uniform1f(glDriver.gl.getUniformLocation(glDriver.copyShader.glShaderProgram, 'camScale'), mainCamera.getFovScale());
-                console.log(mainCamera.getFovScale())
             }
 
             glDriver.copyImage(glDriver.mainRT!.getTexture(0));

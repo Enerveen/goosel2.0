@@ -203,10 +203,6 @@ class GLDriver {
         const frameBuffer: Float32Array = frame;
         const buf: Float32Array = buffer ? buffer : new Float32Array(instancesCount);
 
-        const posUniformIdx = this.gl.getUniformLocation(shader.glShaderProgram, 'pos');
-        const frameUniformIdx = this.gl.getUniformLocation(shader.glShaderProgram, 'textureFrame');
-        const bufferUniformIdx = this.gl.getUniformLocation(shader.glShaderProgram, 'bendData');
-
         this.gl.uniform2f(this.gl.getUniformLocation(shader.glShaderProgram, 'scale'), scale.x, scale.y);
         this.gl.uniform2f(this.gl.getUniformLocation(shader.glShaderProgram, 'u_numFrames'), numFramesX, numFramesY);
 
@@ -215,17 +211,17 @@ class GLDriver {
 
         const posSRV = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, posSRV);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, posBuffer, this.gl.STREAM_DRAW);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, posBuffer, this.gl.STATIC_DRAW);
         this.gl.vertexAttribPointer(1, 3, this.gl.FLOAT, false, 0, 0);
 
         const frameSRV = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, frameSRV);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, frameBuffer, this.gl.STREAM_DRAW);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, frameBuffer, this.gl.STATIC_DRAW);
         this.gl.vertexAttribPointer(2, 2, this.gl.FLOAT, false, 0, 0);
 
         const bufferSRV = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSRV);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, buf, this.gl.STREAM_DRAW);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, buf, this.gl.STATIC_DRAW);
         this.gl.vertexAttribPointer(3, 1, this.gl.FLOAT, false, 0, 0);
 
         this.gl.vertexAttribDivisor(1, 1);
@@ -243,6 +239,10 @@ class GLDriver {
         this.gl.disableVertexAttribArray(1);
         this.gl.disableVertexAttribArray(2);
         this.gl.disableVertexAttribArray(3);
+
+        this.gl.deleteBuffer(posSRV);
+        this.gl.deleteBuffer(frameSRV);
+        this.gl.deleteBuffer(bufferSRV);
 
         // for (let i = 0; i < Math.ceil(instancesCount / INSTANCES_PER_DRAW); i++) {
         //     const sliceIndex = {

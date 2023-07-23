@@ -18,6 +18,8 @@ void main() {
                 smoothNoise(32.0 * np + 0.32 * time) * 0.125 +
                 smoothNoise(64.0 * np + 0.64 * time) * 0.0625;
     noise /= 1.9375;
+
+    //float weatherFactor = 0.5f * sin(0.001f * float(u_time)) + 0.5f;
     noise = smoothstep(0.5, 0.6, noise);
 
     fragValue = vec4(vec3(noise), 1.0);

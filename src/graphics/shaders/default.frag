@@ -138,7 +138,7 @@ void main() {
 
         if (u_isSkew) {
             vec3 bloomColor = mix(vec3(0.f), vec3(1.f, 0.4f, 0.f), bendAge * (1.f - (0.5f * skew + 0.5f)));
-            fragColor.rgb += 32.f * heightFactor * bloomColor;
+            fragColor.rgb += 132.f * heightFactor * bloomColor;
         }
 
         bloomMask = vec4(vec3(0.008f * luminance(fragColor.rgb)), fragColor.a);
