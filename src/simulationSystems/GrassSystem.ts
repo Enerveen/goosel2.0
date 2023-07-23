@@ -27,6 +27,9 @@ export class GrassSystem {
     }[] = []
 
     activeEntities: number[] = []
+    positionSRV: Float32Array = new Float32Array()
+    frameSRV: Float32Array = new Float32Array()
+    constSRV: Float32Array = new Float32Array()
 
     readonly quadTree: Quadtree
 
@@ -89,22 +92,26 @@ export class GrassSystem {
         this.positions.forEach(entity => {
             this.quadTree.push(entity);
         })
+
+        this.constSRV = new Float32Array(count);
     }
 
 
     update(entities: Entity[]) {
         entities.forEach(entity => {
-            const circle = new Circle(entity.position.x, entity.position.y, 30.0);
+            const circle = new Circle(entity.position.x, entity.position.y, 20.0);
 
             this.quadTree.get(circle).forEach(grassEntity => {
+
                 this.states[(grassEntity as GrassEntity).idx].timestamp = simulationStore.getTimestamp;
             })
         })
 
-        this.states.forEach(state => {
+        this.states.forEach((state, idx) => {
             state.age = (simulationStore.getTimestamp - state.timestamp) / 200.0;
 
             state.age = 1.0 - Math.min(1.0, state.age);
+            this.constSRV[idx] = state.age;
         })
     }
 }

@@ -64,7 +64,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     ]);
 
     const boidsSystem = useMemo(() => new BoidsSystem(120, { x: store.getSimulationConstants.fieldSize.width, y: store.getSimulationConstants.fieldSize.height }), [store.getSimulationConstants.fieldSize]);
-    const grassSystem = useMemo(() => new GrassSystem(5000), [])
+    const grassSystem = useMemo(() => new GrassSystem(25000), [])
 
 
     const init = () => {
@@ -154,8 +154,6 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             //GLTexture.fromImage(renderer.eggsAtlas.image).bind(1);
         }
 
-        console.log(context.getTransform());
-
         if (pass === RENDER_PASS.COLOR && glDriver.gl && glDriver.defaultShader) {
             glDriver.gl!.uniform1i(glDriver.gl!.getUniformLocation(glDriver.defaultShader!.glShaderProgram, 'isTerrain'), 1);
             renderer.drawSeamlessBackground({
@@ -174,7 +172,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_isSkew'), 0);
             glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'isGrass'), 0);
 
-            glDriver.gl.uniform1f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'intensityMultiplier'), 100.0);
+            glDriver.gl.uniform1f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'intensityMultiplier'), 40.0);
             renderer.drawButterflies(boidsSystem.boids, store.getTimestamp);
             glDriver.gl.uniform1f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'intensityMultiplier'), 1.0);
         }
@@ -213,8 +211,8 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
 
             if (glDriver.gl && glDriver.copyShader) {
                 glDriver.copyShader.bind();
-                console.log(mainCamera.getFovScale());
                 glDriver.gl.uniform1f(glDriver.gl.getUniformLocation(glDriver.copyShader.glShaderProgram, 'camScale'), mainCamera.getFovScale());
+                console.log(mainCamera.getFovScale())
             }
 
             glDriver.copyImage(glDriver.mainRT!.getTexture(0));

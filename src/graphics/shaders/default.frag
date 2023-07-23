@@ -74,9 +74,9 @@ float rangeMap(float x, float start, float end) {
 
 
 vec3 getLightColor(float shadow) {
-    vec3 daylightColor = vec3(252.0, 253.0, 148.0) / 255.0;
+    vec3 daylightColor = 1.4f * vec3(252.0, 253.0, 208.0) / 255.0;
     vec3 sunsetRedColor = vec3(227.0, 168.0, 87.0) / 255.0;
-    vec3 nightLightColor = 0.2f * vec3(20.0, 68.0, 86.0) / 255.0;
+    vec3 nightLightColor = vec3(20.0, 68.0, 86.0) / 255.0;
 
     const int mixSteps = 3;
     vec3 lightColor = daylightColor;
@@ -126,15 +126,22 @@ void main() {
 
         fragColor.rgba = textureColor.rgba;
 
+        float heightFactor = 0.f;
+
+        if (u_isSkew) {
+            heightFactor = pow(1.0 - uv.y, 4.0);
+            fragColor.rgb += 6.325f * fragColor.a * abs(3.75 * pow(1.0 - uv.y, 4.0) * (0.3 + v_bendAmplitude * bendAge + 0.15 * v_windBendAmplitude)) * mix(vec3(0.f, 0.f, 0.f), vec3(1.0, 0.7, 0.f), 0.5 * skew + 0.5);
+        }
+
         float fragDepth = fragColor.a <= 0.55f ? 1.f : depth;
         fragColor.rgb *= intensityMultiplier * getLightColor(shadowDepth.g < fragDepth ? shadowDepth.r : 0.f);
 
         if (u_isSkew) {
-            fragColor.rgb += 1.25f * fragColor.a * abs(3.75 * pow(1.0 - uv.y, 4.0) * (0.3 + v_bendAmplitude * bendAge + 0.15 * v_windBendAmplitude)) * mix(vec3(8.f, 0.f, 8.f), vec3(0.0, 4.0, 8.f), 0.5 * skew + 0.5);
+            vec3 bloomColor = mix(vec3(0.f), vec3(1.f, 0.4f, 0.f), bendAge * (1.f - (0.5f * skew + 0.5f)));
+            fragColor.rgb += 32.f * heightFactor * bloomColor;
         }
 
-        bloomMask = vec4(vec3(luminance(fragColor.rgb)), fragColor.a);
-
+        bloomMask = vec4(vec3(0.008f * luminance(fragColor.rgb)), fragColor.a);
         fragColor.rgb = tonemapFilmic(fragColor.rgb);
         gl_FragDepth = fragDepth;
     }

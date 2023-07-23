@@ -186,7 +186,7 @@ class GLDriver {
     }
 
 
-    drawImage(texture: GLTexture, numFramesX: number=1, numFramesY: number=1, pos: Position[], frame: Position[] = [{x: 0, y: 0}], scale: {x: number, y: number}, buffer?: number[], shader: Shader | null=this.defaultShader) {
+    drawImage(texture: GLTexture, numFramesX: number=1, numFramesY: number=1, pos: Float32Array, frame: Float32Array = new Float32Array([0, 0]), scale: {x: number, y: number}, buffer?: Float32Array, shader: Shader | null=this.defaultShader) {
         if (!this.gl) {
             throw 'glDriver is not initialized'
         }
@@ -197,49 +197,72 @@ class GLDriver {
         shader.bind();
         texture.bind(0);
 
+        const instancesCount = pos.length / 3;
 
-        const posBuffer: number[] = [];
-        const frameBuffer: number[] = [];
-        const buf: number[] = [];
+        const posBuffer: Float32Array = pos;
+        const frameBuffer: Float32Array = frame;
+        const buf: Float32Array = buffer ? buffer : new Float32Array(instancesCount);
 
-        pos.forEach(p => {
-            posBuffer.push(p.x, p.y, p.z ? p.z : 0.0);
-        })
-        frame.forEach(f => {
-            frameBuffer.push(f.x, f.y);
-        })
-        if (buffer) {
-            buffer.forEach(v => {
-                buf.push(v);
-            })
-        }
-
+        const posUniformIdx = this.gl.getUniformLocation(shader.glShaderProgram, 'pos');
+        const frameUniformIdx = this.gl.getUniformLocation(shader.glShaderProgram, 'textureFrame');
+        const bufferUniformIdx = this.gl.getUniformLocation(shader.glShaderProgram, 'bendData');
 
         this.gl.uniform2f(this.gl.getUniformLocation(shader.glShaderProgram, 'scale'), scale.x, scale.y);
         this.gl.uniform2f(this.gl.getUniformLocation(shader.glShaderProgram, 'u_numFrames'), numFramesX, numFramesY);
 
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.quadVertexBuffer);
-
-        this.gl.enableVertexAttribArray(0);
         this.gl.vertexAttribPointer(0, 3, this.gl.FLOAT, false, 0, 0);
 
-        for (let i = 0; i < Math.ceil(pos.length / INSTANCES_PER_DRAW); i++) {
-            const sliceIndex = {
-                start: i * INSTANCES_PER_DRAW,
-                end: (i + 1) * INSTANCES_PER_DRAW
-            }
+        const posSRV = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, posSRV);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, posBuffer, this.gl.STREAM_DRAW);
+        this.gl.vertexAttribPointer(1, 3, this.gl.FLOAT, false, 0, 0);
 
-            this.gl.uniform3fv(this.gl.getUniformLocation(shader.glShaderProgram, 'pos'), posBuffer.slice(3 * sliceIndex.start, 3 * sliceIndex.end));
-            this.gl.uniform2fv(this.gl.getUniformLocation(shader.glShaderProgram, 'textureFrame'), frameBuffer.slice(2 * sliceIndex.start, 2 * sliceIndex.end));
+        const frameSRV = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, frameSRV);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, frameBuffer, this.gl.STREAM_DRAW);
+        this.gl.vertexAttribPointer(2, 2, this.gl.FLOAT, false, 0, 0);
 
-            if (buffer) {
-                this.gl.uniform1fv(this.gl.getUniformLocation(shader.glShaderProgram, 'bendData'), buf.slice(1 * sliceIndex.start, 1 * sliceIndex.end));
-            }
+        const bufferSRV = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSRV);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, buf, this.gl.STREAM_DRAW);
+        this.gl.vertexAttribPointer(3, 1, this.gl.FLOAT, false, 0, 0);
 
-            this.gl.drawArraysInstanced(this.gl.TRIANGLES, 0, 6, Math.min(INSTANCES_PER_DRAW, pos.length - i * INSTANCES_PER_DRAW));
-        }
+        this.gl.vertexAttribDivisor(1, 1);
+        this.gl.vertexAttribDivisor(2, 1);
+        this.gl.vertexAttribDivisor(3, 1);
+
+        this.gl.enableVertexAttribArray(0);
+        this.gl.enableVertexAttribArray(1);
+        this.gl.enableVertexAttribArray(2);
+        this.gl.enableVertexAttribArray(3);
+
+        this.gl.drawArraysInstanced(this.gl.TRIANGLES, 0, 6, instancesCount)
 
         this.gl.disableVertexAttribArray(0);
+        this.gl.disableVertexAttribArray(1);
+        this.gl.disableVertexAttribArray(2);
+        this.gl.disableVertexAttribArray(3);
+
+        // for (let i = 0; i < Math.ceil(instancesCount / INSTANCES_PER_DRAW); i++) {
+        //     const sliceIndex = {
+        //         start: i * INSTANCES_PER_DRAW,
+        //         end: Math.min(instancesCount, (i + 1) * INSTANCES_PER_DRAW)
+        //     }
+        //
+        //     this.gl.uniform3fv(posUniformIdx, posBuffer.slice(3 * sliceIndex.start, 3 * sliceIndex.end));
+        //     this.gl.uniform2fv(frameUniformIdx, frameBuffer.slice(2 * sliceIndex.start, 2 * sliceIndex.end));
+        //
+        //     if (buffer) {
+        //         this.gl.uniform1fv(bufferUniformIdx, buf.slice(1 * sliceIndex.start, 1 * sliceIndex.end));
+        //     }
+        //
+        //     this.gl.drawArraysInstanced(this.gl.TRIANGLES, 0, 6, Math.min(INSTANCES_PER_DRAW, instancesCount - i * INSTANCES_PER_DRAW));
+        // }
+        //
+        // this.gl.disableVertexAttribArray(0);
+
+        texture.unbind(0);
     }
 }
 

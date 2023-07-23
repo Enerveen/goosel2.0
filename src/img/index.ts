@@ -13,7 +13,7 @@ import corpse from './corpse.png'
 import plantAtlas from './plantsAtlas.png'
 import heartGay from './heartGay.png'
 import childTextureAtlas from './childTextureAtlas.png'
-import grass from './grass.png'
+import grass from './grass2.png'
 import baseGrass from './baseGrass.png'
 
 const imagesSrc = {

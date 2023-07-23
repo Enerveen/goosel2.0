@@ -157,7 +157,7 @@ class Renderer {
                 // }
 
 
-                glDriver.drawImage(GLTexture.fromImage(image), 1, 1, [{x: (j + 0.5) * tileSize.width, y: (i + 0.5) * tileSize.height}], [{x: 0, y: 0}], {x: 0.5 * tileSize.width, y: 0.5 * tileSize.height});
+                glDriver.drawImage(GLTexture.fromImage(image), 1, 1, new Float32Array([(j + 0.5) * tileSize.width, (i + 0.5) * tileSize.height, 1.0]), new Float32Array([0, 0]), {x: 0.5 * tileSize.width, y: 0.5 * tileSize.height});
             }
         }
     }
@@ -201,7 +201,7 @@ class Renderer {
 
                 glDriver.gl.disable(glDriver.gl.DEPTH_TEST);
                 glDriver.gl.uniform1f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_maxAlpha'), 0.45);
-                glDriver.drawImage(GLTexture.fromImage(image), 1, 1, [{x: position.x, y: position.y, z: 0.1}], [{x: 0, y: 0}], scale);
+                glDriver.drawImage(GLTexture.fromImage(image), 1, 1, new Float32Array([position.x, position.y, 0.1]), new Float32Array([0, 0]), scale);
             }
 
             this.context.restore();
@@ -223,8 +223,8 @@ class Renderer {
             offsetX,
             offsetY}] = [this.plantAtlas]
 
-        const posBuffer: Position[] = []
-        const frameBuffer: Position[] = []
+        const posBuffer: number[] = []
+        const frameBuffer: number[] = []
         const scale = {
             x: 0.5 * width,
             y: 0.5 * height
@@ -232,22 +232,19 @@ class Renderer {
 
 
         plants.forEach(plant => {
-            const position = {
-                x: plant.position.x - (offsetX - 0.5) * width,
-                y: plant.position.y - (offsetY - 0.5) * height,
-                z: plant.position.y
-            }
-            const frame = {
-                x: ['common', ...plantsKinds].indexOf(plant.kind),
-                y: 0
-            }
-
-            posBuffer.push(position)
-            frameBuffer.push(frame);
+            posBuffer.push(
+                plant.position.x - (offsetX - 0.5) * width,
+                plant.position.y - (offsetY - 0.5) * height,
+                plant.position.y
+            )
+            frameBuffer.push(
+                ['common', ...plantsKinds].indexOf(plant.kind),
+                0
+            )
         })
 
         //glDriver.gl?.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_isSkew'), 1);
-        glDriver.drawImage(GLTexture.fromImage(image), image.width / frameWidth, image.height / frameHeight, posBuffer, frameBuffer, scale);
+        glDriver.drawImage(GLTexture.fromImage(image), image.width / frameWidth, image.height / frameHeight, new Float32Array(posBuffer), new Float32Array(frameBuffer), scale);
     }
 
 
@@ -302,8 +299,8 @@ class Renderer {
                 offsetX,
                 offsetY}] = [this.butterflyTextureAtlas]
 
-            const posBuffer: Position[] = []
-            const frameBuffer: Position[] = []
+            const posBuffer: number[] = []
+            const frameBuffer: number[] = []
             const scale = {
                 x: 0.5 * width,
                 y: 0.5 * height
@@ -311,23 +308,20 @@ class Renderer {
 
 
             boids.forEach((boid, index) => {
-                const position = {
-                    x: boid.position.x - (offsetX - 0.5) * width,
-                    y: boid.position.y - (offsetY - 0.5) * height,
-                    z: boid.position.y
-                }
+                posBuffer.push(
+                    boid.position.x - (offsetX - 0.5) * width,
+                    boid.position.y - (offsetY - 0.5) * height,
+                    boid.position.y
+                )
 
                 const currentFrame = Math.floor(((timestamp + 37 * index) % animationSpeed) / animationSpeed * 16);
-                const frame = {
-                    x: currentFrame % 4,
-                    y: Math.floor(currentFrame / 4)
-                }
-
-                posBuffer.push(position)
-                frameBuffer.push(frame);
+                frameBuffer.push(
+                    currentFrame % 4,
+                    Math.floor(currentFrame / 4)
+                )
             })
 
-            glDriver.drawImage(GLTexture.fromImage(image), 4, 4, posBuffer, frameBuffer, scale);
+            glDriver.drawImage(GLTexture.fromImage(image), 4, 4, new Float32Array(posBuffer), new Float32Array(frameBuffer), scale);
         }
     }
 
@@ -346,35 +340,26 @@ class Renderer {
             offsetX,
             offsetY}] = [this.grassTexture]
 
-        const posBuffer: Position[] = []
-        const frameBuffer: Position[] = []
-        const buffer: number[] = []
         const scale = {
             x: 0.15 * width,
             y: 0.15 * height
         }
 
-        grassSystem.positions.forEach(plant => {
-            const position = {
-                x: plant.position.x - (offsetX - 0.5) * scale.x,
-                y: plant.position.y - (offsetY - 0.5) * scale.y,
-                z: plant.position.y
-            }
-            const frame = {
-                x: 0,
-                y: 0
-            }
+        if (grassSystem.positionSRV.length === 0) {
+            grassSystem.positionSRV = new Float32Array(3 * grassSystem.positions.length);
+            grassSystem.frameSRV = new Float32Array(2 * grassSystem.positions.length);
 
-            posBuffer.push(position)
-            frameBuffer.push(frame);
-        })
-
-        grassSystem.states.forEach(state => {
-            buffer.push(state.age);
-        })
+            grassSystem.positions.forEach((plant, idx) => {
+                grassSystem.positionSRV[3 * idx + 0] = plant.position.x - (offsetX - 0.5) * scale.x;
+                grassSystem.positionSRV[3 * idx + 1] = plant.position.y - (offsetY - 0.5) * scale.y;
+                grassSystem.positionSRV[3 * idx + 2] = plant.position.y;
+                grassSystem.frameSRV[2 * idx + 0] = 0;
+                grassSystem.frameSRV[2 * idx + 1] = 0;
+            })
+        }
 
         glDriver.gl?.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_isSkew'), 1);
-        glDriver.drawImage(GLTexture.fromImage(image), 1, 1, posBuffer, frameBuffer, scale, buffer);
+        glDriver.drawImage(GLTexture.fromImage(image), 1, 1, grassSystem.positionSRV, grassSystem.frameSRV, scale, grassSystem.constSRV);
     }
 
 
@@ -435,17 +420,17 @@ class Renderer {
                 }
 
                 if (frameWidth) {
-                    glDriver.drawImage(GLTexture.fromImage(image), numFrame.x, numFrame.y, [{
-                        x: x - (offsetX - 0.5) * width,
-                        y: y - (offsetY - 0.5) * height,
-                        z: y
-                    }], [{x: currentFrame, y: heading}], scale);
+                    glDriver.drawImage(GLTexture.fromImage(image), numFrame.x, numFrame.y, new Float32Array([
+                        x - (offsetX - 0.5) * width,
+                        y - (offsetY - 0.5) * height,
+                        y
+                    ]), new Float32Array([currentFrame, heading]), scale);
                 } else {
-                    glDriver.drawImage(GLTexture.fromImage(image), 1, 1, [{
-                        x: x - (offsetX - 0.5) * width,
-                        y: y - (offsetY - 0.5) * height,
-                        z: y
-                    }], [{x: 0, y: 0}], scale);
+                    glDriver.drawImage(GLTexture.fromImage(image), 1, 1, new Float32Array([
+                        x - (offsetX - 0.5) * width,
+                        y - (offsetY - 0.5) * height,
+                        y
+                    ]), new Float32Array([0, 0]), scale);
                 }
             }
         }
@@ -526,11 +511,11 @@ class Renderer {
                     y: 0.5 * height
                 }
 
-                glDriver.drawImage(GLTexture.fromImage(image), image.width / frameWidth, image.height / frameHeight, [{
-                    x: x - (offsetX - 0.5) * width,
-                    y: y - (offsetY - 0.5) * height,
-                    z: y
-                }], [{x: eggType, y: 0}], scale);
+                glDriver.drawImage(GLTexture.fromImage(image), image.width / frameWidth, image.height / frameHeight, new Float32Array([
+                    x - (offsetX - 0.5) * width,
+                    y - (offsetY - 0.5) * height,
+                    y
+                ]),new Float32Array([eggType, 0]), scale);
             }
         }
     }
@@ -548,11 +533,11 @@ class Renderer {
                     y: 0.5 * height
                 }
 
-                glDriver.drawImage(GLTexture.fromImage(image), 1, 1, [{
-                    x: x - (offsetX - 0.5) * width,
-                    y: y - (offsetY - 0.5) * height,
-                    z: y
-                }], [{x: 0, y: 0}], scale);
+                glDriver.drawImage(GLTexture.fromImage(image), 1, 1, new Float32Array([
+                    x - (offsetX - 0.5) * width,
+                    y - (offsetY - 0.5) * height,
+                    y
+                ]), new Float32Array([0, 0]), scale);
             }
         }
     }
