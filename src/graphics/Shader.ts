@@ -47,6 +47,9 @@ export class Shader {
         glDriver.gl.attachShader(this.glShaderProgram, vertexShader);
         glDriver.gl.attachShader(this.glShaderProgram, fragmentShader);
         glDriver.gl.linkProgram(this.glShaderProgram);
+        const linkStatus = glDriver.gl.getProgramParameter(this.glShaderProgram, glDriver.gl.LINK_STATUS);
+        console.log("Shader linked: " + linkStatus);
+        console.log("Shader linking log: ", glDriver.gl.getProgramInfoLog(this.glShaderProgram));
     }
 
 
@@ -69,7 +72,7 @@ export class Shader {
                 })
             ))
             .then(sources => {
-                console.log(`%c${source.vertex}`, 'color: red');
+                console.log(`%c${source.vertex}`, 'color: yellow');
                 callback(new Shader(sources[0], sources[1]));
             })
     }

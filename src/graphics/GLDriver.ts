@@ -26,12 +26,15 @@ class GLDriver {
     defaultShader: Shader | null = null;
     shadowMapShader: Shader | null = null;
     copyShader: Shader | null = null;
+    waterShader: Shader | null = null;
+    lightningShader: Shader | null = null;
     transform: Float32Array = new Float32Array()
 
     quadVertexBuffer: WebGLBuffer | null = null;
     shadowMapRT: GLRenderTarget | null = null;
     mainRT: GLRenderTarget | null = null;
     depthRT: GLRenderTarget | null = null;
+    lightningRT: GLRenderTarget | null = null;
 
 
     init(gl: WebGL2RenderingContext) {
@@ -44,9 +47,34 @@ class GLDriver {
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(verticies), this.gl.STATIC_DRAW);
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
 
-        this.shadowMapRT = new GLRenderTarget(this.gl.canvas.width, this.gl.canvas.height);
-        this.mainRT = new GLRenderTarget(this.gl.canvas.width, this.gl.canvas.height, true, 2, this.gl.RGBA32F);
-        this.depthRT = new GLRenderTarget(this.gl.canvas.width, this.gl.canvas.height, true, 1, this.gl.RGBA32F);
+        this.shadowMapRT = new GLRenderTarget([{
+            width: this.gl.canvas.width,
+            height: this.gl.canvas.height,
+            format: this.gl.RGBA
+        }]);
+        this.mainRT = new GLRenderTarget([{
+            width: this.gl.canvas.width,
+            height: this.gl.canvas.height,
+            format: this.gl.RGBA32F
+        }, {
+            width: this.gl.canvas.width,
+            height: this.gl.canvas.height,
+            format: this.gl.RGBA32F
+        }], true);
+        this.depthRT = new GLRenderTarget([{
+            width: this.gl.canvas.width,
+            height: this.gl.canvas.height,
+            format: this.gl.RGBA32F
+        }], true);
+        this.lightningRT = new GLRenderTarget([{
+            width: this.gl.canvas.width,
+            height: this.gl.canvas.height,
+            format: this.gl.RGBA
+        }, {
+            width: this.gl.canvas.width,
+            height: this.gl.canvas.height,
+            format: this.gl.R32F
+        }], false);
 
 
         console.log('compilation');
@@ -55,10 +83,16 @@ class GLDriver {
         });
         Shader.compileFromSourceFiles({vertex: 'shadowMap.vert', fragment: 'shadowMap.frag'}, (shader) => {
             this.shadowMapShader = shader;
-        })
+        });
         Shader.compileFromSourceFiles({vertex: 'copy.vert', fragment: 'copy.frag'}, (shader) => {
             this.copyShader = shader;
-        })
+        });
+        Shader.compileFromSourceFiles({vertex: 'default.vert', fragment: 'water.frag'}, (shader) => {
+            this.waterShader = shader;
+        });
+        Shader.compileFromSourceFiles({vertex: 'lightning.vert', fragment: 'lightning.frag'}, (shader) => {
+            this.lightningShader = shader;
+        });
     }
 
 
@@ -96,7 +130,7 @@ class GLDriver {
         this.gl.enable(this.gl.DEPTH_TEST);
         this.gl.depthFunc(this.gl.LESS);
         this.gl.depthMask(true);
-        this.gl.enable(this.gl.BLEND);
+        this.gl.disable(this.gl.BLEND);
         this.gl.blendFuncSeparate(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA, this.gl.ZERO, this.gl.ONE);
 
         this.gl.uniform1f(this.gl.getUniformLocation(this.defaultShader.glShaderProgram, 'u_maxAlpha'), 1.0);
@@ -138,12 +172,12 @@ class GLDriver {
     }
 
 
-    copyImage(texture: GLTexture, target: GLRenderTarget | null = null, corner: number = 0) {
-        if (!this.gl || !this.copyShader) {
+    copyImage(texture: GLTexture, shader: Shader | null = this.copyShader, target: GLRenderTarget | null = null, corner: number = 0) {
+        if (!this.gl || !shader) {
             return;
         }
 
-        this.copyShader.bind();
+        shader.bind();
 
         const targetWidth: number = target ? target.width : this.gl.canvas.width;
         let targetHeight: number = target ? target.height : this.gl.canvas.height;
@@ -165,11 +199,10 @@ class GLDriver {
 
         this.gl.disable(this.gl.DEPTH_TEST);
 
-        this.gl.uniform1i(this.gl.getUniformLocation(this.copyShader.glShaderProgram, 'tex'), 0);
-        this.gl.uniform1i(this.gl.getUniformLocation(this.copyShader.glShaderProgram, 'bloomMask'), 1);
-        this.gl.uniform2f(this.gl.getUniformLocation(this.copyShader.glShaderProgram, 'u_resolution'), targetWidth, targetHeight);
+        this.gl.uniform1i(this.gl.getUniformLocation(shader.glShaderProgram, 'tex'), 0);
+        this.gl.uniform1i(this.gl.getUniformLocation(shader.glShaderProgram, 'u_time'), simulationStore.getTimestamp);
+        this.gl.uniform2f(this.gl.getUniformLocation(shader.glShaderProgram, 'u_resolution'), targetWidth, targetHeight);
         texture.bind(0);
-        this.mainRT?.getTexture(1).bind(1);
 
         this.gl!.bindBuffer(this.gl!.ARRAY_BUFFER, this.quadVertexBuffer);
 

@@ -209,12 +209,30 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         if (pass === RENDER_PASS.COLOR) {
             glDriver.depthRT?.getTexture().unbind(2);
 
+            if (glDriver.gl && glDriver.lightningShader) {
+                glDriver.lightningShader.bind();
+                glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.lightningShader.glShaderProgram, 'emissionTex'), 1);
+                glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.lightningShader.glShaderProgram, 'cloudsTex'), 2);
+                glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.lightningShader.glShaderProgram, 'gBuffer'), 3);
+                glDriver.mainRT!.getTexture(1).bind(1);
+                glDriver.shadowMapRT!.getTexture(0).bind(2);
+                glDriver.depthRT!.getTexture(0).bind(3);
+
+                glDriver.copyImage(glDriver.mainRT!.getTexture(0), glDriver.lightningShader, glDriver.lightningRT);
+
+                glDriver.mainRT!.getTexture(1).unbind(1);
+                glDriver.shadowMapRT!.getTexture(0).unbind(2);
+                glDriver.depthRT!.getTexture(0).unbind(3);
+            }
+
             if (glDriver.gl && glDriver.copyShader) {
                 glDriver.copyShader.bind();
                 glDriver.gl.uniform1f(glDriver.gl.getUniformLocation(glDriver.copyShader.glShaderProgram, 'camScale'), mainCamera.getFovScale());
+                glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.copyShader.glShaderProgram, 'bloomMask'), 1);
+                glDriver.lightningRT!.getTexture(1).bind(1);
+                glDriver.copyImage(glDriver.lightningRT!.getTexture(0));
+                glDriver.lightningRT!.getTexture(1).unbind(1);
             }
-
-            glDriver.copyImage(glDriver.mainRT!.getTexture(0));
         } else if (pass === RENDER_PASS.DEPTH) {
             glDriver.depthRT?.unbind();
         }

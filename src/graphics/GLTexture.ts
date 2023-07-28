@@ -12,6 +12,41 @@ type GLTextureParams = {
 }
 
 
+const getChannelParams = function(format: number) {
+    glDriver.check()
+
+    switch(format) {
+        case glDriver.gl!.RGBA:
+            return {
+                base:  glDriver.gl!.RGBA,
+                type: glDriver.gl!.UNSIGNED_BYTE
+            };
+        case glDriver.gl!.RGBA32F:
+            return {
+                base:  glDriver.gl!.RGBA,
+                type: glDriver.gl!.FLOAT
+            };
+        case glDriver.gl!.RGB32F:
+            return {
+                base:  glDriver.gl!.RGB,
+                type: glDriver.gl!.FLOAT
+            };
+        case glDriver.gl!.RG32F:
+            return {
+                base:  glDriver.gl!.RG,
+                type: glDriver.gl!.FLOAT
+            };
+        case glDriver.gl!.R32F:
+            return {
+                base:  glDriver.gl!.RED,
+                type: glDriver.gl!.FLOAT
+            };
+        default:
+            throw "Something wrong here"
+    }
+}
+
+
 export class GLTexture {
     // TODO: move it to texture manager
     private static loadedTextures: {[key: string] : GLTexture} = {}
@@ -47,10 +82,10 @@ export class GLTexture {
             this.width = params.image.width;
             this.height = params.image.height;
         } else if (params.size) {
-            const channelFormat = params.size.format === glDriver.gl.RGBA32F ? glDriver.gl.FLOAT : glDriver.gl.UNSIGNED_BYTE;
+            const channelParams = getChannelParams(params.size.format);
 
             glDriver.gl.texImage2D(glDriver.gl.TEXTURE_2D, 0, params.size.format, params.size.width, params.size.height, 0,
-                glDriver.gl.RGBA, channelFormat, null);
+                channelParams.base, channelParams.type, null);
 
             this.width = params.size.width;
             this.height = params.size.height;

@@ -8,21 +8,19 @@ export class GLRenderTarget {
     width: number = 0
     height: number = 0
 
-    constructor(width: number, height: number, depth: boolean = false, count: number = 1, format: number = glDriver.gl!.RGBA) {
+    constructor(params: {width: number, height: number, format: number}[], depth: boolean = false) {
         glDriver.check()
 
-        this.width = width;
-        this.height = height;
+        this.width = params[0].width;
+        this.height = params[0].height;
 
         this.native = glDriver.gl!.createFramebuffer()
         glDriver.gl!.bindFramebuffer(glDriver.gl!.FRAMEBUFFER, this.native);
 
         let buffers: number[] = [];
-        for (let i = 0; i < count; i++) {
-            this.texture.push(GLTexture.create(width, height, false, format));
-            console.log(glDriver.gl!.getError());
+        for (let i = 0; i < params.length; i++) {
+            this.texture.push(GLTexture.create(params[i].width, params[i].height, false, params[i].format));
             glDriver.gl!.framebufferTexture2D(glDriver.gl!.FRAMEBUFFER, glDriver.gl!.COLOR_ATTACHMENT0 + i, glDriver.gl!.TEXTURE_2D, this.texture[i].native, 0);
-            console.log(glDriver.gl!.getError());
 
             buffers.push(glDriver.gl!.COLOR_ATTACHMENT0 + i);
         }
@@ -31,7 +29,7 @@ export class GLRenderTarget {
             const depthBuffer = glDriver.gl!.createRenderbuffer();
             glDriver.gl!.bindRenderbuffer(glDriver.gl!.RENDERBUFFER, depthBuffer);
 
-            glDriver.gl!.renderbufferStorage(glDriver.gl!.RENDERBUFFER, glDriver.gl!.DEPTH_COMPONENT16, width, height);
+            glDriver.gl!.renderbufferStorage(glDriver.gl!.RENDERBUFFER, glDriver.gl!.DEPTH_COMPONENT16, this.width, this.height);
             glDriver.gl!.framebufferRenderbuffer(glDriver.gl!.FRAMEBUFFER, glDriver.gl!.DEPTH_ATTACHMENT, glDriver.gl!.RENDERBUFFER, depthBuffer);
         }
 

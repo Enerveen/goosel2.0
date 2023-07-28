@@ -99,16 +99,15 @@ export class GrassSystem {
 
     update(entities: Entity[]) {
         entities.forEach(entity => {
-            const circle = new Circle(entity.position.x, entity.position.y, 20.0);
+            const circle = new Circle(entity.position.x, entity.position.y, 25.0);
 
             this.quadTree.get(circle).forEach(grassEntity => {
-
                 this.states[(grassEntity as GrassEntity).idx].timestamp = simulationStore.getTimestamp;
             })
         })
 
         this.states.forEach((state, idx) => {
-            state.age = (simulationStore.getTimestamp - state.timestamp) / 200.0;
+            state.age = (simulationStore.getTimestamp - state.timestamp) / 600.0;
 
             state.age = 1.0 - Math.min(1.0, state.age);
             this.constSRV[idx] = state.age;

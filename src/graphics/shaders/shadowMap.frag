@@ -1,9 +1,9 @@
 #version 300 es
 precision highp float;
 
-#include <smoothNoise.glsl>
-
 uniform float u_time;
+
+#include <smoothNoise.glsl>
 
 in vec2 worldPosition;
 
