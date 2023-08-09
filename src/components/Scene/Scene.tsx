@@ -1,27 +1,31 @@
 import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import classes from './Scene.module.scss'
 import {observer} from "mobx-react-lite";
-import {SimulationStore} from "../../stores/simulationStore";
+import simulationStore, {SimulationStore} from "../../stores/simulationStore";
 import {getRandomInRange, rollNPercentChance} from "../../utils/utils";
 import Plant from "../../entities/Plant";
-import {
-    generateAnimals,
-    generateFood
-} from "../../utils/helpers";
+import {generateAnimals, generateFood} from "../../utils/helpers";
 import Renderer from "../../graphics/Renderer";
 import {appPhase, plantKind} from "../../types";
 import useWindowSize from "../../hooks/useWindowSize";
 import {Camera} from "../../graphics/Camera";
 import ImageContext from "../../stores/ImageContext";
 import {
-    handleCanvasClick, handleCanvasMouseMove,
-    handleCanvasMousePress, handleCanvasMouseRelease, handleCanvasMouseWheel, handleCanvasTouchEnd,
+    handleCanvasClick,
+    handleCanvasMouseMove,
+    handleCanvasMousePress,
+    handleCanvasMouseRelease,
+    handleCanvasMouseWheel,
+    handleCanvasTouchEnd,
     handleCanvasTouchMove,
     handleCanvasTouchStart
 } from "../../utils/eventHandlers";
 import Vector2 from "../../dataStructures/Vector2";
 import {plantsKinds} from "../../constants/simulation";
-import {BoundingBox} from "../../dataStructures/Quadtree";
+import {RENDER_PASS} from "../../constants/render";
+import {glDriver} from "../../graphics/GLDriver";
+import {GrassSystem} from "../../simulationSystems/GrassSystem";
+
 
 interface ISceneProps {
     store: SimulationStore,
@@ -30,8 +34,11 @@ interface ISceneProps {
 
 const Scene = observer(({store, setAppPhase}: ISceneProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const secretCanvasRef = useRef<HTMLCanvasElement>(null);
+
     const touchRef = useRef({start: 0, end: 0})
     const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
+    const [glContext, setGlContext] = useState<WebGL2RenderingContext | null>(null);
     const {width: canvasWidth, height: canvasHeight} = useWindowSize()
     const images = useContext(ImageContext)
     const renderer = useMemo(() => new Renderer(context, images), [context])
@@ -50,12 +57,17 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         canvasHeight
     ]);
 
-    const init = useCallback(() => {
+    const grassSystem = useMemo(() => new GrassSystem(5000), [])
+
+
+    const init = () => {
         console.log('Simulation has started with the following constants:',
             JSON.stringify(store.getSimulationConstants, null, 4))
         store.addAnimal(generateAnimals(store.getSimulationConstants.initialAnimalCount))
         store.addPlant(generateFood(store.getSimulationConstants.initialFoodCount))
-    }, [canvasWidth, canvasHeight])
+
+        glDriver.init(glContext as WebGL2RenderingContext);
+    }
 
 
     const calculateStep = useCallback(() => {
@@ -68,8 +80,10 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         store.gatherStatistics()
         if (rollNPercentChance(store.getSimulationConstants.foodSpawnChance * store.getSimulationSpeed)) {
             const isSpecial = rollNPercentChance(0.2)
-            store.addPlant(new Plant({kind: isSpecial ?
-                    plantsKinds[getRandomInRange(0, 5)] as plantKind : 'common'}
+            store.addPlant(new Plant({
+                    kind: isSpecial ?
+                        plantsKinds[getRandomInRange(0, 6)] as plantKind : 'common'
+                }
             ))
         }
         store.getAnimals.forEach(animal => animal.live())
@@ -78,10 +92,12 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                 egg.hatch()
             }
         })
+
+        grassSystem.update(store.getAnimals);
     }, [context, canvasWidth, canvasHeight])
 
 
-    const drawStep = useCallback(() => {
+    const drawStep = useCallback((pass: RENDER_PASS) => {
         if (!context) {
             return;
         }
@@ -89,18 +105,58 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         context.resetTransform();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
-        mainCamera.checkBounds(new BoundingBox(0, store.getSimulationConstants.fieldSize.width,
-           0, store.getSimulationConstants.fieldSize.height));
+        //mainCamera.checkBounds(new BoundingBox(0, store.getSimulationConstants.fieldSize.width,
+        //   0, store.getSimulationConstants.fieldSize.height));
         {
             const scale = Math.min(canvasWidth / mainCamera.fov.x, canvasHeight / mainCamera.fov.y);
             context.translate(canvasWidth / 2 - mainCamera.position.x * scale, canvasHeight / 2 - mainCamera.position.y * scale);
             context.scale(scale, scale);
+
+            glDriver.setGlobalTransform(context.getTransform().toFloat32Array());
+
+            if (pass === RENDER_PASS.COLOR) {
+                glDriver.createShadowMap(mainCamera.position, scale);
+            }
         }
 
-        renderer.drawSeamlessBackground({
-            width: store.getSimulationConstants.fieldSize.width,
-            height: store.getSimulationConstants.fieldSize.height
-        })
+        glDriver.renderPrepare(pass);
+
+        if (glDriver.gl && glDriver.defaultShader) {
+            glDriver.defaultShader.bind()
+
+            glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_time'), simulationStore.getTimestamp);
+            glDriver.gl.uniformMatrix4fv(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_transform'), false, glDriver.transform);
+            glDriver.gl.uniform2f(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_resolution'), glDriver.gl.canvas.width, glDriver.gl.canvas.height);
+
+            glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'tex'), 0);
+
+            if (pass === RENDER_PASS.COLOR) {
+                glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'shadowMap'), 1);
+                glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'gBuffer'), 2);
+
+                glDriver.shadowMapRT?.getTexture().bind(1);
+                glDriver.depthRT?.getTexture().bind(2);
+            }
+            //GLTexture.fromImage(renderer.eggsAtlas.image).bind(1);
+        }
+
+        if (pass === RENDER_PASS.COLOR) {
+            renderer.drawSeamlessBackground({
+                width: store.getSimulationConstants.fieldSize.width,
+                height: store.getSimulationConstants.fieldSize.height
+            })
+        }
+
+        if (glDriver.gl && glDriver.defaultShader) {
+            glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_isSkew'), 1);
+            renderer.drawPlants(store.getPlants);
+            glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'isGrass'), 1);
+            renderer.drawGrass(grassSystem);
+
+            glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'u_isSkew'), 0);
+            glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.defaultShader.glShaderProgram, 'isGrass'), 0);
+        }
+
         store.getPlants.forEach(entity => renderer.drawPlant(entity.position, entity.kind))
         store.getCorpses.forEach(entity => renderer.drawCorpse(entity.position, entity.age))
         store.getEggs.forEach(entity => renderer.drawEgg(entity.position))
@@ -130,56 +186,78 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             }
         })
 
-        renderer.drawClouds();
+        if (pass === RENDER_PASS.COLOR) {
+            glDriver.depthRT?.getTexture().unbind(2);
+            glDriver.copyImage(glDriver.mainRT!.getTexture(0));
+        } else if (pass === RENDER_PASS.DEPTH) {
+            glDriver.depthRT?.unbind();
+        }
+        //glDriver.copyImage(glDriver.depthRT!.getTexture(0), null, 1);
+
+        //renderer.drawClouds();
         if (!store.getLogHidden) {
             renderer.drawLogs()
         }
-    }, [context, canvasWidth, canvasHeight]);
+
+    }, [context, glContext, canvasWidth, canvasHeight]);
 
     useEffect(() => {
-        if (canvasRef.current) {
+        if (canvasRef.current && secretCanvasRef.current) {
             const canvas = canvasRef.current;
+
             const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
             setContext(ctx);
+            const gl = secretCanvasRef.current.getContext('webgl2') as WebGL2RenderingContext;
+            setGlContext(gl);
         }
     }, []);
 
     useEffect(() => {
         let animationFrameId: number;
-        if (context) {
+        if (context && glContext) {
             const render = () => {
                 const timestamp = store.getTimestamp
                 if (timestamp === 0) {
                     init()
                 }
                 calculateStep();
-                drawStep();
+                drawStep(RENDER_PASS.DEPTH);
+                drawStep(RENDER_PASS.COLOR);
                 store.updateTimestamp()
                 animationFrameId = window.requestAnimationFrame(render);
             };
+
             render();
         }
         return () => {
             window.cancelAnimationFrame(animationFrameId);
         };
-    }, [context, drawStep, store]);
+    }, [context, glContext, drawStep, store]);
 
-    return <canvas
-        className={classes.canvas}
-        ref={canvasRef}
-        width={canvasWidth}
-        height={canvasHeight}
-        onMouseDown={event => handleCanvasMousePress(event, mainCamera)}
-        onMouseUp={handleCanvasMouseRelease}
-        onMouseMove={event => handleCanvasMouseMove(event, mainCamera)}
-        onWheel={event => handleCanvasMouseWheel(event, canvasWidth, canvasHeight, mainCamera)}
-        onTouchStart={event => handleCanvasTouchStart(event, mainCamera, touchRef.current)}
-        onTouchMove={event => handleCanvasTouchMove(event, mainCamera, touchRef.current)}
-        onTouchEnd={event => handleCanvasTouchEnd(event)}
-        onClick={event => handleCanvasClick(
-            event,
-            renderer
-        )}/>;
+    return <>
+            <canvas
+            className={classes.canvas}
+            ref={canvasRef}
+            width={canvasWidth}
+            height={canvasHeight}
+            onMouseDown={event => handleCanvasMousePress(event, mainCamera)}
+            onMouseUp={handleCanvasMouseRelease}
+            onMouseMove={event => handleCanvasMouseMove(event, mainCamera)}
+            onWheel={event => handleCanvasMouseWheel(event, canvasWidth, canvasHeight, mainCamera)}
+            onTouchStart={event => handleCanvasTouchStart(event, mainCamera, touchRef.current)}
+            onTouchMove={event => handleCanvasTouchMove(event, mainCamera, touchRef.current)}
+            onTouchEnd={event => handleCanvasTouchEnd(event)}
+            onClick={event => handleCanvasClick(
+                event,
+                renderer
+            )}/>
+            <canvas
+                width={canvasWidth}
+                height={canvasHeight}
+                className={classes.secretCanvas}
+                ref={secretCanvasRef}
+            />
+        </>
 })
 
 export default Scene;
