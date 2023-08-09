@@ -10,7 +10,7 @@ in vec2 worldPosition;
 out vec4 fragValue;
 
 void main() {
-    vec2 np = 12873.0 + (worldPosition) / 4000.0;
+    vec2 np = 123.0 + (worldPosition) / 4000.0;
     float time = 0.03125 * u_time;
     float noise = smoothNoise(4.0 * np + 615.0 + 0.02 * time) +
                 smoothNoise(8.0 * np + 0.04 * time) * 0.5 +
@@ -20,7 +20,7 @@ void main() {
     noise /= 1.9375;
 
     //float weatherFactor = 0.5f * sin(0.001f * float(u_time)) + 0.5f;
-    noise = smoothstep(0.5, 0.6, noise);
+    noise = smoothstep(0.6, 0.7, noise);
 
     fragValue = vec4(vec3(noise), 1.0);
 }

@@ -35,6 +35,10 @@ class GLDriver {
     mainRT: GLRenderTarget | null = null;
     depthRT: GLRenderTarget | null = null;
     lightningRT: GLRenderTarget | null = null;
+    waterRT: GLRenderTarget | null = null;
+
+    sceneCopyTexture: GLTexture | null = null;
+    emissionCopyTexture: GLTexture | null = null;
 
 
     init(gl: WebGL2RenderingContext) {
@@ -60,11 +64,28 @@ class GLDriver {
             width: this.gl.canvas.width,
             height: this.gl.canvas.height,
             format: this.gl.RGBA32F
+        }, {
+            width: this.gl.canvas.width,
+            height: this.gl.canvas.height,
+            format: this.gl.R32F
         }], true);
         this.depthRT = new GLRenderTarget([{
             width: this.gl.canvas.width,
             height: this.gl.canvas.height,
             format: this.gl.RGBA32F
+        }], true);
+        this.waterRT = new GLRenderTarget([{
+            width: this.gl.canvas.width,
+            height: this.gl.canvas.height,
+            format: this.gl.RGBA32F
+        }, {
+            width: this.gl.canvas.width,
+            height: this.gl.canvas.height,
+            format: this.gl.RGBA32F
+        }, {
+            width: this.gl.canvas.width,
+            height: this.gl.canvas.height,
+            format: this.gl.R32F
         }], true);
         this.lightningRT = new GLRenderTarget([{
             width: this.gl.canvas.width,
@@ -87,12 +108,15 @@ class GLDriver {
         Shader.compileFromSourceFiles({vertex: 'copy.vert', fragment: 'copy.frag'}, (shader) => {
             this.copyShader = shader;
         });
-        Shader.compileFromSourceFiles({vertex: 'default.vert', fragment: 'water.frag'}, (shader) => {
+        Shader.compileFromSourceFiles({vertex: 'water.vert', fragment: 'water.frag'}, (shader) => {
             this.waterShader = shader;
         });
         Shader.compileFromSourceFiles({vertex: 'lightning.vert', fragment: 'lightning.frag'}, (shader) => {
             this.lightningShader = shader;
         });
+
+        this.sceneCopyTexture = GLTexture.create(this.gl.canvas.width, this.gl.canvas.height, false, this.gl.RGBA32F);
+        this.emissionCopyTexture = GLTexture.create(this.gl.canvas.width, this.gl.canvas.height, false, this.gl.RGBA32F);
     }
 
 
@@ -299,9 +323,23 @@ class GLDriver {
     }
 
     drawQuad(shader: Shader) {
+        if (!this.gl || !shader) {
+            return;
+        }
+
         shader.bind();
 
+        this.gl.uniform1f(this.gl.getUniformLocation(shader.glShaderProgram, 'u_time'), simulationStore.getTimestamp);
+        this.gl.uniform2f(this.gl.getUniformLocation(shader.glShaderProgram, 'u_resolution'), this.gl.canvas.width, this.gl.canvas.height); // TODO REPLACE WITH RENDER TARGET RESOLUTION
 
+        this.gl!.bindBuffer(this.gl!.ARRAY_BUFFER, this.quadVertexBuffer);
+
+        this.gl!.enableVertexAttribArray(0);
+        this.gl!.vertexAttribPointer(0, 3, this.gl!.FLOAT, false, 0, 0);
+
+        this.gl!.drawArrays(this.gl!.TRIANGLES, 0, 6);
+
+        this.gl!.disableVertexAttribArray(0);
 
         shader.unbind();
     }

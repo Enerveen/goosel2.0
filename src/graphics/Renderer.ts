@@ -63,7 +63,7 @@ class Renderer {
             frameWidth: 282,
             frameHeight: 361,
             offsetX: 0.5,
-            offsetY: 0.8
+            offsetY: 0.95
         });
         const animalTextureAtlasFrameRatio = animalTextureAtlas.frameHeight / animalTextureAtlas.frameWidth
         this.teenAnimalTextureAtlas = {...animalTextureAtlas, width: 70.5, height: 70.5 * animalTextureAtlasFrameRatio};

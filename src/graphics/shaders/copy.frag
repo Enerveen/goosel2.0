@@ -98,30 +98,6 @@ void main() {
 
     fragValue /= totalWeight;
     fragValue.a = 1.f;
-//
-//    if (texture(bloomMask, gl_FragCoord.xy / u_resolution).g == 1.f) {
-//        return;
-//    }
-//
-//    vec2 uv = gl_FragCoord.xy / u_resolution.x / camScale;
-//    float uvScale = 22.2f;
-//    uv *= uvScale;
-//
-//    vec3 lightDirection = normalize(vec3(8.f, 0.f, 7.f));
-//    vec3 lookDirection = normalize(vec3(1.f, 1.f, -1.f));
-//    float wave = max(0.f, calcWave(uv));
-//    vec3 normal = calcWaveNormal(uv);
-//    float caustic = 1.f + 16.f * calcCaustic(2.f * uv / uvScale - 0.02f * normal.xy * (1.f + wave));
-//
-//    float ambient = 0.2f;
-//    float diffuse = max(0.f, dot(normal, lightDirection));
-//    float specular = 0.5f * pow(max(0.f, dot(reflect(lookDirection, normal), lightDirection)), 32.f);
-//
-//    vec3 backgroundColor = 1.f * texture(tex, gl_FragCoord.xy / u_resolution - 0.01f * normal.xy * camScale).rgb * caustic;
-//    vec3 waterColor = vec3(0.9f, 1.1f, 1.4f);
-//
-//    vec3 col = (ambient + diffuse + specular) * mix(vec3(1.f, 1.f, 1.f), backgroundColor, 1.f - clamp(wave / 0.44043f, 0.f, 1.f) * pow(abs(dot(normal, lookDirection)), 1.2f)) * waterColor;
-//    fragValue.rgb = col;
 
     //    for (int i = -quatSteps; i <= quatSteps; i++) {
     //        for (int j = -quatSteps; j <= quatSteps; j++) {

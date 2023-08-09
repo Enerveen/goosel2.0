@@ -9,7 +9,7 @@ uniform float u_camScale;
 out vec2 worldPosition;
 
 void main() {
-    worldPosition = u_camPos + vec2(position.x + 0.5, -(position.y + 0.5)) * u_resolution / u_camScale;
+    worldPosition = u_camPos + 0.5f * vec2(position.x, -position.y) * u_resolution / u_camScale;
 
     gl_Position = vec4(position.xy, 1.0, 1.0);
 }

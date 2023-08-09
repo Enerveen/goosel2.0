@@ -33,7 +33,7 @@ float voronoi(vec2 uv, float scale) {
     for (int i = -1; i <= 1; i++) {
         for (int j = -1; j <= 1; j++) {
             vec2 noise = vec2(smoothNoise(tr + vec2(i, j)), smoothNoise(tr + vec2(i, j) + vec2(130.6787f, 479.452f)));
-            vec2 adjustedUV = vec2(i, j) + vec2(0.5f) + 0.5f * sin(3438.f * noise + 0.02f * vec2(float(u_time)));
+            vec2 adjustedUV = vec2(i, j) + vec2(0.5f) + 0.5f * sin(3438.f * noise + 0.01f * vec2(float(u_time)));
 
             minDistance = min(minDistance, distance(uv, adjustedUV));
         }

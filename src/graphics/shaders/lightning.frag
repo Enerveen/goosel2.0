@@ -7,6 +7,9 @@ uniform sampler2D tex;
 uniform sampler2D emissionTex;
 uniform sampler2D cloudsTex;
 uniform sampler2D gBuffer;
+uniform sampler2D depthOffsetTex;
+
+uniform float camScale;
 
 #include <commonUniform.glsl>
 
@@ -63,7 +66,7 @@ vec3 getLightColor(float shadow) {
     //vec3 lightColor = mix(mix(daylightColor, vec3(0.0), min(1.0, 2.0 * dayPhase)), nightLightColor, max(0.0, 2.0 * dayPhase - 1.0));
     float ambient = mix(1.0, 0.2, min(1.0, 2.0 * dayPhase));
 
-    shadow += texture(cloudsTex, 0.5 * gl_FragCoord.xy / u_resolution).r;
+    shadow += 0.5f * texture(cloudsTex, gl_FragCoord.xy / u_resolution).r;
 
     return vec3(ambient) + 2.f * mix(vec3(0.0), lightColor, smoothstep(0.0, 1.0, 1.0 - shadow));
 }
@@ -72,10 +75,12 @@ vec3 getLightColor(float shadow) {
 void main() {
     vec2 uv = gl_FragCoord.xy / u_resolution;
 
-    vec2 shadowDepth = texture(gBuffer, uv).rg;
+    vec2 depthOffset = 1.f * (1.f / camScale) * vec2(0.f, texture(depthOffsetTex, uv).r) * vec2(2.f, 1.f);
     vec4 emissionDepth = texture(emissionTex, uv);
+    vec2 shadowDepth = vec2(texture(gBuffer, uv).g, texture(gBuffer, uv).g);
+    float shadow = texture(gBuffer, uv).r;
 
-    fragValue.rgb = texture(tex, uv).rgb * getLightColor(emissionDepth.a > shadowDepth.g ? shadowDepth.r : 0.f) + emissionDepth.rgb;
+    fragValue.rgb = texture(tex, uv).rgb * getLightColor(emissionDepth.a > shadowDepth.y ? clamp(shadow, 0.f, 1.f) : 0.f) + emissionDepth.rgb;
     fragValue.a = 1.f;
 
     bloomMask = 0.008f * luminance(fragValue.rgb);

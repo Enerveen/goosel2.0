@@ -207,6 +207,28 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         })
 
         if (pass === RENDER_PASS.COLOR) {
+            if (glDriver.gl && glDriver.waterShader) {
+                glDriver.sceneCopyTexture!.bind(1);
+                glDriver.gl.copyTexImage2D(glDriver.gl.TEXTURE_2D, 0, glDriver.gl.RGBA32F, 0, 0, glDriver.mainRT!.width, glDriver.mainRT!.height, 0);
+                glDriver.sceneCopyTexture!.unbind(1);
+                // glDriver.sceneCopyTexture!.bind(0);
+                // glDriver.gl.copyTexImage2D(glDriver.gl.TEXTURE_2D, 0, glDriver.gl.RGBA32F, 0, 0, glDriver.mainRT!.width, glDriver.mainRT!.height, 0);
+                // glDriver.sceneCopyTexture!.unbind(0);
+
+                glDriver.waterShader.bind();
+
+                glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.waterShader.glShaderProgram, 'backgroundTex'), 0);
+                glDriver.gl.uniformMatrix4fv(glDriver.gl.getUniformLocation(glDriver.waterShader.glShaderProgram, 'u_transform'), false, glDriver.transform);
+                glDriver.gl.uniform2f(glDriver.gl.getUniformLocation(glDriver.waterShader.glShaderProgram, 'pos'), 800.0, 400.0);
+                glDriver.gl.uniform2f(glDriver.gl.getUniformLocation(glDriver.waterShader.glShaderProgram, 'scale'), 310.0, 310.0);
+                glDriver.gl.uniform1f(glDriver.gl.getUniformLocation(glDriver.waterShader.glShaderProgram, 'camScale'), mainCamera.getFovScale());
+
+                glDriver.sceneCopyTexture!.bind(0);
+                glDriver.drawQuad(glDriver.waterShader);
+                glDriver.sceneCopyTexture!.unbind(0);
+            }
+
+
             glDriver.depthRT?.getTexture().unbind(2);
 
             if (glDriver.gl && glDriver.lightningShader) {
@@ -214,15 +236,20 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
                 glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.lightningShader.glShaderProgram, 'emissionTex'), 1);
                 glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.lightningShader.glShaderProgram, 'cloudsTex'), 2);
                 glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.lightningShader.glShaderProgram, 'gBuffer'), 3);
+                glDriver.gl.uniform1i(glDriver.gl.getUniformLocation(glDriver.lightningShader.glShaderProgram, 'depthOffsetTex'), 4);
+                glDriver.gl.uniform1f(glDriver.gl.getUniformLocation(glDriver.lightningShader.glShaderProgram, 'camScale'), mainCamera.getFovScale());
+
                 glDriver.mainRT!.getTexture(1).bind(1);
                 glDriver.shadowMapRT!.getTexture(0).bind(2);
                 glDriver.depthRT!.getTexture(0).bind(3);
+                glDriver.mainRT!.getTexture(2).bind(4);
 
                 glDriver.copyImage(glDriver.mainRT!.getTexture(0), glDriver.lightningShader, glDriver.lightningRT);
 
                 glDriver.mainRT!.getTexture(1).unbind(1);
                 glDriver.shadowMapRT!.getTexture(0).unbind(2);
                 glDriver.depthRT!.getTexture(0).unbind(3);
+                glDriver.mainRT!.getTexture(2).bind(4);
             }
 
             if (glDriver.gl && glDriver.copyShader) {

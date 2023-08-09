@@ -34,6 +34,7 @@ in float bendAge;
 // TODO write IF preprocessor
 layout (location = 0) out vec4 fragColor; // r - shadow mask, gba - g buffer
 layout (location = 1) out vec4 emissionMask;
+layout (location = 2) out float depthOffset;
 
 
 #include <smoothNoise.glsl>
@@ -67,17 +68,18 @@ void main() {
 
         if (u_isSkew) {
             heightFactor = pow(1.0 - uv.y, 4.0);
-            fragColor.rgb += heightFactor * (3.f * vec3(smoothNoise(v_worldPosition / 50.f)) * vec3(1.f, 0.f, 1.f) + 6.325f * fragColor.a * abs(3.75 * (0.3 + v_bendAmplitude * bendAge + 0.15 * v_windBendAmplitude)) * mix(vec3(0.f, 0.f, 0.f), vec3(0.5, 0.1, 0.5f), 0.5 * skew + 0.5));
+            fragColor.rgb += heightFactor * (3.f * vec3(smoothNoise(v_worldPosition / 50.f)) * vec3(1.f, 1.f, 0.f) + 6.325f * fragColor.a * abs(3.75 * (0.3 + v_bendAmplitude * bendAge + 0.15 * v_windBendAmplitude)) * mix(vec3(0.f, 0.f, 0.f), vec3(0.5, 0.1, 0.5f), 0.5 * skew + 0.5));
         }
 
         emissionMask.rgb = intensityMultiplier * fragColor.rgb;
 
         if (u_isSkew) {
-            vec3 bloomColor = mix(vec3(0.f), vec3(1.f, 0.4f, 1.f), bendAge * (1.f - (0.5f * skew + 0.5f)));
+            vec3 bloomColor = mix(vec3(0.f), vec3(1.f, 0.9f, 0.f), bendAge * (1.f - (0.5f * skew + 0.5f)));
             emissionMask.rgb += 52.f * heightFactor * bloomColor;
         }
 
         gl_FragDepth = fragColor.a <= 0.55f ? 1.f : depth;
         emissionMask.a = gl_FragDepth;
+        depthOffset = 0.f;
     }
 }
