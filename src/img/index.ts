@@ -10,6 +10,7 @@ import corpse from './corpse.png'
 import plantAtlas from './plantsAtlas.png'
 import heartGay from './heartGay.png'
 import childTextureAtlas from './childTextureAtlas.png'
+import childCorpse from './child_corpse.png'
 
 const imagesSrc = {
     clouds,
@@ -23,7 +24,8 @@ const imagesSrc = {
     egg_slider,
     corpse,
     plantAtlas,
-    childTextureAtlas
+    childTextureAtlas,
+    childCorpse
 }
 
 export default imagesSrc

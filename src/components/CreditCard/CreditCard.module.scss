@@ -12,6 +12,12 @@
 
 .name {
   font-size: 32px;
+
+  &.ripFrame {
+    border: 1px solid #ffffff;
+    padding: 0 4px;
+    border-radius: 2px;
+  }
 }
 
 .description {

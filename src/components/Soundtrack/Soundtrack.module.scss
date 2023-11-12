@@ -1,4 +1,7 @@
 .soundtrackBtnContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   position: fixed;
   top: 10px;
@@ -9,5 +12,11 @@
     width: 40px;
     height: 40px;
     fill: white;
+    &.soundIcon {
+      padding-top: 5px;
+      padding-right: 4px;
+      width: 30px;
+      height: 30px;
+    }
   }
 }

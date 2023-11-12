@@ -15,11 +15,12 @@ interface ICreditCardProps {
     description: string,
     name: string,
     links: CreditsLink[]
+    isDead?: boolean
 }
 
-const CreditCard = ({imageSrc, description, links, name}: ICreditCardProps) => <div className={classes.cardContainer}>
+const CreditCard = ({imageSrc, description, links, name, isDead = false}: ICreditCardProps) => <div className={classes.cardContainer}>
     <img src={imageSrc} alt={name}/>
-    <div className={classes.name}>{name}</div>
+    <div className={`${classes.name} ${isDead ? classes.ripFrame : ''}`}>{name}</div>
     <div className={classes.description}>{description}</div>
     <div className={classes.linksBox}>
         {links.map(({type, link}:CreditsLink) => {

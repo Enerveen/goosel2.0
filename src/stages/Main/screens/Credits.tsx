@@ -31,6 +31,7 @@ const Credits = ({setCurrentScreen}: ICreditsProps) => {
                 <CreditCard
                     imageSrc={kkPortrait}
                     description={'Coding'}
+                    isDead={true}
                     name={'Konstantin Kovalev'}
                     links={[{type: "gh", link: 'https://github.com/IMConstant'}]}
                 />

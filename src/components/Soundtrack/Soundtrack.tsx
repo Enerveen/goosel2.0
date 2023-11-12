@@ -1,8 +1,8 @@
 import soundtrack from '../../audio/soundtrack.mp3'
 import classes from './Soundtrack.module.scss'
 import {useCallback, useEffect, useMemo, useState} from "react";
-import Cross from "../../icons/Cross";
-import Tick from "../../icons/Tick";
+import Sound from "../../icons/Sound";
+import Mute from "../../icons/Mute";
 
 const Soundtrack = () => {
     const [isSoundOn, setSoundOn] = useState(false)
@@ -24,7 +24,7 @@ const Soundtrack = () => {
         }
         return () => audio.pause()
     }, [isSoundOn])
-    return <div className={classes.soundtrackBtnContainer} onClick={toggleSound}>{isSoundOn ? <Tick/> : <Cross/>}</div>
+    return <div className={classes.soundtrackBtnContainer} onClick={toggleSound}>{isSoundOn ? <Sound className={classes.soundIcon}/> : <Mute/>}</div>
 }
 
 export default Soundtrack

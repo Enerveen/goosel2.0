@@ -65,15 +65,16 @@ class Renderer {
         })
         this.matureAnimalTextureAtlas = {...animalTextureAtlas, width: 94, height: 94 * animalTextureAtlasFrameRatio};
         const corpseTextureRatio = 262 / 421
+        const childCorpseTextureRatio = 335 / 256
         this.teenCorpseTexture = loadTexture(images.corpse, {
             width: 90.25,
             height: 90.25 * corpseTextureRatio,
             offsetX: 0.5,
             offsetY: 0.5
         })
-        this.childCorpseTexture = loadTexture(images.corpse, {
-            width: 60.16,
-            height: 60.16 * corpseTextureRatio,
+        this.childCorpseTexture = loadTexture(images.childCorpse, {
+            width: 50,
+            height: 50 * childCorpseTextureRatio,
             offsetX: 0.5,
             offsetY: 0.5
         })
