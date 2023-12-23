@@ -1,10 +1,13 @@
 .checkboxContainer {
   display: flex;
+  justify-content: space-between;
+  color: #fafafa;
+  margin-bottom: 8px;
+  height: 30px;
   align-items: center;
 
   span {
     color: #fafafa;
-    line-height: 30px;
     font-size: 20px;
   }
 
@@ -15,4 +18,17 @@
     accent-color: #5fa35c;
     cursor: pointer;
   }
+}
+
+.tooltipIcon {
+  font-family: "Comic Sans MS", serif;
+  text-align: center;
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  border-radius: 100%;
+  padding: 2px;
+  font-size: 16px !important;
+  margin-left: 8px;
+  background-color: rgba(17, 17, 17, 0.2);
 }

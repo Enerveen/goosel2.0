@@ -197,7 +197,7 @@ class Renderer {
 
     public drawBreeding(position: Position, isGay = false) {
         const [{image, width, height, offsetX, offsetY}, {x, y}] =
-            [isGay ? this.breedingTexture : this.gaySexTexture, position]
+            [isGay ? this.gaySexTexture : this.breedingTexture, position]
         if (this.context) {
             this.context.drawImage(image, x - offsetX * width, y - offsetY * height, width, height)
         }
@@ -277,11 +277,11 @@ class Renderer {
     }
 
     public calculateCorpseTexture(age: number) {
-        if (age >= 0 && age < 5) {
+        if (age >= 0 && age < 3) {
             return this.childCorpseTexture
         }
 
-        if (age >= 5 && age < 10) {
+        if (age >= 3 && age < 10) {
             return this.teenCorpseTexture
         }
 

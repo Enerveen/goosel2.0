@@ -37,7 +37,8 @@ export const defaultSimConstants:SimulationConstants = {
     foodSpawnChance: 0.03,
     initialFoodCount: 200,
     initialAnimalCount: 24,
-    fieldSize: {width: 3200, height: 1800}
+    fieldSize: {width: 3200, height: 1800},
+    isBalancedGenderDiff: true
 }
 
 export const simConstantsRanges = {

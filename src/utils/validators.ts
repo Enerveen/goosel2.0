@@ -5,6 +5,9 @@ import {defaultSimConstants, simConstantsRanges} from "../constants/simulation";
 export const validateSimulationConstants = (constants: SimulationConstants) => {
     try {
         Object.keys(constants).forEach(key => {
+            if (key === 'isBalancedGenderDiff') {
+                return;
+            }
             if (key === 'breedingMinAge' || key === 'breedingMaxAge') {
                 (constants as any)[key] = (constants as any)[key] > simConstantsRanges.breedingAge.max ?
                     simConstantsRanges.breedingAge.max : (constants as any)[key] < simConstantsRanges.breedingAge.min ?

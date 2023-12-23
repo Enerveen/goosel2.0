@@ -392,11 +392,11 @@ class Animal extends Entity implements Movable {
         }
 
         this.age.current += 1
-        if (this.age.current <= 15) {
+        if (this.age.current <= 18) {
             return;
         }
 
-        const isDead = (Math.random() * this.age.current) > 15
+        const isDead = (Math.random() * this.age.current) > 18
         if (!isDead) {
             return;
         }
@@ -483,7 +483,7 @@ class Animal extends Entity implements Movable {
                 const father = this.gender === 'male' ? this : partner
                 const mother = this.gender === 'female' ? this : partner
                 const eggs = new Array(getRandomInRange(1, 4)).fill(null)
-                    .map((elem, index) => {
+                    .map((_, index) => {
                         return new Egg({
                             parents: {father, mother},
                             id: `A${getId()}`,

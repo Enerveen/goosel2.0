@@ -68,6 +68,7 @@ export type SimulationConstants = {
     initialAnimalCount: number,
     foodNutritionMin: number,
     foodNutritionMax: number,
+    isBalancedGenderDiff: boolean,
     fieldSize: FieldDimensions
 }
 

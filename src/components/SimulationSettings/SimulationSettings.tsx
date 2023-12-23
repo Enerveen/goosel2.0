@@ -4,21 +4,22 @@ import Slider from "../Slider/Slider";
 import RangeSlider from "../RangeSlider/RangeSlider";
 import {SimulationConstants} from "../../types";
 import {simConstantsRanges} from "../../constants/simulation";
+import Checkbox from "../Checkbox/Checkbox";
 
 interface ISimulationSettingsProps {
     constantsValues: SimulationConstants,
     setConstantsValues: (p: (prevValue: SimulationConstants) => any) => void
 }
 
-const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSettingsProps) => {
+const SimulationSettings = ({constantsValues, setConstantsValues}: ISimulationSettingsProps) => {
 
     const updateSettingsValues =
-        useCallback((key: string, value: number) =>
+        useCallback((key: string, value: number | boolean) =>
             setConstantsValues(prevValue => ({...prevValue, [key]: value})), [setConstantsValues])
 
     const updateFieldDimensions =
         useCallback((key: 'width' | 'height', value: number) =>
-            setConstantsValues(prevValue => ({...prevValue, fieldSize: {...prevValue.fieldSize, [key]: value}})),
+                setConstantsValues(prevValue => ({...prevValue, fieldSize: {...prevValue.fieldSize, [key]: value}})),
             [setConstantsValues])
 
     const updateBreedingRange = useCallback((values: number[]) =>
@@ -28,7 +29,6 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
     const updateFoodNutritionRange = useCallback((values: number[]) =>
         setConstantsValues(prevValue =>
             ({...prevValue, foodNutritionMin: values[0], foodNutritionMax: values[1]})), [setConstantsValues])
-
     return <div className={classes.container}>
         <RangeSlider
             minGap={1}
@@ -141,6 +141,11 @@ const SimulationSettings = ({constantsValues, setConstantsValues}:ISimulationSet
             value={Math.round(constantsValues.mutationChance * simConstantsRanges.mutationChance.multiplier)}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 updateSettingsValues('mutationChance', +e.target.value / simConstantsRanges.mutationChance.multiplier)}
+        />
+        <Checkbox label={'Balance gender diversity'}
+                  onChange={(e => updateSettingsValues('isBalancedGenderDiff', e.target.checked))}
+                  checked={constantsValues.isBalancedGenderDiff}
+                  tooltipContent={'While enabled, balances chances of gender on birth based on gender diversity of current population'}
         />
     </div>
 }

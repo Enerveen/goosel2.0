@@ -1,6 +1,6 @@
 import {gender, Position, Stats} from "../types";
 import Animal from "../entities/Animal";
-import {coinFlip, rollNPercentChance} from "./utils";
+import {coinFlip, getRandomInRange, rollNPercentChance} from "./utils";
 import {generateAnimalFirstName} from "./nameGen";
 import Plant from "../entities/Plant";
 import simulationStore from "../stores/simulationStore";
@@ -12,6 +12,15 @@ export const getRandomPosition = (edgeX: number, edgeY: number) => ({
     x: Math.random() * edgeX,
     y: Math.random() * edgeY
 })
+
+const calculateGender = () => {
+    if (simulationStore.getSimulationConstants.isBalancedGenderDiff) {
+        const stats = simulationStore.getStatistics.gender[simulationStore.getStatistics.gender.length - 1]
+        return getRandomInRange(0, stats.male + stats.female) > stats.male ? 'male' : 'female'
+    } else {
+        return coinFlip() ? 'male' : 'female'
+    }
+}
 
 export const getChild = (
     parents: { mother: Animal, father: Animal },
@@ -31,7 +40,7 @@ export const getChild = (
         immunity: (mother.stats.immunity + father.stats.immunity) / 2,
         curiosity: (mother.stats.curiosity + father.stats.curiosity) / 2
     }
-    const gender: gender = coinFlip() ? 'male' : 'female'
+    const gender: gender = calculateGender()
 
     const stats = {
         speed: Math.max(0.1, +((!rollNPercentChance(mutationChance) ? baseStats.speed : coinFlip() ?
