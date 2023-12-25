@@ -1,7 +1,7 @@
 import {SimulationConstants} from "../types";
 
 export const plantsKinds =
-    ['lethal', 'poisonous', 'speed', 'lovely', 'gay'] as const
+    ['tasty', 'hearty','speed', 'lovely', 'gay', 'lethal', 'poisonous'] as const
 
 export const simulationValuesMultipliers = {
     foodSensitivity: 200,
@@ -28,8 +28,8 @@ export const appConstants = {
 
 export const defaultSimConstants:SimulationConstants = {
     mutationChance: 0.2,
-    breedingMinAge: 5,
-    breedingMaxAge: 15,
+    breedingMinAge: 3,
+    breedingMaxAge: 18,
     foodNutritionMin: 300,
     foodNutritionMax: 800,
     breedingMaxProgress: 200,
@@ -37,7 +37,7 @@ export const defaultSimConstants:SimulationConstants = {
     foodSpawnChance: 0.03,
     initialFoodCount: 200,
     initialAnimalCount: 24,
-    fieldSize: {width: 3200, height: 1800},
+    fieldSize: {width: 1800, height: 1000},
     isBalancedGenderDiff: true
 }
 

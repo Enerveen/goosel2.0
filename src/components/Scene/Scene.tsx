@@ -69,7 +69,7 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
         if (rollNPercentChance(store.getSimulationConstants.foodSpawnChance * store.getSimulationSpeed)) {
             const isSpecial = rollNPercentChance(0.2)
             store.addPlant(new Plant({kind: isSpecial ?
-                    plantsKinds[getRandomInRange(0, 5)] as plantKind : 'common'}
+                    plantsKinds[getRandomInRange(0, 7)] as plantKind : 'common'}
             ))
         }
         store.getAnimals.forEach(animal => animal.live())
@@ -101,10 +101,10 @@ const Scene = observer(({store, setAppPhase}: ISceneProps) => {
             width: store.getSimulationConstants.fieldSize.width,
             height: store.getSimulationConstants.fieldSize.height
         })
-        store.getPlants.forEach(entity => renderer.drawPlant(entity.position, entity.kind))
-        store.getCorpses.forEach(entity => renderer.drawCorpse(entity.position, entity.age))
-        store.getEggs.forEach(entity => renderer.drawEgg(entity.position))
-        store.getAnimals.forEach(entity => {
+        store.getPlants.sort((elem1, elem2) => elem1.position.y - elem2.position.y).forEach(entity => renderer.drawPlant(entity.position, entity.kind))
+        store.getCorpses.sort((elem1, elem2) => elem1.position.y - elem2.position.y).forEach(entity => renderer.drawCorpse(entity.position, entity.age))
+        store.getEggs.sort((elem1, elem2) => elem1.position.y - elem2.position.y).forEach(entity => renderer.drawEgg(entity.position))
+        store.getAnimals.sort((elem1, elem2) => elem1.position.y - elem2.position.y).forEach(entity => {
             renderer.drawAnimal(
                 entity.position,
                 {

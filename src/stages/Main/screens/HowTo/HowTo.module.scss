@@ -19,6 +19,11 @@
     text-decoration: underline;
     cursor: pointer;
   }
+
+  h2 {
+    text-align: center;
+    font-size: 24px;
+  }
 }
 
 .plantInfoContainer {
@@ -28,12 +33,12 @@
 }
 
 .clippedImage {
-  width: 75px;
-  min-width: 75px;
+  width: 66px;
+  min-width: 66px;
   overflow: hidden;
   display: inline-block;
   img {
-    width: 450px;
+    width: 528px;
   }
 
 }

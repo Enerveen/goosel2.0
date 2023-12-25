@@ -42,6 +42,12 @@ class Plant extends Entity {
             case "poisonous":
                 animal.energy.current -=this.nutritionValue * 2
                 break;
+            case "tasty":
+                animal.energy.current +=this.nutritionValue * 0.5
+                break;
+            case "hearty":
+                animal.energy.current = animal.energy.max
+                break;
             case "lethal":
                 animal.die()
                 addLogItem({message:`${animal.name} died after consuming a poisonous food`, timestamp})

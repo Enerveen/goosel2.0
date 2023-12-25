@@ -50,8 +50,8 @@ class Renderer {
     constructor(ctx: CanvasRenderingContext2D | null, images: any) {
         this.context = ctx || null
         const animalTextureAtlas = loadTextureAtlas(images.animalTextureAtlas, {
-            frameWidth: 282,
-            frameHeight: 361,
+            frameWidth: 300,
+            frameHeight: 370,
             offsetX: 0.5,
             offsetY: 0.8
         });
@@ -86,12 +86,12 @@ class Renderer {
         })
         this.eggsAtlas = loadTextureAtlas(images.eggAtlas, {frameWidth: 200, frameHeight: 201, width: 44, height: 44, offsetX: 0.5, offsetY: 0.5});
         this.plantAtlas = loadTextureAtlas(images.plantAtlas, {
-            frameWidth: 300,
+            frameWidth: 330,
             frameHeight: 330,
             offsetY: 0.5,
             offsetX: 0.5,
             width: 45,
-            height: 49.5
+            height: 45
         })
         this.cloudsTexture = loadTexture(images.clouds);
         this.breedingTexture = loadTexture(images.heart, {width: 20, height: 20, offsetX: 0.5, offsetY: 0.5});
@@ -290,11 +290,11 @@ class Renderer {
 
     calculateAnimalTexture(entity: { gender: gender, age: number }) {
         const {age} = entity
-        if (age >= 0 && age < 5) {
+        if (age >= 0 && age < 3) {
             return this.childAnimalTextureAtlas
         }
 
-        if (age >= 5 && age < 10) {
+        if (age >= 3 && age < 10) {
             return this.teenAnimalTextureAtlas
         }
 

@@ -365,7 +365,7 @@ class Animal extends Entity implements Movable {
         const nearestPair = [...animals].filter(animal =>
             animal.id !== this.id &&
             checkBreedingPossibility(animal) &&
-            (this.genes.gay ? animal.gender === this.gender && animal.genes.gay : animal.gender !== this.gender))
+            (this.genes.gay ? animal.gender === this.gender && animal.genes.gay : animal.gender !== this.gender && !animal.genes.gay))
             .sort((a, b) => {
                 const distanceToA = findDistance(this.position, a.position)
                 const distanceToB = findDistance(this.position, b.position)
