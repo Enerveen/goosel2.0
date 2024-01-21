@@ -8,7 +8,7 @@ interface IPlantInfoProps {
     description: string
 }
 const PlantInfo = ({plantName, posShift, description}:IPlantInfoProps) => <div className={classes.plantInfoContainer}>
-    <div><span className={classes.special}>{plantName}</span>: {description}</div>
+    <div><span className={classes.special}>{plantName}</span> - {description}</div>
     <div className={classes.clippedImage}>
         <img src={plantAtlas} alt={plantName} style={{objectPosition: posShift}} />
     </div>

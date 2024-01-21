@@ -21,7 +21,7 @@ export class SimulationStore {
     currentYear: number = -1
     statistics: {
         age: { child: number, teen: number, mature: number, elder: number, year: number }[],
-        genes: {total: number, predator: number, gay:  number, scavenger: number, year: number}[]
+        genes: {total: number, gay: number, scavenger: number, year: number}[]
         gender: { male: number, female: number, year: number }[]
         averageStats: {
             breedingCD: number,

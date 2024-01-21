@@ -3,7 +3,6 @@ import classes from './chartsStyles.module.scss'
 enum keyNames {
     total = 'Total',
     gay = 'Homosexual',
-    predator = 'Predator',
     scavenger = 'Scavenger',
     child = 'Children',
     teen = 'Teens',

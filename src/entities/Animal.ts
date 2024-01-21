@@ -73,7 +73,7 @@ class Animal extends Entity implements Movable {
                 immunity: 1
             },
             parents = null,
-            genes = {gay: false, predator: false, scavenger: false}
+            genes = {gay: false, scavenger: false}
         } = props
 
         super(position, id);
@@ -310,14 +310,15 @@ class Animal extends Entity implements Movable {
             this.position.y - foodSenseRange,
             this.position.y + foodSenseRange,
         )
-        const plants = store.getPlants as Plant[]
-        plants.forEach(plant => {
-            quadtree.push(plant);
-        })
         if (this.genes.scavenger) {
             const corpses = store.getCorpses as Corpse[]
             corpses.forEach(corpse => {
                 quadtree.push(corpse);
+            })
+        } else {
+            const plants = store.getPlants as Plant[]
+            plants.forEach(plant => {
+                quadtree.push(plant);
             })
         }
         const possibleFood = quadtree.get(searchObb)

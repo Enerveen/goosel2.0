@@ -5,9 +5,9 @@ export const plantsKinds =
 
 export const simulationValuesMultipliers = {
     foodSensitivity: 200,
-    breedingCD: 1000,
+    breedingCD: 900,
     breedingSensitivity: 200,
-    hatchingTime: 1000,
+    hatchingTime: 900,
     immunity: 0.5,
     curiosity: 0.5
 }

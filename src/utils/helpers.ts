@@ -61,8 +61,7 @@ export const getChild = (
 
     const genes = {
         gay: rollNPercentChance(mutationChance / 2),
-        scavenger: rollNPercentChance(mutationChance / 2) ? !(mother.genes.scavenger || father.genes.scavenger) : (mother.genes.scavenger || father.genes.scavenger),
-        predator: rollNPercentChance(mutationChance / 2) ? !(mother.genes.predator || father.genes.predator) : (mother.genes.predator || father.genes.predator)
+        scavenger: rollNPercentChance(mutationChance / 2) ? !(mother.genes.scavenger || father.genes.scavenger) : (mother.genes.scavenger || father.genes.scavenger)
     }
     return new Animal({
         id,
@@ -125,8 +124,7 @@ export const generateAnimals = (amount: number, demo: boolean = false) => {
             energy: {current: demo ? Infinity : animalMaxEnergy, max: animalMaxEnergy, breedingCD: 0},
             genes: {
                 gay: false,
-                scavenger: coinFlip(),
-                predator:coinFlip()
+                scavenger: false
             }
         }))
 }

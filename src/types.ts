@@ -79,8 +79,7 @@ export type LogItem = {
 
 export type Genes = {
     gay: boolean,
-    scavenger: boolean,
-    predator: boolean
+    scavenger: boolean
 }
 
 export type plantKind = typeof plantsKinds[number] | 'common'

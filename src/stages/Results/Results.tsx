@@ -50,7 +50,7 @@ const Results = ({setAppPhase}: IResultsProps) => {
             </div>
             <div className={classes.chartContainer}>
                 <h2>Animals genes representation</h2>
-                <BarChart data={statistics.genes} dataKeys={['total', 'gay', 'predator', 'scavenger']} xAxisDataKey={'year'}/>
+                <BarChart data={statistics.genes} dataKeys={['total', 'gay', 'scavenger']} xAxisDataKey={'year'}/>
             </div>
             <div className={classes.chartContainer}>
                 <h2>Average population stats</h2>
