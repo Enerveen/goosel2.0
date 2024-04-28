@@ -1,5 +1,4 @@
 import classes from "./HowTo.module.scss";
-import React from "react";
 
 const TimeFlowInfo = ({setTab}: {setTab: (id:string) => void}) => {
 

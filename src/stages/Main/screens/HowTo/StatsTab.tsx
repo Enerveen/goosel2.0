@@ -1,8 +1,7 @@
 import classes from "./HowTo.module.scss";
-import React from "react";
 import {simulationValuesMultipliers} from "../../../../constants/simulation";
 
-const StatsInfo = ({setTab}: {setTab: (id:string) => void}) => {
+const StatsInfo = () => {
 
     return <div className={classes.infoContent}>
         <p>

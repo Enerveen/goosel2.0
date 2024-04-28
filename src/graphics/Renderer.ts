@@ -290,11 +290,12 @@ class Renderer {
 
     calculateAnimalTexture(entity: { gender: gender, age: number }) {
         const {age} = entity
-        if (age >= 0 && age < 3) {
+        const minAge = simulationStore.getSimulationConstants.breedingMinAge
+        if (age >= 0 && age < minAge) {
             return this.childAnimalTextureAtlas
         }
 
-        if (age >= 3 && age < 10) {
+        if (age >= minAge && age < 10) {
             return this.teenAnimalTextureAtlas
         }
 

@@ -1,4 +1,3 @@
-import React from "react";
 import classes from "./HowTo.module.scss";
 import plantAtlas from '../../../../img/plantsAtlas.png'
 

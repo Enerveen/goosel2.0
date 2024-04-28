@@ -7,13 +7,7 @@ import {Tab} from "../../../../types";
 import TimeFlowInfo from "./TimeFlowTab";
 import PlantsInfo from "./PlantsTab";
 import StatsInfo from "./StatsTab";
-
-const BehaviorInfo = () => {
-
-    return <div>
-        {'Some information about behaviour, I guess \n'.repeat(20)}
-    </div>
-}
+import BehaviorInfo from "./BehaviorTab";
 
 interface IHowToProps {
     setCurrentScreen: (screen: mainMenuScreens) => void
@@ -25,7 +19,7 @@ const HowTo = ({setCurrentScreen}: IHowToProps) => {
         {id: 'time', content: (setTab) => <TimeFlowInfo setTab={setTab}/>, label: 'Time flow'},
         {id: 'plants', content: () => <PlantsInfo/>, label: 'Plants'},
         {id: 'stats', content: (setTab) => <StatsInfo setTab={setTab}/>, label: 'Stats & Genes'},
-        {id: 'behavior', content: () => <BehaviorInfo/>, label: 'Geese behaviour'}
+        {id: 'behavior', content: (setTab) => <BehaviorInfo setTab={setTab}/>, label: 'Geese behaviour'}
     ]
     return <div className={classes.screenContainer}>
         <Tabs tabsList={tabsList} className={classes.tabs}/>
