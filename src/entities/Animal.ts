@@ -260,7 +260,7 @@ class Animal extends Entity implements Movable {
             return;
         }
 
-        this.energy.current -= simulationSpeed * calculateEnergyLoss(this.stats);
+        this.energy.current -= simulationSpeed * calculateEnergyLoss(this.stats, this.genes.scavenger);
         if (this.energy.breedingCD > 0) {
             this.energy.breedingCD -= simulationSpeed
         }
@@ -466,7 +466,7 @@ class Animal extends Entity implements Movable {
         removeAnimal(this.id)
         addCorpse(new Corpse({
             id: this.id,
-            nutritionValue: 100 + this.energy.current,
+            nutritionValue: this.energy.current * 0.8,
             position: {...this.position},
             deathTimestamp: timestamp,
             age: this.age.current
@@ -478,18 +478,20 @@ class Animal extends Entity implements Movable {
         const timestamp = store.getTimestamp
         const {addEgg, getId} = store
         const {progress, maxProgress} = this.currentActivity
-        this.energy.current -= +((simulationSpeed * calculateEnergyLoss(this.stats)).toFixed(3));
+        this.energy.current -= +((simulationSpeed * calculateEnergyLoss(this.stats, this.genes.scavenger)).toFixed(3));
         if (progress >= maxProgress) {
             if (!this.genes.gay) {
                 const father = this.gender === 'male' ? this : partner
                 const mother = this.gender === 'female' ? this : partner
-                const eggs = new Array(getRandomInRange(1, 4)).fill(null)
+                const siblingsCount = getRandomInRange(1, 4)
+                const eggs = new Array(siblingsCount).fill(null)
                     .map((_, index) => {
                         return new Egg({
                             parents: {father, mother},
                             id: `A${getId()}`,
                             position: {x: this.position.x - 20 + index * 20, y: this.position.y - 20 * (index % 2)},
-                            hatchTimestamp: timestamp + mother.stats.hatchingTime * simulationValuesMultipliers.hatchingTime
+                            hatchTimestamp: timestamp + mother.stats.hatchingTime * simulationValuesMultipliers.hatchingTime,
+                            siblingsCount
                         })
                     })
                 addEgg(eggs)

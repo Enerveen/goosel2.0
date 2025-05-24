@@ -25,7 +25,8 @@ const calculateGender = () => {
 export const getChild = (
     parents: { mother: Animal, father: Animal },
     id: string,
-    position: Position
+    position: Position,
+    siblingsCount: number
 ) => {
     const timestamp = simulationStore.getTimestamp
     const {mutationChance, animalMaxEnergy, breedingMaxProgress} = simulationStore.getSimulationConstants
@@ -71,7 +72,7 @@ export const getChild = (
         name: `${generateAnimalFirstName(gender)} ${father.name.split(' ').slice(1).join(' ')}`,
         position: {...position},
         energy: {
-            current: (calculateEnergyLoss(father.stats) + calculateEnergyLoss(mother.stats)) * breedingMaxProgress * 0.4,
+            current: (calculateEnergyLoss(father.stats, father.genes.scavenger) + calculateEnergyLoss(mother.stats, mother.genes.scavenger)) * breedingMaxProgress / siblingsCount,
             max: animalMaxEnergy,
             breedingCD: 0
         },
@@ -83,17 +84,20 @@ export const getChild = (
     })
 }
 
-export const calculateEnergyLoss = (stats: Stats) => {
+export const calculateEnergyLoss = (stats: Stats, isScavenger: boolean) => {
     const {
         speed,
         foodSensitivity,
         breedingSensitivity,
-        breedingCD,
         curiosity,
+        immunity,
         hatchingTime,
-        immunity
+        breedingCD
     } = stats
-    return speed * foodSensitivity * breedingSensitivity * curiosity * hatchingTime * immunity / breedingCD
+        return 1.2 * speed *
+            1.2 * foodSensitivity * 1.2 *
+            breedingSensitivity *
+            curiosity * immunity * (isScavenger ? 1.5 : 1) * 0.8 * breedingCD * 0.8 * hatchingTime;
 }
 
 export const checkBreedingPossibility = (animal: Animal) => {
@@ -107,14 +111,14 @@ export const checkBreedingPossibility = (animal: Animal) => {
 
 export const generateFood = (amount: number) => {
     const {fieldSize: {width, height}} = simulationStore.getSimulationConstants
-    return new Array(amount).fill(null).map((elem, index) =>
+    return new Array(amount).fill(null).map((_, index) =>
         new Plant({id: `P${index}init`, position: getRandomPosition(width, height)}))
 }
 
 
 export const generateAnimals = (amount: number, demo: boolean = false) => {
     const {fieldSize: {width, height}, animalMaxEnergy} = simulationStore.getSimulationConstants
-    return new Array(amount).fill(null).map((elem, index) =>
+    return new Array(amount).fill(null).map((_, index) =>
         new Animal({
             id: `A${index}init`,
             position: demo ? getRandomPosition(
